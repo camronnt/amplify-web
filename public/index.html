@@ -1286,7 +1286,7 @@ async function generateAIChallenge(force){
     var prompt=goalName
       ?'Generate a single specific, actionable daily challenge for someone whose main goal is: "'+goalName+'". The challenge must be completable today. It should feel urgent and push the person slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person ("You", "Do", "Send", etc). No preamble. No title. No bullet. Just the challenge text.'
       :'Generate a single specific, actionable daily challenge for someone working on an important personal goal. It must be completable today, feel urgent, and push them slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person. No preamble, no title.';
-    var resp=await fetch('https://bucolic-puffpuff-475ccd.netlify.app/.netlify/functions/push',{
+    var resp=await fetch('https://zingy-kheer-f624a3.netlify.app/.netlify/functions/push',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:120,messages:[{role:'user',content:prompt}]})
@@ -1452,7 +1452,7 @@ async function sendPush(){
     return {role: m.role==='user'?'user':'assistant', content: m.text};
   });
   try{
-    var resp = await fetch('https://bucolic-puffpuff-475ccd.netlify.app/.netlify/functions/push',{
+    var resp = await fetch('https://zingy-kheer-f624a3.netlify.app/.netlify/functions/push',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
