@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Amplify">
+<meta name="theme-color" content="#0d0d0d">
+<title>Amplify</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:#0d0d0d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;min-height:100vh;}
+.app{max-width:430px;margin:0 auto;min-height:100vh;background:#0d0d0d;}
+.screen{padding:20px 16px 100px;display:none;}
+.screen.active{display:block;}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0d0d0d;border-top:1px solid #1e1e1e;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom,8px);}
+.nav-btn{flex:1;background:none;border:none;color:rgba(255,255,255,0.3);font-size:10px;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.nav-btn.active{color:#7F77DD;}
+.nav-icon{font-size:18px;}
+.nav-hero{display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,#7F77DD,#534AB7);border-radius:14px;padding:6px 14px 4px;gap:2px;margin-top:-10px;box-shadow:0 4px 16px rgba(127,119,221,0.45);}
+.nav-hero span{font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.07em;}
+.card{background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:16px;margin-bottom:12px;}
+.card-label{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+input[type=text],input[type=date],input[type=time],input[type=datetime-local],select,textarea{width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:10px;color:#fff;font-size:14px;padding:11px 12px;outline:none;-webkit-appearance:none;appearance:none;font-family:-apple-system,sans-serif;}
+textarea{resize:none;min-height:80px;line-height:1.5;}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
+.btn{border:none;border-radius:10px;font-size:14px;padding:11px 18px;cursor:pointer;font-weight:600;font-family:-apple-system,sans-serif;display:inline-block;}
+.btn-p{background:#7F77DD;color:#fff;}
+.btn-g{background:#161616;color:rgba(255,255,255,0.6);border:1px solid #2a2a2a;}
+.btn-r{background:rgba(226,75,74,0.15);color:#E24B4A;border:1px solid rgba(226,75,74,0.2);}
+.btn-sm{font-size:11px;padding:7px 12px;}
+.row{display:flex;gap:8px;}
+.cd-card{border-radius:16px;padding:16px;margin-bottom:10px;position:relative;border:1px solid #1e1e1e;background:#111;}
+.cd-card.deadline-type{border-color:rgba(226,75,74,0.5);background:#120a0a;animation:dpulse 3s ease-in-out infinite;}
+.cd-card.milestone-type{border-color:rgba(127,119,221,0.4);background:#0e0c1a;}
+.cd-card.daily-type{border-color:rgba(29,158,117,0.3);background:#0a130f;}
+.cd-card.hourly-type{border-color:rgba(239,159,39,0.3);background:#131009;}
+@keyframes dpulse{0%,100%{box-shadow:0 0 16px rgba(226,75,74,0.1);}50%{box-shadow:0 0 28px rgba(226,75,74,0.28);}}
+.type-badge{display:inline-block;font-size:9px;padding:3px 8px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+.type-badge.deadline{background:rgba(226,75,74,0.2);color:#ff6b6a;border:1px solid rgba(226,75,74,0.35);}
+.type-badge.milestone{background:rgba(127,119,221,0.2);color:#a29bf0;border:1px solid rgba(127,119,221,0.35);}
+.type-badge.daily{background:rgba(29,158,117,0.2);color:#4dcca0;border:1px solid rgba(29,158,117,0.35);}
+.type-badge.hourly{background:rgba(239,159,39,0.2);color:#f4b842;border:1px solid rgba(239,159,39,0.35);}
+.primary-badge{display:inline-block;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(127,119,221,0.15);color:#7F77DD;border:1px solid rgba(127,119,221,0.3);margin-right:4px;margin-bottom:8px;}
+.cd-secs{font-size:44px;font-weight:700;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;}
+.cd-unit{font-size:9px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;}
+.cd-breakdown{display:flex;margin-top:12px;padding-top:10px;border-top:1px solid #1e1e1e;}
+.cd-bd{flex:1;text-align:center;}
+.cd-bd-val{font-size:14px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;}
+.cd-bd-lbl{font-size:8px;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-top:2px;}
+.urgency{height:3px;background:#1e1e1e;border-radius:2px;margin-top:12px;overflow:hidden;}
+.urgency-fill{height:100%;border-radius:2px;}
+.cd-del{position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,0.2);font-size:16px;cursor:pointer;padding:4px 6px;}
+.vibe-bar{background:#111;border:1px solid #1e1e1e;border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+.vibe-label{font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;}
+.vibe-opts{display:flex;gap:6px;}
+.vibe-btn{flex:1;background:#161616;border:1px solid #2a2a2a;border-radius:10px;color:rgba(255,255,255,0.4);font-size:11px;padding:8px 4px;cursor:pointer;font-family:-apple-system,sans-serif;text-align:center;}
+.vibe-btn.active{border-color:#7F77DD;background:rgba(127,119,221,0.15);color:#fff;}
+.vibe-msg{font-size:12px;color:rgba(255,255,255,0.4);margin-top:10px;line-height:1.5;}
+.micro-card{background:rgba(29,158,117,0.08);border:1px solid rgba(29,158,117,0.2);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
+.goal-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #161616;}
+.goal-row:last-of-type{border-bottom:none;}
+.check-btn{width:20px;height:20px;border-radius:50%;border:1.5px solid #333;background:none;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.check-btn.done{background:#1D9E75;border-color:#1D9E75;}
+.goal-txt{flex:1;font-size:14px;color:#fff;}
+.goal-txt.done{color:rgba(255,255,255,0.25);text-decoration:line-through;}
+.del-btn{background:none;border:none;color:rgba(255,255,255,0.2);font-size:14px;cursor:pointer;padding:4px;}
+.streak-num{font-size:36px;font-weight:700;color:#EF9F27;}
+.dots{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap;}
+.dot{width:26px;height:26px;border-radius:50%;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.2);}
+.dot.done{background:#EF9F27;border-color:#EF9F27;color:#000;}
+.dot.today{border-color:#7F77DD;color:#7F77DD;}
+.disc-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.disc-tab{flex:1;background:#161616;border:1px solid #2a2a2a;border-radius:10px;color:rgba(255,255,255,0.4);font-size:12px;padding:8px;cursor:pointer;font-family:-apple-system,sans-serif;text-align:center;font-weight:600;}
+.disc-tab.active-do{border-color:#1D9E75;background:rgba(29,158,117,0.15);color:#4dcca0;}
+.disc-tab.active-dont{border-color:#7F77DD;background:rgba(127,119,221,0.15);color:#a29bf0;}
+.disc-card{border-radius:14px;padding:14px 16px;margin-bottom:10px;position:relative;}
+.disc-card.do-type{background:rgba(29,158,117,0.06);border:1px solid rgba(29,158,117,0.2);}
+.disc-card.dont-type{background:rgba(127,119,221,0.06);border:1px solid rgba(127,119,221,0.2);}
+.disc-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.disc-streak{font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;}
+.disc-streak.do-color{color:#4dcca0;}
+.disc-streak.dont-color{color:#a29bf0;}
+.disc-unit{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;margin-bottom:10px;}
+.disc-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.disc-check-btn{flex:1;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;}
+.disc-check-btn.do-check{background:rgba(29,158,117,0.2);color:#4dcca0;border:1px solid rgba(29,158,117,0.3);}
+.disc-check-btn.dont-check{background:rgba(127,119,221,0.2);color:#a29bf0;border:1px solid rgba(127,119,221,0.3);}
+.disc-check-btn.checked{opacity:0.4;cursor:default;}
+.disc-del{position:absolute;top:12px;right:12px;background:none;border:none;color:rgba(255,255,255,0.15);font-size:14px;cursor:pointer;padding:4px;}
+.disc-best{font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px;}
+.disc-bar{height:4px;background:#1e1e1e;border-radius:2px;margin-top:10px;overflow:hidden;}
+.disc-bar-fill{height:100%;border-radius:2px;}
+.checkin-banner{background:rgba(239,159,39,0.1);border:1px solid rgba(239,159,39,0.25);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.checkin-txt{font-size:13px;color:#f4b842;line-height:1.4;flex:1;}
+.m-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.m-tab{background:transparent;border:1px solid #2a2a2a;border-radius:20px;color:rgba(255,255,255,0.3);font-size:12px;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;}
+.m-tab.active{background:rgba(127,119,221,0.15);border-color:#7F77DD;color:#7F77DD;}
+.quote-line{width:20px;height:2px;background:#7F77DD;border-radius:2px;margin-bottom:10px;}
+.quote-txt{font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6;font-style:italic;}
+.quote-by{font-size:11px;color:rgba(255,255,255,0.25);margin-top:8px;}
+.cq-card{background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:14px;margin-bottom:8px;}
+.cq-text{font-size:13px;color:rgba(255,255,255,0.8);font-style:italic;line-height:1.5;margin-bottom:6px;}
+.cq-meta{display:flex;justify-content:space-between;align-items:center;}
+.cq-author{font-size:11px;color:rgba(255,255,255,0.25);}
+.cq-like{font-size:12px;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:-apple-system,sans-serif;padding:2px 6px;}
+.cq-like.liked{color:#7F77DD;}
+.shame-card{background:rgba(226,75,74,0.06);border:1px solid rgba(226,75,74,0.2);border-radius:12px;padding:14px;margin-bottom:8px;}
+.timer-big{font-size:64px;font-weight:700;color:#fff;letter-spacing:-3px;font-variant-numeric:tabular-nums;line-height:1;text-align:center;margin:16px 0;}
+.presets{display:flex;gap:6px;margin-top:10px;}
+.preset{flex:1;background:#161616;border:1px solid #2a2a2a;border-radius:8px;color:rgba(255,255,255,0.4);font-size:12px;padding:8px;cursor:pointer;font-family:-apple-system,sans-serif;}
+.preset.active{background:rgba(127,119,221,0.15);border-color:#7F77DD;color:#7F77DD;}
+.rem-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #161616;}
+.rem-row:last-of-type{border-bottom:none;}
+.push-suggest{background:#161616;border:1px solid #2a2a2a;border-radius:20px;color:rgba(255,255,255,0.4);font-size:11px;padding:6px 12px;cursor:pointer;font-family:-apple-system,sans-serif;white-space:nowrap;}
+.push-suggest:active{background:rgba(127,119,221,0.15);border-color:#7F77DD;color:#a29bf0;}
+.push-bubble{margin-bottom:14px;}
+.push-bubble.user{display:flex;justify-content:flex-end;}
+.push-bubble.coach{display:flex;justify-content:flex-start;}
+.push-bubble-inner{max-width:85%;padding:12px 14px;border-radius:16px;font-size:14px;line-height:1.6;}
+.push-bubble.user .push-bubble-inner{background:#7F77DD;color:#fff;border-radius:16px 16px 4px 16px;}
+.push-bubble.coach .push-bubble-inner{background:#1a1a1a;border:1px solid #2a2a2a;color:rgba(255,255,255,0.85);border-radius:16px 16px 16px 4px;}
+.push-bubble-time{font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;text-align:right;}
+.push-bubble.coach .push-bubble-time{text-align:left;}
+.push-clear{background:none;border:none;color:rgba(255,255,255,0.2);font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;padding:4px 0;display:block;margin:0 auto 10px;}
+.toggle{width:40px;height:22px;border-radius:11px;border:none;position:relative;cursor:pointer;flex-shrink:0;}
+.toggle-knob{position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;}
+.notif-banner{background:rgba(127,119,221,0.1);border:1px solid rgba(127,119,221,0.25);border-radius:14px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.ds-card{background:rgba(226,75,74,0.06);border:1px solid rgba(226,75,74,0.18);border-radius:16px;padding:16px;margin-bottom:12px;}
+.ds-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ds-title{font-size:15px;font-weight:700;color:#ff6b6a;display:flex;align-items:center;gap:7px;}
+.ds-badge{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(226,75,74,0.18);color:#ff6b6a;border:1px solid rgba(226,75,74,0.3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;}
+.ds-desc{font-size:12px;color:rgba(255,255,255,0.35);line-height:1.5;margin-bottom:10px;}
+.ds-preview{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:10px;padding:12px 14px;font-size:12px;color:rgba(255,255,255,0.5);font-style:italic;line-height:1.6;display:none;}
+.ds-preview.visible{display:block;}
+.ds-preview-label{font-size:9px;color:rgba(226,75,74,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;}
+.cd-unit-toggle{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.unit-pill{background:#161616;border:1px solid #2a2a2a;border-radius:20px;color:rgba(255,255,255,0.3);font-size:10px;padding:3px 9px;cursor:pointer;font-family:-apple-system,sans-serif;transition:all 0.15s;}
+.unit-pill.active{background:rgba(127,119,221,0.18);border-color:#7F77DD;color:#a29bf0;}
+@keyframes urgentPulse{0%,100%{box-shadow:0 0 18px rgba(226,75,74,0.15);}50%{box-shadow:0 0 36px rgba(226,75,74,0.5),0 0 60px rgba(226,75,74,0.2);}}
+@keyframes alarmShake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-3px);}40%,80%{transform:translateX(3px);}}
+.cd-card.alarm-mode{animation:urgentPulse 0.8s ease-in-out infinite,alarmShake 0.5s ease-in-out infinite;border-color:rgba(226,75,74,0.9)!important;background:#1a0505!important;}
+.cd-card.warning-mode{animation:urgentPulse 1.4s ease-in-out infinite;border-color:rgba(226,75,74,0.75)!important;background:#160808!important;}
+.notif-txt{flex:1;font-size:12px;color:#7F77DD;line-height:1.4;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay-center{align-items:center;}
+.modal-box{background:#111;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:430px;border-top:1px solid #2a2a2a;}
+.modal-box-center{background:#111;border-radius:20px;padding:24px;width:90%;max-width:380px;border:1px solid #2a2a2a;}
+.modal-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:16px;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:block;}
+.tick-btn{background:rgba(226,75,74,0.12);border:1px solid rgba(226,75,74,0.25);border-radius:8px;color:#ff6b6a;font-size:11px;padding:6px 12px;cursor:pointer;font-family:-apple-system,sans-serif;}
+.prove-btn{background:rgba(127,119,221,0.12);border:1px solid rgba(127,119,221,0.3);border-radius:8px;color:#a29bf0;font-size:11px;padding:6px 12px;cursor:pointer;font-family:-apple-system,sans-serif;}
+.mission-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:12px;padding:14px 18px;background:linear-gradient(135deg,rgba(29,158,117,0.25),rgba(29,158,117,0.1));border:1.5px solid rgba(29,158,117,0.45);border-radius:12px;color:#4dcca0;font-size:14px;font-weight:800;letter-spacing:0.03em;cursor:pointer;font-family:-apple-system,sans-serif;position:relative;overflow:hidden;transition:all 0.15s ease;}
+.mission-btn:active{transform:scale(0.97);background:linear-gradient(135deg,rgba(29,158,117,0.4),rgba(29,158,117,0.2));}
+.mission-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.04),transparent);pointer-events:none;}
+.mission-btn .m-icon{font-size:18px;}
+.mission-btn .m-sub{font-size:9px;color:rgba(29,158,117,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;display:block;margin-top:1px;}
+@keyframes missionFlash{0%{background:rgba(29,158,117,0.6);}100%{background:transparent;}}
+.goal-row .mission-check{width:28px;height:28px;border-radius:50%;border:1.5px solid #333;background:none;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.2s ease;}
+.goal-row .mission-check.done{background:#1D9E75;border-color:#1D9E75;transform:scale(1.05);}
+.goal-row .mission-check.done::after{content:'✓';color:#fff;font-size:13px;font-weight:800;}
+.confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:9999;animation:cfall 1.2s ease-in forwards;}
+@keyframes cfall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.guide-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.guide-card{width:100%;max-width:360px;text-align:center;}
+.guide-emoji{font-size:56px;margin-bottom:20px;}
+.guide-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;}
+.guide-body{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:28px;}
+.guide-body b{color:rgba(255,255,255,0.85);}
+.guide-dots{display:flex;gap:6px;justify-content:center;margin-bottom:24px;}
+.guide-dot{width:6px;height:6px;border-radius:50%;background:#2a2a2a;transition:all 0.2s;}
+.guide-dot.active{width:20px;border-radius:3px;background:#7F77DD;}
+.guide-actions{display:flex;gap:10px;width:100%;}
+.guide-skip{flex:1;background:transparent;border:1px solid #2a2a2a;border-radius:10px;color:rgba(255,255,255,0.3);font-size:13px;padding:12px;cursor:pointer;font-family:-apple-system,sans-serif;}
+.guide-next{flex:2;background:#7F77DD;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;padding:12px;cursor:pointer;font-family:-apple-system,sans-serif;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ONBOARDING -->
+<div id="onboarding" style="display:none;position:fixed;inset:0;background:#0d0d0d;z-index:999;flex-direction:column;justify-content:center;padding:32px 24px;max-width:430px;margin:0 auto;">
+  <div id="ob-1" style="display:flex;flex-direction:column;gap:16px;">
+    <div style="font-size:52px;">⚡</div>
+    <div style="font-size:28px;font-weight:800;color:#fff;line-height:1.2;">Welcome to Amplify.</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">The app that keeps you honest, keeps you moving, and makes you feel the time passing.</div>
+    <button class="btn btn-p" style="width:100%;" onclick="obGo(2)">Let's go</button>
+    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
+  </div>
+  <div id="ob-2" style="display:none;flex-direction:column;gap:16px;">
+    <div style="font-size:52px;">👋</div>
+    <div style="font-size:28px;font-weight:800;color:#fff;">What do we call you?</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">The app will use your name to check in on you personally.</div>
+    <input type="text" id="ob-name" placeholder="Your first name" style="font-size:18px;padding:14px 16px;" maxlength="20">
+    <button class="btn btn-p" style="width:100%;" onclick="obGo(3)">Continue</button>
+    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
+  </div>
+  <div id="ob-3" style="display:none;flex-direction:column;gap:16px;">
+    <div style="font-size:52px;">🎯</div>
+    <div style="font-size:28px;font-weight:800;color:#fff;">What is your biggest goal?</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">Just one. The most important thing right now.</div>
+    <input type="text" id="ob-goal" placeholder="e.g. Launch my app, Get fit, Pay off debt">
+    <div class="form-group"><label class="form-label">Deadline</label><input type="datetime-local" id="ob-deadline"></div>
+    <button class="btn btn-p" style="width:100%;" onclick="obGo(4)">Almost there</button>
+    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
+  </div>
+  <div id="ob-4" style="display:none;flex-direction:column;gap:16px;">
+    <div style="font-size:52px;">🔔</div>
+    <div style="font-size:28px;font-weight:800;color:#fff;">Let Amplify push you.</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">Morning, midday, and evening check-ins. Real messages. This is how you stay accountable.</div>
+    <button class="btn btn-p" style="width:100%;" onclick="obNotif()">Turn on notifications</button>
+    <button class="btn btn-g" style="width:100%;" onclick="obFinish()">Skip for now</button>
+    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div></div>
+  </div>
+</div>
+
+<!-- TIMERS -->
+<div class="screen active" id="screen-home">
+  <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:2px;" id="home-greeting">Good morning,</div>
+  <div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:16px;" id="home-name">Let's go. ⚡</div>
+  <div class="vibe-bar">
+    <div class="vibe-label">How are you showing up today?</div>
+    <div class="vibe-opts">
+      <button class="vibe-btn" onclick="setVibe('low',this)">😮 Low</button>
+      <button class="vibe-btn active" onclick="setVibe('focused',this)">🔥 Focused</button>
+      <button class="vibe-btn" onclick="setVibe('chaos',this)">🌀 Chaos</button>
+    </div>
+    <div class="vibe-msg" id="vibe-msg"></div>
+  </div>
+  <div id="micro-goals-card" style="display:none;" class="micro-card">
+    <div class="card-label" style="color:#4dcca0;">Micro-goals for low energy</div>
+    <div id="micro-list"></div>
+    <div style="font-size:11px;color:rgba(29,158,117,0.5);margin-top:8px;">Just pick one. That's enough.</div>
+  </div>
+  <div id="countdown-list"></div>
+  <button class="btn btn-g" style="width:100%;margin-bottom:12px;" onclick="openAddCountdownModal()">+ Add countdown</button>
+</div>
+
+<!-- GOALS -->
+<div class="screen" id="screen-goals">
+  <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:2px;" id="goals-greeting">Today's goals,</div>
+  <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:16px;">make some noise.</div>
+  <div id="checkin-banner" class="checkin-banner" style="display:none;">
+    <div style="flex:1;">
+      <div class="checkin-txt" id="checkin-txt">Morning check-in: did you stay strong yesterday?</div>
+      <div id="checkin-prompt" style="font-size:11px;color:rgba(239,159,39,0.6);margin-top:5px;line-height:1.5;font-style:italic;"></div>
+    </div>
+    <div style="display:flex;gap:6px;flex-shrink:0;">
+      <button class="btn btn-sm" style="background:rgba(29,158,117,0.2);color:#4dcca0;border:1px solid rgba(29,158,117,0.3);" onclick="checkinAnswer(true)">Yes</button>
+      <button class="btn btn-sm" style="background:rgba(226,75,74,0.1);color:#ff6b6a;border:1px solid rgba(226,75,74,0.2);" onclick="checkinAnswer(false)">No</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="card-label" style="margin-bottom:0;">Today's goals</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);" id="task-count">0 / 0</div>
+    </div>
+    <div id="task-list"></div>
+    <div class="row" style="margin-top:12px;">
+      <input type="text" id="new-task" placeholder="Add a goal..." style="flex:1;" onkeydown="if(event.key==='Enter')addTask()">
+      <button class="btn btn-p" onclick="addTask()">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Goal streak</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div><div class="streak-num" id="streak-num">0</div><div style="font-size:11px;color:rgba(255,255,255,0.3);">day streak</div></div>
+      <div style="flex:1;font-size:12px;color:rgba(255,255,255,0.4);line-height:1.5;">Complete at least one goal every day to keep it alive.</div>
+    </div>
+    <div class="dots" id="streak-dots"></div>
+  </div>
+  <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px;margin-top:4px;">Discipline</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;">Track what you're doing and what you're not.</div>
+  <div class="disc-tabs">
+    <button class="disc-tab active-do" onclick="setDiscTab('do',this)">DO streaks</button>
+    <button class="disc-tab" onclick="setDiscTab('dont',this)">DON'T streaks</button>
+  </div>
+  <div id="disc-do-section">
+    <div id="disc-do-list"></div>
+    <button class="btn btn-g" style="width:100%;margin-bottom:6px;" onclick="openDiscModal('do')">+ Add DO streak</button>
+    <div style="font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-bottom:14px;">e.g. Work out, Read, Pray, Meditate, Cold shower</div>
+  </div>
+  <div id="disc-dont-section" style="display:none;">
+    <div id="disc-dont-list"></div>
+    <button class="btn btn-g" style="width:100%;margin-bottom:6px;" onclick="openDiscModal('dont')">+ Add DON'T streak</button>
+    <div style="font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-bottom:14px;">e.g. No fornication, No alcohol, No social media, No junk food</div>
+  </div>
+</div>
+
+<!-- FUEL -->
+<div class="screen" id="screen-fuel">
+  <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:4px;">Fuel</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;">Your daily motivation.</div>
+  <div class="m-tabs">
+    <button class="m-tab active" onclick="setMotivTab('quote',this)">Quote</button>
+    <button class="m-tab" onclick="setMotivTab('affirmation',this)">Affirmation</button>
+    <button class="m-tab" onclick="setMotivTab('challenge',this)">Challenge</button>
+    <button class="m-tab" onclick="setMotivTab('community',this)">Community</button>
+  </div>
+  <div id="tab-quote">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-label" style="margin-bottom:0;">Daily quote</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3);">✝️ Scripture</span>
+          <button class="toggle" id="scripture-toggle" onclick="toggleScripture()" style="background:#2a2a2a;"><div class="toggle-knob" id="scripture-knob" style="left:3px;"></div></button>
+        </div>
+      </div>
+      <div class="quote-line"></div>
+      <div id="quote-scripture-badge" style="display:none;margin-bottom:8px;"><span style="font-size:10px;background:rgba(239,159,39,0.12);border:1px solid rgba(239,159,39,0.25);color:#EF9F27;padding:3px 10px;border-radius:20px;font-weight:600;">✝️ Scripture</span></div>
+      <div class="quote-txt" id="quote-text"></div>
+      <div class="quote-by" id="quote-author"></div>
+      <div id="quote-prompt" style="margin-top:12px;padding:10px 12px;background:rgba(127,119,221,0.07);border:1px solid rgba(127,119,221,0.15);border-radius:10px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;font-style:italic;"></div>
+      <button class="btn btn-g btn-sm" style="margin-top:14px;" onclick="nextQuote()">Next quote</button>
+    </div>
+  </div>
+  <div id="tab-affirmation" style="display:none;">
+    <div class="card">
+      <div class="card-label">Today's affirmation</div>
+      <div style="font-size:18px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:10px;" id="aff-text"></div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;" id="aff-sub"></div>
+      <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.25);">Say it out loud. Right now. Three times.</div>
+    </div>
+  </div>
+  <div id="tab-challenge" style="display:none;">
+    <div class="card">
+      <div class="card-label">Today's challenge</div>
+      <div id="chal-ai-badge" style="display:inline-flex;align-items:center;gap:5px;background:rgba(127,119,221,0.1);border:1px solid rgba(127,119,221,0.2);border-radius:20px;padding:3px 10px;font-size:10px;color:#a29bf0;margin-bottom:10px;">✨ Personalized to your goal</div>
+      <div style="font-size:14px;color:#fff;line-height:1.6;margin-bottom:12px;" id="chal-text"></div>
+      <div id="chal-loading" style="display:none;font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:10px;font-style:italic;">Generating your challenge...</div>
+      <button id="chal-btn" onclick="completeChallenge()" style="display:inline-block;background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);border-radius:20px;color:#1D9E75;font-size:11px;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;"></button>
+      <button id="chal-refresh" onclick="generateAIChallenge(true)" style="display:inline-block;background:none;border:1px solid #2a2a2a;border-radius:20px;color:rgba(255,255,255,0.3);font-size:11px;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;margin-left:6px;margin-top:6px;">New challenge</button>
+    </div>
+  </div>
+  <div id="tab-community" style="display:none;">
+    <div class="card" style="background:rgba(127,119,221,0.05);border-color:rgba(127,119,221,0.2);margin-bottom:12px;">
+      <div class="card-label" style="color:#7F77DD;">Submit your quote</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Share something that actually moves you. Real words hit different.</div>
+      <div class="form-group"><textarea id="cq-input" placeholder="Type your quote or words of encouragement..."></textarea></div>
+      <div class="form-group"><input type="text" id="cq-name" placeholder="Your name or leave blank for Anonymous"></div>
+      <button class="btn btn-p" style="width:100%;" onclick="submitCommunityQuote()">Submit to the community</button>
+      <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;line-height:1.5;">Quotes are reviewed before going live. Usually approved within 24 hours.</div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
+      <span>From the community</span>
+      <button onclick="loadCommunityQuotes()" style="background:none;border:none;color:rgba(127,119,221,0.5);font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;">↻ Refresh</button>
+    </div>
+    <div id="community-list"></div>
+  </div>
+</div>
+
+<!-- PUSH -->
+<div class="screen" id="screen-focus">
+  <div style="font-size:26px;font-weight:800;color:#fff;margin-bottom:2px;">Push 🔥</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;">Talk to your coach. Get real answers.</div>
+  <div class="card" style="background:rgba(127,119,221,0.05);border-color:rgba(127,119,221,0.2);margin-bottom:10px;">
+    <div style="font-size:11px;color:rgba(255,255,255,0.25);line-height:1.6;margin-bottom:4px;">Your AI coach. Ask anything — goals, setbacks, relationships, hard days. You get honesty, not comfort.</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.15);font-style:italic;">Push is not a substitute for professional help. If you're in crisis, please reach out to someone who can be there in person.</div>
+  </div>
+  <div id="push-history" style="margin-bottom:12px;"></div>
+  <div id="push-suggestions" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+    <button class="push-suggest" onclick="useSuggestion(this)">How do I stay consistent?</button>
+    <button class="push-suggest" onclick="useSuggestion(this)">I feel like giving up</button>
+    <button class="push-suggest" onclick="useSuggestion(this)">How do I get over someone?</button>
+    <button class="push-suggest" onclick="useSuggestion(this)">I keep self-sabotaging</button>
+    <button class="push-suggest" onclick="useSuggestion(this)">I don't know my purpose</button>
+    <button class="push-suggest" onclick="useSuggestion(this)">How do I stop procrastinating?</button>
+  </div>
+  <div style="display:flex;gap:8px;align-items:flex-end;">
+    <textarea id="push-input" placeholder="What's on your mind? Be honest." style="flex:1;min-height:60px;max-height:120px;resize:none;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPush();}"></textarea>
+    <button class="btn btn-p" onclick="sendPush()" style="padding:14px 16px;flex-shrink:0;">Send</button>
+  </div>
+  <div id="push-loading" style="display:none;text-align:center;padding:16px 0;">
+    <div style="font-size:12px;color:rgba(127,119,221,0.6);font-style:italic;" id="push-loading-txt">Thinking...</div>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div class="screen" id="screen-alerts">
+  <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:4px;">Alerts</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;">Amplify checks in on you.</div>
+  <div id="alerts-notif-banner" class="notif-banner">
+    <div class="notif-txt">Enable notifications to get daily check-ins from Amplify.</div>
+    <button class="btn btn-p btn-sm" onclick="requestNotif()">Enable</button>
+  </div>
+  <div class="card">
+    <div class="card-label">Your reminders</div>
+    <div id="reminder-list"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1e1e1e;display:flex;flex-direction:column;gap:8px;">
+      <input type="text" id="new-rem-label" placeholder="Reminder message...">
+      <div class="row"><input type="time" id="new-rem-time" style="flex:1;"><button class="btn btn-p" onclick="addReminder()">Add</button></div>
+    </div>
+  </div>
+  <div class="ds-card">
+    <div class="ds-header">
+      <div class="ds-title">🪖 Drill Sergeant <span class="ds-badge" id="ds-status-badge">Off</span></div>
+      <button class="toggle" id="ds-toggle" style="background:#2a2a2a;" onclick="toggleDrillSergeant()"><div class="toggle-knob" style="left:3px;" id="ds-knob"></div></button>
+    </div>
+    <div class="ds-desc">Aggressive mode. Notifications stop being polite. The clock doesn't care about your feelings — and neither will Amplify.</div>
+    <div class="ds-preview" id="ds-preview">
+      <div class="ds-preview-label">What you'll hear instead</div>
+      <div id="ds-preview-text"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">What Amplify says</div>
+    <div style="display:flex;gap:10px;padding-bottom:10px;border-bottom:1px solid #1e1e1e;margin-bottom:10px;"><div style="width:7px;height:7px;border-radius:50%;background:#1D9E75;margin-top:4px;flex-shrink:0;"></div><div><div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">7:00 AM</div><div style="font-size:12px;color:rgba(255,255,255,0.5);font-style:italic;line-height:1.5;" id="notif-morning-preview">"Good morning. What is your first move today?"</div></div></div>
+    <div style="display:flex;gap:10px;padding-bottom:10px;border-bottom:1px solid #1e1e1e;margin-bottom:10px;"><div style="width:7px;height:7px;border-radius:50%;background:#EF9F27;margin-top:4px;flex-shrink:0;"></div><div><div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">12:00 PM</div><div style="font-size:12px;color:rgba(255,255,255,0.5);font-style:italic;line-height:1.5;" id="notif-midday-preview">"Halfway through. How many goals have you touched? Be honest."</div></div></div>
+    <div style="display:flex;gap:10px;"><div style="width:7px;height:7px;border-radius:50%;background:#E24B4A;margin-top:4px;flex-shrink:0;"></div><div><div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">8:00 PM</div><div style="font-size:12px;color:rgba(255,255,255,0.5);font-style:italic;line-height:1.5;" id="notif-evening-preview">"Day is almost done. What did you actually do today?"</div></div></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('home',this)"><div class="nav-hero"><span style="font-size:18px;">⏱</span><span>Timers</span></div></button>
+  <button class="nav-btn" onclick="showScreen('goals',this)"><span class="nav-icon">✅</span>Goals</button>
+  <button class="nav-btn" onclick="showScreen('fuel',this)"><span class="nav-icon">⚡</span>Fuel</button>
+  <button class="nav-btn" onclick="showScreen('focus',this)"><span class="nav-icon">🔥</span>Push</button>
+  <button class="nav-btn" onclick="showScreen('alerts',this)"><span class="nav-icon">🔔</span>Alerts</button>
+</nav>
+
+<!-- MODALS -->
+<div class="overlay" id="add-modal" style="display:none;">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="modal-title" style="margin-bottom:0;">New countdown</div>
+      <button onclick="closeModal('add-modal')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:22px;cursor:pointer;">x</button>
+    </div>
+    <div class="form-group"><label class="form-label">Goal name</label><input type="text" id="m-name" placeholder="e.g. App launch, Meeting"></div>
+    <div class="form-group"><label class="form-label">Target date and time</label><input type="datetime-local" id="m-datetime"></div>
+    <div class="form-group"><label class="form-label">Type</label>
+      <select id="m-type">
+        <option value="deadline">Deadline - urgent, cannot move it</option>
+        <option value="milestone">Milestone - something to celebrate</option>
+        <option value="daily">Daily - resets at midnight</option>
+        <option value="hourly">Hourly - resets every 60 minutes</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Display unit</label>
+      <select id="m-unit">
+        <option value="seconds" selected>Seconds (default)</option>
+        <option value="minutes">Minutes</option>
+        <option value="hours">Hours</option>
+        <option value="days">Days</option>
+        <option value="weeks">Weeks</option>
+        <option value="months">Months</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Set as primary?</label>
+      <select id="m-primary"><option value="no">No</option><option value="yes">Yes - show this one biggest</option></select>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:4px;" onclick="saveCountdown()">Start countdown</button>
+  </div>
+</div>
+
+<div class="overlay overlay-center" id="chaos-overlay" style="display:none;">
+  <div style="text-align:center;padding:32px 24px;">
+    <div style="font-size:48px;margin-bottom:16px;">🌀</div>
+    <div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:8px;">Chaos Mode</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;margin-bottom:32px;">Everything is locked. Just breathe. 10 minutes.</div>
+    <div style="font-size:72px;font-weight:700;color:#7F77DD;font-variant-numeric:tabular-nums;letter-spacing:-3px;margin-bottom:8px;" id="chaos-timer">10:00</div>
+    <button class="btn btn-p" style="width:100%;max-width:300px;margin-bottom:10px;" onclick="startChaosTimer()">Start reset</button>
+    <button class="btn btn-g" style="width:100%;max-width:300px;" onclick="exitChaos()">I am okay now</button>
+  </div>
+</div>
+
+<div class="overlay overlay-center" id="photo-modal" style="display:none;">
+  <div class="modal-box-center">
+    <div style="font-size:20px;font-weight:700;color:#ff6b6a;margin-bottom:8px;">Prove it.</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:16px;" id="photo-task-name">Take a photo of your completed task.</div>
+    <div id="photo-preview" style="display:none;margin-bottom:12px;"><img id="photo-img" style="width:100%;border-radius:12px;display:block;"></div>
+    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(event)">
+    <button class="btn btn-p" style="width:100%;margin-bottom:8px;" onclick="document.getElementById('photo-input').click()">Take photo</button>
+    <button id="photo-confirm" class="btn btn-g" style="width:100%;margin-bottom:8px;display:none;" onclick="confirmPhoto()">Task done - dismiss deadline</button>
+    <button class="btn btn-g" style="width:100%;font-size:11px;color:rgba(255,255,255,0.3);" onclick="closeModal('photo-modal')">Cancel</button>
+  </div>
+</div>
+
+<div class="overlay overlay-center" id="shame-modal" style="display:none;">
+  <div class="modal-box-center" style="background:#120a0a;border-color:rgba(226,75,74,0.4);">
+    <div style="font-size:20px;font-weight:700;color:#ff6b6a;margin-bottom:8px;">You missed it.</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:16px;" id="shame-goal-name"></div>
+    <div style="background:#1a0a0a;border:1px solid #2a1a1a;border-radius:12px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Your public post</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.7);font-style:italic;line-height:1.5;" id="shame-post-text"></div>
+    </div>
+    <div class="row">
+      <button class="btn btn-r" style="flex:1;" onclick="postShame()">Post publicly</button>
+      <button class="btn btn-g" style="flex:1;" onclick="closeModal('shame-modal')">Skip</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay overlay-center" id="share-modal" style="display:none;">
+  <div class="modal-box-center">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="modal-title" style="margin-bottom:0;">Share your countdown</div>
+      <button onclick="closeModal('share-modal')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:22px;cursor:pointer;">x</button>
+    </div>
+    <div style="background:#0d0d0d;border-radius:16px;padding:24px;text-align:center;border:1px solid #2a2a2a;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Amplify</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:6px;" id="share-goal-label"></div>
+      <div style="font-size:48px;font-weight:800;color:#fff;letter-spacing:-2px;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:4px;" id="share-secs"></div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">seconds remaining</div>
+      <div style="display:flex;justify-content:center;gap:20px;margin-bottom:16px;">
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-d"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">days</div></div>
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-h"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">hrs</div></div>
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-m"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">mins</div></div>
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-s"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">secs</div></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.2);font-style:italic;" id="share-quote-line"></div>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:14px;" onclick="shareNow()">Share this</button>
+    <div style="font-size:10px;color:rgba(255,255,255,0.2);text-align:center;margin-top:8px;">Screenshot and post it. Make some noise.</div>
+  </div>
+</div>
+
+<div class="overlay" id="disc-modal" style="display:none;">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="modal-title" style="margin-bottom:0;" id="disc-modal-title">New DO streak</div>
+      <button onclick="closeModal('disc-modal')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:22px;cursor:pointer;">x</button>
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;margin-bottom:16px;" id="disc-modal-desc"></div>
+    <div class="form-group"><label class="form-label">What are you tracking?</label><input type="text" id="disc-name-input" placeholder=""></div>
+    <div class="form-group"><label class="form-label">Milestone goal</label>
+      <select id="disc-milestone-input">
+        <option value="7">7 days - one week</option>
+        <option value="14">14 days - two weeks</option>
+        <option value="21">21 days - habit forming</option>
+        <option value="30" selected>30 days - one month</option>
+        <option value="60">60 days</option>
+        <option value="90">90 days - life changing</option>
+        <option value="365">365 days - one full year</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Keep this private?</label>
+      <select id="disc-private-input"><option value="no">No - show the name</option><option value="yes">Yes - show as Personal discipline</option></select>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:4px;" id="disc-save-btn" onclick="saveDisc()">Start tracking</button>
+  </div>
+</div>
+
+<!-- GUIDE OVERLAYS — one per tab, all start hidden -->
+<div class="guide-overlay" id="guide-home" style="display:none;">
+  <div class="guide-card">
+    <div class="guide-emoji" id="gh-emoji"></div>
+    <div class="guide-title" id="gh-title"></div>
+    <div class="guide-body" id="gh-body"></div>
+    <div class="guide-dots" id="gh-dots"></div>
+    <div class="guide-actions">
+      <button class="guide-skip" onclick="skipGuide('home')">Skip</button>
+      <button class="guide-next" onclick="nextGuide('home')" id="gh-next">Next</button>
+    </div>
+  </div>
+</div>
+<div class="guide-overlay" id="guide-goals" style="display:none;">
+  <div class="guide-card">
+    <div class="guide-emoji" id="gg-emoji"></div>
+    <div class="guide-title" id="gg-title"></div>
+    <div class="guide-body" id="gg-body"></div>
+    <div class="guide-dots" id="gg-dots"></div>
+    <div class="guide-actions">
+      <button class="guide-skip" onclick="skipGuide('goals')">Skip</button>
+      <button class="guide-next" onclick="nextGuide('goals')" id="gg-next">Next</button>
+    </div>
+  </div>
+</div>
+<div class="guide-overlay" id="guide-fuel" style="display:none;">
+  <div class="guide-card">
+    <div class="guide-emoji" id="gf-emoji"></div>
+    <div class="guide-title" id="gf-title"></div>
+    <div class="guide-body" id="gf-body"></div>
+    <div class="guide-dots" id="gf-dots"></div>
+    <div class="guide-actions">
+      <button class="guide-skip" onclick="skipGuide('fuel')">Skip</button>
+      <button class="guide-next" onclick="nextGuide('fuel')" id="gf-next">Next</button>
+    </div>
+  </div>
+</div>
+<div class="guide-overlay" id="guide-focus" style="display:none;">
+  <div class="guide-card">
+    <div class="guide-emoji" id="gfo-emoji"></div>
+    <div class="guide-title" id="gfo-title"></div>
+    <div class="guide-body" id="gfo-body"></div>
+    <div class="guide-dots" id="gfo-dots"></div>
+    <div class="guide-actions">
+      <button class="guide-skip" onclick="skipGuide('focus')">Skip</button>
+      <button class="guide-next" onclick="nextGuide('focus')" id="gfo-next">Next</button>
+    </div>
+  </div>
+</div>
+<div class="guide-overlay" id="guide-alerts" style="display:none;">
+  <div class="guide-card">
+    <div class="guide-emoji" id="ga-emoji"></div>
+    <div class="guide-title" id="ga-title"></div>
+    <div class="guide-body" id="ga-body"></div>
+    <div class="guide-dots" id="ga-dots"></div>
+    <div class="guide-actions">
+      <button class="guide-skip" onclick="skipGuide('alerts')">Skip</button>
+      <button class="guide-next" onclick="nextGuide('alerts')" id="ga-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var QUOTES = [
+  {t:"The clock is ticking. Are you becoming the person you want to be?",a:"Greg Plitt",q:"How did you show up for your goal today?"},
+  {t:"Every second you wait is a second someone else is using.",a:"Amplify",q:"What are you waiting for — and is that reason real?"},
+  {t:"Stop waiting for the right moment. Make it right.",a:"Amplify",q:"What is one thing you can do right now, not later?"},
+  {t:"Noise is not made by people who wait. Go.",a:"Amplify",q:"What would moving look like in the next 10 minutes?"},
+  {t:"You do not have to be great to start, but you have to start to be great.",a:"Zig Ziglar",q:"What is the smallest possible first step toward your goal?"},
+  {t:"Discipline is choosing what you want most over what you want now.",a:"Augusta F. Kantra",q:"What are you choosing right now — comfort or progress?"},
+  {t:"Done is better than perfect.",a:"Sheryl Sandberg",q:"What are you holding back because it's not ready yet?"},
+  {t:"A year from now you may wish you had started today.",a:"Karen Lamb",q:"If you start today, what does a year from now look like?"},
+  {t:"The pain of discipline is far less than the pain of regret.",a:"Unknown",q:"Which pain are you choosing right now?"},
+  {t:"You are what you do, not what you say you will do.",a:"Carl Jung",q:"What did your actions today say about you?"},
+  {t:"Every action you take is a vote for the person you are becoming.",a:"James Clear",q:"What person are your actions voting for today?"},
+  {t:"Do not count the days. Make the days count.",a:"Muhammad Ali",q:"What did you make of today specifically?"},
+  {t:"Push yourself, because no one else is going to do it for you.",a:"Unknown",q:"Who is counting on the version of you that pushes through?"},
+  {t:"Great things never came from comfort zones.",a:"Unknown",q:"What is stopping you from being uncomfortable today?"},
+  {t:"The secret of getting ahead is getting started.",a:"Mark Twain",q:"What have you been putting off that you could start in the next 5 minutes?"},
+  {t:"Success is the sum of small efforts repeated day in and day out.",a:"Robert Collier",q:"What small effort did you repeat today?"},
+  {t:"It does not matter how slowly you go as long as you do not stop.",a:"Confucius",q:"Are you moving, even slowly? What would stopping cost you?"},
+  {t:"Believe you can and you're halfway there.",a:"Theodore Roosevelt",q:"What belief is holding you back right now?"},
+  {t:"The harder you work for something, the greater you'll feel when you achieve it.",a:"Unknown",q:"How hard are you actually working for this?"},
+  {t:"Dream it. Wish it. Do it.",a:"Unknown",q:"Which stage are you stuck in — dreaming, wishing, or doing?"},
+  {t:"Don't stop when you're tired. Stop when you're done.",a:"Unknown",q:"How close to done are you actually?"},
+  {t:"Wake up with determination. Go to bed with satisfaction.",a:"Unknown",q:"What would you need to do today to feel satisfied tonight?"},
+  {t:"Little things make big days.",a:"Unknown",q:"What little thing can you do right now that matters?"},
+  {t:"It's going to be hard, but hard is not impossible.",a:"Unknown",q:"What feels hard right now — and what would impossible actually look like?"},
+  {t:"Don't wish for it. Work for it.",a:"Unknown",q:"Are you wishing or working right now?"},
+  {t:"You didn't come this far to only come this far.",a:"Unknown",q:"How far have you actually come? Take a second to acknowledge it."},
+  {t:"The only bad workout is the one that didn't happen.",a:"Unknown",q:"What did you skip today that you could still do?"},
+  {t:"Motivation gets you started. Habit keeps you going.",a:"Jim Ryun",q:"What habit are you building that will outlast your motivation?"},
+  {t:"Success doesn't come to you. You go to it.",a:"Marva Collins",q:"What step toward success did you take today?"},
+  {t:"Be stronger than your strongest excuse.",a:"Unknown",q:"What excuse have you been using — and what is it costing you?"},
+  {t:"Your future is created by what you do today, not tomorrow.",a:"Robert Kiyosaki",q:"What are you doing today that your future self will thank you for?"},
+  {t:"The difference between ordinary and extraordinary is that little extra.",a:"Jimmy Johnson",q:"What extra thing could you do today that most people wouldn't?"},
+  {t:"Don't limit your challenges. Challenge your limits.",a:"Unknown",q:"Where are you playing it too safe right now?"},
+  {t:"You have to be at your personal best when it matters most.",a:"Unknown",q:"Is today a day that matters? Are you showing up like it is?"},
+  {t:"Either you run the day or the day runs you.",a:"Jim Rohn",q:"Who is running your day right now?"},
+  {t:"The only way to do great work is to love what you do.",a:"Steve Jobs",q:"Are you working toward something you actually care about?"},
+  {t:"You miss 100% of the shots you don't take.",a:"Wayne Gretzky",q:"What shot are you not taking right now because you're afraid to miss?"},
+  {t:"Whether you think you can or think you can't, you're right.",a:"Henry Ford",q:"What story are you telling yourself about what's possible?"},
+  {t:"In the middle of difficulty lies opportunity.",a:"Albert Einstein",q:"What opportunity is hiding inside your current struggle?"},
+  {t:"The best time to plant a tree was 20 years ago. The second best time is now.",a:"Chinese Proverb",q:"What are you waiting for that you could start right now?"},
+  {t:"Hardships often prepare ordinary people for an extraordinary destiny.",a:"C.S. Lewis",q:"What hardship are you in right now that might be preparing you for something bigger?"},
+  {t:"It always seems impossible until it's done.",a:"Nelson Mandela",q:"What feels impossible right now that you know you need to do anyway?"},
+  {t:"Strive not to be a success, but rather to be of value.",a:"Albert Einstein",q:"What value are you bringing to your goal and the people around you?"},
+  {t:"Life is 10% what happens to you and 90% how you react to it.",a:"Charles R. Swindoll",q:"How are you choosing to react to what's happening in your life right now?"},
+  {t:"The mind is everything. What you think, you become.",a:"Buddha",q:"What are you thinking about most — and is it moving you forward or backward?"},
+  {t:"An unexamined life is not worth living.",a:"Socrates",q:"When did you last sit down and honestly evaluate where you are?"},
+  {t:"Eighty percent of success is showing up.",a:"Woody Allen",q:"Are you showing up consistently — even on the days it doesn't feel worth it?"},
+  {t:"Your time is limited. Don't waste it living someone else's life.",a:"Steve Jobs",q:"Whose version of success are you actually chasing?"},
+  {t:"The greatest glory in living lies not in never falling, but in rising every time we fall.",a:"Nelson Mandela",q:"What are you rising from right now?"},
+  {t:"You only live once, but if you do it right, once is enough.",a:"Mae West",q:"Are you doing it right? What would that look like?"},
+  {t:"If life were predictable it would cease to be life and be without flavor.",a:"Eleanor Roosevelt",q:"What unpredictable thing are you facing that might actually be a gift?"},
+  {t:"If you look at what you have in life, you'll always have more.",a:"Oprah Winfrey",q:"What do you already have that you've been taking for granted?"},
+  {t:"If you want to live a happy life, tie it to a goal, not to people or things.",a:"Albert Einstein",q:"What goal is your happiness tied to right now?"}
+];
+
+var BIBLE_VERSES = [
+  {t:"I can do all things through Christ who strengthens me.",a:"Philippians 4:13",q:"What are you facing today that you need strength for?"},
+  {t:"For I know the plans I have for you, plans to prosper you and not to harm you, plans to give you hope and a future.",a:"Jeremiah 29:11",q:"Do you trust that your current struggle is part of a bigger plan?"},
+  {t:"Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",a:"Joshua 1:9",q:"Where do you need courage right now?"},
+  {t:"Trust in the Lord with all your heart and lean not on your own understanding.",a:"Proverbs 3:5",q:"Where are you relying on your own understanding instead of trusting the process?"},
+  {t:"But those who hope in the Lord will renew their strength. They will soar on wings like eagles.",a:"Isaiah 40:31",q:"Where do you need your strength renewed today?"},
+  {t:"For God gave us a spirit not of fear but of power and love and self-control.",a:"2 Timothy 1:7",q:"What fear are you letting control you right now?"},
+  {t:"Come to me, all who labor and are heavy laden, and I will give you rest.",a:"Matthew 11:28",q:"What burden are you carrying that you need to put down?"},
+  {t:"The Lord is my strength and my shield; my heart trusts in him.",a:"Psalm 28:7",q:"Are you trusting in your own strength or something greater?"},
+  {t:"Do not be anxious about anything, but in every situation, present your requests to God.",a:"Philippians 4:6",q:"What are you anxious about right now that you haven't fully surrendered?"},
+  {t:"She is clothed with strength and dignity, and she laughs without fear of the future.",a:"Proverbs 31:25",q:"What would your day look like if you had no fear of the future?"},
+  {t:"And we know that in all things God works for the good of those who love him.",a:"Romans 8:28",q:"What difficult thing in your life might be working for your good?"},
+  {t:"Even though I walk through the darkest valley, I will fear no evil, for you are with me.",a:"Psalm 23:4",q:"What valley are you walking through right now — and do you believe you're not alone in it?"},
+  {t:"No discipline seems pleasant at the time, but painful. Later on, however, it produces a harvest of righteousness.",a:"Hebrews 12:11",q:"What discipline are you avoiding that you know will produce good fruit?"},
+  {t:"Commit to the Lord whatever you do, and he will establish your plans.",a:"Proverbs 16:3",q:"Have you committed your goal to something bigger than yourself?"},
+  {t:"Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.",a:"Galatians 6:9",q:"Are you close to giving up? What would it mean to keep going just one more day?"},
+  {t:"The Lord will fight for you; you need only to be still.",a:"Exodus 14:14",q:"What battle are you trying to fight alone that you need to let go of?"},
+  {t:"Delight yourself in the Lord, and he will give you the desires of your heart.",a:"Psalm 37:4",q:"Are your desires aligned with who you're becoming?"},
+  {t:"Be transformed by the renewing of your mind.",a:"Romans 12:2",q:"What thought pattern do you need to renew today?"},
+  {t:"For where your treasure is, there your heart will be also.",a:"Matthew 6:21",q:"Where is your time and energy actually going — and is that where your heart wants to be?"},
+  {t:"I press on toward the goal to win the prize for which God has called me.",a:"Philippians 3:14",q:"What prize are you pressing toward — and is today's effort worthy of it?"},
+  {t:"The heart of man plans his way, but the Lord establishes his steps.",a:"Proverbs 16:9",q:"Are you planning hard while staying open to where the path actually leads?"},
+  {t:"Do not conform to the pattern of this world, but be transformed by the renewing of your mind.",a:"Romans 12:2",q:"Where are you conforming to a pattern that isn't serving you?"},
+  {t:"Have I not commanded you? Be strong and courageous.",a:"Joshua 1:9",q:"What act of courage is required of you today?"},
+  {t:"With man this is impossible, but with God all things are possible.",a:"Matthew 19:26",q:"What feels impossible right now that you need to stop trying to do alone?"},
+  {t:"The Lord is close to the brokenhearted and saves those who are crushed in spirit.",a:"Psalm 34:18",q:"Are you carrying pain right now that you haven't acknowledged?"},
+  {t:"Ask and it will be given to you; seek and you will find; knock and the door will be opened.",a:"Matthew 7:7",q:"What door are you standing in front of, afraid to knock?"},
+  {t:"You are the light of the world. A city set on a hill cannot be hidden.",a:"Matthew 5:14",q:"Are you hiding your light right now — and why?"},
+  {t:"Whatever you do, work at it with all your heart.",a:"Colossians 3:23",q:"Are you giving your whole heart to what's in front of you today?"},
+  {t:"For the Spirit God gave us does not make us timid, but gives us power.",a:"2 Timothy 1:7",q:"Where are you being timid when you should be bold?"},
+  {t:"Create in me a pure heart, O God, and renew a steadfast spirit within me.",a:"Psalm 51:10",q:"What do you need renewed in yourself right now?"}
+];
+
+var scriptureOn = load('amp_scripture', true);
+var AFFIRMATIONS = [
+  {t:"I take action even when I do not feel ready.",s:"Say this out loud before your first task. Mean it."},
+  {t:"I am building something that will outlast my doubt.",s:"Doubt is just fear dressed up. Keep moving."},
+  {t:"Every small step I take today is compounding.",s:"You will not see it today. You will feel it in 90 days."},
+  {t:"I do not need motivation. I have discipline.",s:"Motivation shows up after you start, not before."},
+  {t:"I am the person who follows through.",s:"Not someday. Today. Right now."},
+  {t:"I choose progress over perfection, every time.",s:"Shipped beats perfect. Always."}
+];
+var CHALLENGES = [
+  {t:"Do the one thing you have been avoiding all week. Not tomorrow. Today. Before 5pm.",b:"Mark complete"},
+  {t:"Send a message to one person who can help you move forward. Just one. Right now.",b:"Message sent"},
+  {t:"Set a 25-minute timer and do only one thing. No switching. No phone.",b:"Deep work done"},
+  {t:"Write down your three most important goals in order of priority. Be honest.",b:"Priorities set"},
+  {t:"Tell one person about your goal today. Accountability starts with one witness.",b:"Accountability made"}
+];
+var MICRO_GOALS = [
+  "Drink a glass of water right now.",
+  "Write down ONE thing you need to do today.",
+  "Stretch for 5 minutes.",
+  "Send one message you have been putting off.",
+  "Close 5 browser tabs you do not need.",
+  "Stand up and walk for 3 minutes."
+];
+var MILESTONES = [
+  {days:1,label:"Day 1. It starts here."},
+  {days:3,label:"3 days strong."},
+  {days:7,label:"One week. Keep going."},
+  {days:14,label:"Two weeks. You are different now."},
+  {days:21,label:"21 days. Habit is forming."},
+  {days:30,label:"30 days. One month strong."},
+  {days:60,label:"60 days. Most people quit here. You did not."},
+  {days:90,label:"90 days. You are not the same person."},
+  {days:180,label:"180 days. Half a year of discipline."},
+  {days:365,label:"365 days. One full year. Legendary."}
+];
+var GUIDE_DATA = {
+  home: [
+    {e:"⏱",t:"Countdown to anything",b:"Add a countdown to any goal with a deadline. The seconds tick live so you always feel the time passing."},
+    {e:"🔴",t:"Deadline vs Milestone",b:"Deadline cards pulse red and get louder as time runs out. Milestone cards feel celebratory. Pick the right energy for each goal."},
+    {e:"📸",t:"Prove you finished it",b:"Deadline cards have a Prove Done button. Take a photo of the finished task to dismiss the countdown. No shortcuts."}
+  ],
+  goals: [
+    {e:"✅",t:"Daily goals",b:"Add what you need to do today. Check them off to build your streak. Every checkoff fires confetti."},
+    {e:"🔥",t:"Keep your streak alive",b:"Complete at least one goal every day. Miss a day and the streak resets. The dots show your last 14 days."},
+    {e:"⚔️",t:"Discipline streaks",b:"Scroll down for DO and DON'T streaks. Track habits you are building and things you are walking away from."}
+  ],
+  fuel: [
+    {e:"⚡",t:"Quotes that hit different",b:"Quotes rotate every 30 seconds. Tap Next Quote to skip ahead. Chosen to create urgency, not comfort."},
+    {e:"🗣",t:"Say your affirmation out loud",b:"Your daily affirmation changes every day. Say it out loud three times before your first task. It works."},
+    {e:"🔥",t:"Community quotes",b:"Tap the Community tab to submit your own quote. Others can like it. The most liked float to the top."}
+  ],
+  focus: [
+    {e:"🔥",t:"Talk to your coach",b:"Push is your AI coach. Ask about goals, setbacks, hard days, relationships — anything. You get honesty, not comfort."},
+    {e:"💬",t:"Be specific, get more back",b:"The more real you are, the better the response. Don't say 'I'm struggling.' Say what you're actually struggling with."},
+    {e:"📖",t:"Your sessions are saved",b:"Every conversation stays here so you can scroll back. Use it to track your mindset over time."}
+  ],
+  alerts: [
+    {e:"🔔",t:"Three check-ins a day",b:"Morning, midday, and evening reminders are already set. Real messages, not generic pings. Toggle any off if needed."},
+    {e:"📲",t:"Enable notifications",b:"Tap Enable to turn on push notifications. Without this, reminders cannot reach your lock screen."},
+    {e:"✏️",t:"Add your own reminders",b:"Add custom reminders anytime. Pick a time, write your message, hit Add. They are yours to control."}
+  ]
+};
+var PREFIX = {home:"gh",goals:"gg",fuel:"gf",focus:"gfo",alerts:"ga"};
+var guideStep = {};
+var appReady = false;
+
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function load(k,d){try{var v=localStorage.getItem(k);return v!=null?JSON.parse(v):d;}catch(e){return d;}}
+var today = new Date().toDateString();
+var dayOfYear = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+
+function showScreen(id,btn){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('screen-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(appReady) showGuide(id);
+}
+
+function openModal(id){document.getElementById(id).style.display='flex';}
+function closeModal(id){document.getElementById(id).style.display='none';}
+
+function showGuide(tab){
+  if(load('amp_guide_'+tab,false)) return;
+  guideStep[tab]=0;
+  renderGuide(tab);
+  document.getElementById('guide-'+tab).style.display='flex';
+}
+function renderGuide(tab){
+  var steps=GUIDE_DATA[tab];
+  var step=guideStep[tab]||0;
+  var s=steps[step];
+  var p=PREFIX[tab];
+  var isLast=step===steps.length-1;
+  document.getElementById(p+'-emoji').textContent=s.e;
+  document.getElementById(p+'-title').textContent=s.t;
+  document.getElementById(p+'-body').textContent=s.b;
+  document.getElementById(p+'-next').textContent=isLast?'Got it':'Next';
+  var dots=document.getElementById(p+'-dots');
+  dots.innerHTML='';
+  steps.forEach(function(_,i){
+    var d=document.createElement('div');
+    d.className='guide-dot'+(i===step?' active':'');
+    dots.appendChild(d);
+  });
+}
+function nextGuide(tab){
+  var steps=GUIDE_DATA[tab];
+  var step=guideStep[tab]||0;
+  if(step<steps.length-1){guideStep[tab]=step+1;renderGuide(tab);}
+  else{skipGuide(tab);}
+}
+function skipGuide(tab){
+  save('amp_guide_'+tab,true);
+  document.getElementById('guide-'+tab).style.display='none';
+}
+
+function loadUser(){
+  var name=load('amp_name','');
+  var hr=new Date().getHours();
+  var greet=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+  var g1=document.getElementById('home-greeting');
+  var n1=document.getElementById('home-name');
+  var g2=document.getElementById('goals-greeting');
+  if(g1) g1.textContent=greet+(name?', '+name+'.':',');
+  if(n1) n1.textContent=name?name+', lets go.':'Lets go.';
+  if(g2) g2.textContent="Today's goals"+(name?', '+name+'.':',');
+  updateNotifPreviews();
+}
+
+var obCurrent=1;
+function obGo(step){
+  if(step===3){var n=document.getElementById('ob-name').value.trim();if(!n){alert('Please enter your name.');return;}save('amp_name',n);loadUser();}
+  if(step===4){var g=document.getElementById('ob-goal').value.trim();var dl=document.getElementById('ob-deadline').value;if(g&&dl){countdowns.push({id:Date.now(),name:g,targetTs:new Date(dl).getTime(),setAt:Date.now(),type:'deadline',primary:true,shameFired:false});save('amp_countdowns',countdowns);}}
+  document.getElementById('ob-'+obCurrent).style.display='none';
+  obCurrent=step;
+  document.getElementById('ob-'+step).style.display='flex';
+}
+function obNotif(){
+  if('Notification' in window){
+    Notification.requestPermission().then(function(p){
+      if(p==='granted'){document.getElementById('alerts-notif-banner').style.display='none';}
+      obFinish();
+    });
+  } else { obFinish(); }
+}
+function obFinish(){save('amp_onboarded',true);document.getElementById('onboarding').style.display='none';initApp();}
+
+function setVibe(v,btn){
+  document.querySelectorAll('.vibe-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var msg=document.getElementById('vibe-msg');
+  var micro=document.getElementById('micro-goals-card');
+  micro.style.display='none';
+  if(v==='low'){
+    msg.textContent='Low energy mode. Small wins only today.';
+    micro.style.display='block';
+    document.getElementById('micro-list').innerHTML=MICRO_GOALS.slice(0,3).map(function(g){return '<div style="padding:7px 0;border-bottom:1px solid rgba(29,158,117,0.1);font-size:13px;color:rgba(255,255,255,0.7);">'+g+'</div>';}).join('');
+  } else if(v==='chaos'){
+    msg.textContent='Chaos mode. Locking everything. Just breathe.';
+    openModal('chaos-overlay');
+    resetChaosTimer();
+  } else {
+    msg.textContent='Focused mode. Full access. Go get it.';
+  }
+  save('amp_vibe',v);
+}
+
+var chaosInterval=null;
+var chaosSecs=600;
+function resetChaosTimer(){chaosSecs=600;renderChaosTimer();}
+function renderChaosTimer(){var el=document.getElementById('chaos-timer');if(el)el.textContent=Math.floor(chaosSecs/60).toString().padStart(2,'0')+':'+String(chaosSecs%60).padStart(2,'0');}
+function startChaosTimer(){clearInterval(chaosInterval);chaosInterval=setInterval(function(){chaosSecs--;renderChaosTimer();if(chaosSecs<=0){clearInterval(chaosInterval);exitChaos();alert('Reset complete. Go back to Focused when ready.');}},1000);}
+function exitChaos(){closeModal('chaos-overlay');clearInterval(chaosInterval);}
+
+var countdowns=load('amp_countdowns',[]);
+function openAddCountdownModal(){
+  var d=new Date(Date.now()+7*24*3600000);
+  var pad=function(n){return String(n).padStart(2,'0');};
+  document.getElementById('m-datetime').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+  document.getElementById('m-name').value='';
+  openModal('add-modal');
+}
+function saveCountdown(){
+  var name=document.getElementById('m-name').value.trim();
+  var dt=document.getElementById('m-datetime').value;
+  var type=document.getElementById('m-type').value;
+  var primary=document.getElementById('m-primary').value==='yes';
+  var unit=document.getElementById('m-unit').value||'seconds';
+  if(!name||!dt){alert('Please enter a name and date/time.');return;}
+  var ts;
+  if(type==='daily'){var e=new Date();e.setHours(23,59,59,999);ts=e.getTime();}
+  else if(type==='hourly'){ts=Date.now()+3600000;}
+  else{ts=new Date(dt).getTime();}
+  if(primary) countdowns.forEach(function(c){c.primary=false;});
+  countdowns.push({id:Date.now(),name:name,targetTs:ts,setAt:Date.now(),type:type,primary:primary,shameFired:false,unit:unit});
+  save('amp_countdowns',countdowns);
+  closeModal('add-modal');
+  renderCountdowns();
+}
+function deleteCountdown(id){countdowns=countdowns.filter(function(c){return c.id!==id;});save('amp_countdowns',countdowns);renderCountdowns();}
+function setPrimary(id){countdowns.forEach(function(c){c.primary=c.id===id;});save('amp_countdowns',countdowns);renderCountdowns();}
+
+function renderCountdowns(){
+  var list=document.getElementById('countdown-list');
+  if(!countdowns.length){list.innerHTML='<div class="card" style="text-align:center;padding:24px 16px;"><div style="font-size:32px;margin-bottom:10px;">⏱</div><div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">No countdowns yet. Add your first goal above.</div></div>';return;}
+  var sorted=countdowns.slice().sort(function(a,b){return (b.primary?1:0)-(a.primary?1:0);});
+  list.innerHTML=sorted.map(function(c){
+    var diff=Math.max(0,c.targetTs-Date.now());
+    var s=Math.floor(diff/1000);
+    var d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;
+    var unit=c.unit||'seconds';
+    var dispVal,dispLabel;
+    if(unit==='seconds'){dispVal=s.toLocaleString();dispLabel='seconds remaining';}
+    else if(unit==='minutes'){dispVal=Math.floor(s/60).toLocaleString();dispLabel='minutes remaining';}
+    else if(unit==='hours'){dispVal=(s/3600).toFixed(1);dispLabel='hours remaining';}
+    else if(unit==='days'){dispVal=(s/86400).toFixed(1);dispLabel='days remaining';}
+    else if(unit==='weeks'){dispVal=(s/604800).toFixed(2);dispLabel='weeks remaining';}
+    else if(unit==='months'){dispVal=(s/2592000).toFixed(2);dispLabel='months remaining';}
+    else{dispVal=s.toLocaleString();dispLabel='seconds remaining';}
+    var pct=c.setAt?Math.min(100,((Date.now()-c.setAt)/(c.targetTs-c.setAt))*100):0;
+    var barColor=pct<40?'#1D9E75':pct<70?'#EF9F27':'#E24B4A';
+    var secsColor={deadline:'#ff6b6a',milestone:'#a29bf0',daily:'#4dcca0',hourly:'#f4b842'}[c.type]||'#fff';
+    var typeLabel={deadline:'Deadline',milestone:'Milestone',daily:'Daily',hourly:'Hourly'}[c.type]||c.type;
+    var safeName=c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var html='<div class="cd-card '+c.type+'-type" id="cd-'+c.id+'">';
+    html+='<button class="cd-del" onclick="deleteCountdown('+c.id+')">x</button>';
+    html+='<div style="margin-bottom:6px;">'+(c.primary?'<span class="primary-badge">Primary</span>':'')+' <span class="type-badge '+c.type+'">'+typeLabel+'</span></div>';
+    html+='<div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">'+c.name+'</div>';
+    html+='<div class="cd-secs" style="color:'+secsColor+';" id="secs-'+c.id+'">'+dispVal+'</div>';
+    html+='<div class="cd-unit" id="unit-lbl-'+c.id+'">'+dispLabel+'</div>';
+    html+='<div class="cd-unit-toggle">';
+    ['seconds','minutes','hours','days','weeks','months'].forEach(function(u){
+      html+='<button class="unit-pill'+(unit===u?' active':'')+'" onclick="setCountdownUnit('+c.id+',\''+u+'\')">'+u.charAt(0).toUpperCase()+u.slice(1)+'</button>';
+    });
+    html+='</div>';
+    html+='<div class="cd-breakdown">';
+    html+='<div class="cd-bd"><div class="cd-bd-val" id="bd-d-'+c.id+'">'+d+'</div><div class="cd-bd-lbl">days</div></div>';
+    html+='<div class="cd-bd"><div class="cd-bd-val" id="bd-h-'+c.id+'">'+h+'</div><div class="cd-bd-lbl">hrs</div></div>';
+    html+='<div class="cd-bd"><div class="cd-bd-val" id="bd-m-'+c.id+'">'+m+'</div><div class="cd-bd-lbl">mins</div></div>';
+    html+='<div class="cd-bd"><div class="cd-bd-val" id="bd-s-'+c.id+'">'+sec+'</div><div class="cd-bd-lbl">secs</div></div>';
+    html+='</div>';
+    html+='<div class="urgency"><div class="urgency-fill" id="uf-'+c.id+'" style="width:'+pct+'%;background:'+barColor+';"></div></div>';
+    html+='<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">';
+    if(!c.primary) html+='<button class="btn btn-g btn-sm" onclick="setPrimary('+c.id+')">Set primary</button>';
+    if(c.type==='deadline') html+='<button class="tick-btn" id="tick-'+c.id+'" onclick="toggleTick('+c.id+')">Sound on</button>';
+    if(c.type==='deadline') html+='<button class="prove-btn" onclick="openProveModal('+c.id+',\''+safeName+'\')">Prove done</button>';
+    html+='<button class="btn btn-g btn-sm" onclick="openShareModal('+c.id+')">Share</button>';
+    html+='</div>';
+    if(c.type==='deadline'){
+      html+='<button class="mission-btn" onclick="openProveModal('+c.id+',\''+safeName+'\')">';
+      html+='<span class="m-icon">🏁</span>';
+      html+='<span><span style="display:block;">Mission Accomplished</span><span class="m-sub">Tap to prove it & dismiss</span></span>';
+      html+='</button>';
+    }
+    html+='</div>';
+    return html;
+  }).join('');
+}
+
+function setCountdownUnit(id,unit){
+  var c=countdowns.find(function(c){return c.id===id;});
+  if(!c)return;
+  c.unit=unit;
+  save('amp_countdowns',countdowns);
+  renderCountdowns();
+}
+
+function tickCountdowns(){
+  countdowns.forEach(function(c){
+    var el=document.getElementById('secs-'+c.id);if(!el)return;
+    var diff=Math.max(0,c.targetTs-Date.now());
+    var s=Math.floor(diff/1000);
+    var unit=c.unit||'seconds';
+    var dispVal;
+    if(unit==='seconds'){dispVal=s.toLocaleString();}
+    else if(unit==='minutes'){dispVal=Math.floor(s/60).toLocaleString();}
+    else if(unit==='hours'){dispVal=(s/3600).toFixed(1);}
+    else if(unit==='days'){dispVal=(s/86400).toFixed(1);}
+    else if(unit==='weeks'){dispVal=(s/604800).toFixed(2);}
+    else if(unit==='months'){dispVal=(s/2592000).toFixed(2);}
+    else{dispVal=s.toLocaleString();}
+    el.textContent=dispVal;
+    var d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;
+    var dEl=document.getElementById('bd-d-'+c.id);
+    if(dEl){dEl.textContent=d;document.getElementById('bd-h-'+c.id).textContent=h;document.getElementById('bd-m-'+c.id).textContent=m;document.getElementById('bd-s-'+c.id).textContent=sec;}
+    var pct=c.setAt?Math.min(100,((Date.now()-c.setAt)/(c.targetTs-c.setAt))*100):0;
+    var barColor=pct<40?'#1D9E75':pct<70?'#EF9F27':'#E24B4A';
+    var uf=document.getElementById('uf-'+c.id);
+    if(uf){uf.style.width=pct+'%';uf.style.background=barColor;}
+    // Visual urgency escalation for deadline cards
+    if(c.type==='deadline'){
+      var card=document.getElementById('cd-'+c.id);
+      var secsEl=document.getElementById('secs-'+c.id);
+      if(card){
+        card.classList.remove('alarm-mode','warning-mode');
+        if(s<=10&&s>0){card.classList.add('alarm-mode');if(secsEl)secsEl.style.color='#ff2a2a';}
+        else if(s<=60&&s>0){card.classList.add('warning-mode');if(secsEl)secsEl.style.color='#cc2a2a';}
+        else{if(secsEl)secsEl.style.color='';}
+      }
+    }
+  });
+}
+setInterval(tickCountdowns,1000);
+
+var tickIntervals={};var audioCtx=null;
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playTick(){try{var ctx=getCtx();var o=ctx.createOscillator();var g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.setValueAtTime(900,ctx.currentTime);g.gain.setValueAtTime(0.07,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.04);o.start(ctx.currentTime);o.stop(ctx.currentTime+0.04);}catch(e){}}
+function toggleTick(id){
+  var btn=document.getElementById('tick-'+id);
+  if(tickIntervals[id]){clearInterval(tickIntervals[id]);delete tickIntervals[id];if(btn){btn.textContent='Sound on';}}
+  else{playTick();tickIntervals[id]=setInterval(playTick,1000);if(btn){btn.textContent='Sound off';}}
+}
+
+var proveId=null;
+function openProveModal(id,name){proveId=id;document.getElementById('photo-task-name').textContent='Prove you completed: '+name;document.getElementById('photo-preview').style.display='none';document.getElementById('photo-confirm').style.display='none';document.getElementById('photo-input').value='';openModal('photo-modal');}
+function handlePhoto(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){document.getElementById('photo-img').src=ev.target.result;document.getElementById('photo-preview').style.display='block';document.getElementById('photo-confirm').style.display='block';};reader.readAsDataURL(file);}
+function confirmPhoto(){closeModal('photo-modal');if(proveId){deleteCountdown(proveId);proveId=null;}renderCountdowns();confetti();alert('Task verified. Keep going.');}
+
+var shameData=null;
+function checkDeadlines(){
+  var changed=false;
+  countdowns.forEach(function(c){
+    if(c.type==='deadline'&&!c.shameFired&&c.targetTs<Date.now()){
+      c.shameFired=true;changed=true;
+      var msgs=['I set a deadline for "'+c.name+'" and I missed it. Holding myself accountable publicly.','I did not finish "'+c.name+'" on time. No excuses. Posting this so I cannot pretend it did not happen.'];
+      shameData={name:c.name,msg:msgs[Math.floor(Math.random()*msgs.length)]};
+      document.getElementById('shame-goal-name').textContent='Your deadline for "'+c.name+'" has passed.';
+      document.getElementById('shame-post-text').textContent=shameData.msg;
+      openModal('shame-modal');
+    }
+  });
+  if(changed) save('amp_countdowns',countdowns);
+}
+function postShame(){if(!shameData)return;sbFetch('community_quotes','POST',{text:shameData.msg,author:'Accountability post',likes:0,approved:true}).then(function(){loadCommunityQuotes();});closeModal('shame-modal');shameData=null;alert('Posted. Now get back on it.');}
+setInterval(checkDeadlines,10000);
+
+function openShareModal(id){
+  var c=countdowns.find(function(c){return c.id===id;});if(!c)return;
+  var diff=Math.max(0,c.targetTs-Date.now());var s=Math.floor(diff/1000);
+  document.getElementById('share-goal-label').textContent=c.name;
+  document.getElementById('share-secs').textContent=s.toLocaleString();
+  document.getElementById('share-d').textContent=Math.floor(s/86400);
+  document.getElementById('share-h').textContent=Math.floor((s%86400)/3600);
+  document.getElementById('share-m').textContent=Math.floor((s%3600)/60);
+  document.getElementById('share-s').textContent=s%60;
+  var q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  document.getElementById('share-quote-line').textContent='"'+q.t+'" - '+q.a;
+  openModal('share-modal');
+}
+function shareNow(){
+  var text='I have '+document.getElementById('share-secs').textContent+' seconds left to achieve: '+document.getElementById('share-goal-label').textContent+'. Amplify is keeping me honest. Make some noise for yourself.';
+  if(navigator.share){navigator.share({title:'Amplify',text:text,url:'https://dulcet-kitten-282a63.netlify.app'});}
+  else{navigator.clipboard.writeText(text).then(function(){alert('Copied! Paste it anywhere.');});}
+}
+
+function confetti(){
+  var colors=['#7F77DD','#1D9E75','#EF9F27','#ff6b6a','#fff','#a29bf0'];
+  for(var i=0;i<40;i++){
+    var el=document.createElement('div');el.className='confetti-piece';
+    el.style.left=Math.random()*100+'vw';el.style.top='-10px';
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay=Math.random()*0.6+'s';el.style.animationDuration=(0.8+Math.random()*0.8)+'s';
+    el.style.width=(6+Math.random()*8)+'px';el.style.height=(6+Math.random()*8)+'px';
+    document.body.appendChild(el);setTimeout(function(){el.remove();},2000);
+  }
+  playSuccess();
+}
+function playSuccess(){
+  try{
+    var ctx=getCtx();
+    [523,659,784,1047].forEach(function(freq,i){
+      var o=ctx.createOscillator();var g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.setValueAtTime(freq,ctx.currentTime+i*0.1);
+      g.gain.setValueAtTime(0.15,ctx.currentTime+i*0.1);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.1+0.3);
+      o.start(ctx.currentTime+i*0.1);o.stop(ctx.currentTime+i*0.1+0.3);
+    });
+  }catch(e){}
+}
+
+var tasks=load('amp_tasks_'+today,[]);
+function renderTasks(){
+  var done=tasks.filter(function(t){return t.done;}).length;
+  document.getElementById('task-count').textContent=done+' / '+tasks.length;
+  var list=document.getElementById('task-list');
+  if(!tasks.length){list.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,0.25);padding:8px 0;">No goals yet. Add something.</div>';return;}
+  list.innerHTML='';
+  tasks.forEach(function(t,i){
+    var row=document.createElement('div');row.className='goal-row';
+    row.innerHTML='<button class="mission-check '+(t.done?'done':'')+'" onclick="toggleTask('+i+')">'+(t.done?'':'')+'</button><div class="goal-txt '+(t.done?'done':'')+'">'+t.text+'</div><button class="del-btn" onclick="deleteTask('+i+')">x</button>';
+    list.appendChild(row);
+  });
+  if(done>0){var sd=load('amp_streak_days',[]);if(sd.indexOf(today)===-1){sd.push(today);save('amp_streak_days',sd);}renderStreak();}
+}
+function addTask(){var inp=document.getElementById('new-task');if(!inp.value.trim())return;tasks.push({id:Date.now(),text:inp.value.trim(),done:false});inp.value='';save('amp_tasks_'+today,tasks);renderTasks();}
+function toggleTask(i){tasks[i].done=!tasks[i].done;save('amp_tasks_'+today,tasks);if(tasks[i].done)confetti();renderTasks();}
+function deleteTask(i){tasks.splice(i,1);save('amp_tasks_'+today,tasks);renderTasks();}
+
+function renderStreak(){
+  var sd=load('amp_streak_days',[]);var streak=0;var d=new Date();
+  while(true){var ds=d.toDateString();if(sd.indexOf(ds)!==-1){streak++;d.setDate(d.getDate()-1);}else break;}
+  document.getElementById('streak-num').textContent=streak;
+  var dots=document.getElementById('streak-dots');dots.innerHTML='';
+  for(var i=13;i>=0;i--){
+    var dd=new Date();dd.setDate(dd.getDate()-i);var ds=dd.toDateString();
+    var dot=document.createElement('div');
+    dot.className='dot'+(sd.indexOf(ds)!==-1?' done':'')+(i===0?' today':'');
+    dot.textContent=dd.getDate();dots.appendChild(dot);
+  }
+}
+
+var CHECKIN_PROMPTS = [
+  "What is one thing stopping you right now — and why is it actually stopping you?",
+  "How did you show up for your goal yesterday? Be honest.",
+  "If your future self could see yesterday, what would they say?",
+  "What habit are you building that will matter in 90 days?",
+  "What excuse have you been using — and what is it costing you?",
+  "Name one thing you did yesterday that moved you forward.",
+  "What would staying strong today prove to yourself?"
+];
+
+var discStreaks=load('amp_disc_streaks',[]);
+var discCheckinDone=load('amp_disc_checkin_'+today,false);
+var discModalType='do';
+
+function setDiscTab(tab,btn){
+  document.querySelectorAll('.disc-tab').forEach(function(b){b.classList.remove('active-do');b.classList.remove('active-dont');});
+  if(tab==='do'){btn.classList.add('active-do');document.getElementById('disc-do-section').style.display='block';document.getElementById('disc-dont-section').style.display='none';}
+  else{btn.classList.add('active-dont');document.getElementById('disc-do-section').style.display='none';document.getElementById('disc-dont-section').style.display='block';}
+}
+function openDiscModal(type){
+  discModalType=type;var isDont=type==='dont';
+  document.getElementById('disc-modal-title').textContent=isDont?'New DON\'T streak':'New DO streak';
+  document.getElementById('disc-modal-desc').textContent=isDont?'Something you are choosing to walk away from. Every day you resist is a win.':'Something you want to do every single day without breaking the chain.';
+  document.getElementById('disc-name-input').placeholder=isDont?'e.g. No fornication, No alcohol, No social media':'e.g. Work out, Read, Pray, Meditate';
+  document.getElementById('disc-save-btn').style.background=isDont?'#7F77DD':'#1D9E75';
+  document.getElementById('disc-name-input').value='';
+  openModal('disc-modal');
+}
+function saveDisc(){
+  var name=document.getElementById('disc-name-input').value.trim();
+  var milestone=parseInt(document.getElementById('disc-milestone-input').value);
+  var isPrivate=document.getElementById('disc-private-input').value==='yes';
+  if(!name){alert('Please enter what you are tracking.');return;}
+  discStreaks.push({id:Date.now(),name:name,type:discModalType,milestone:milestone,isPrivate:isPrivate,days:0,lastCheckin:null,best:0,checkedToday:false});
+  save('amp_disc_streaks',discStreaks);closeModal('disc-modal');renderDiscStreaks();
+}
+function deleteDisc(id){
+  if(!confirm('Delete this streak? You will lose your progress.'))return;
+  discStreaks=discStreaks.filter(function(d){return d.id!==id;});
+  save('amp_disc_streaks',discStreaks);renderDiscStreaks();
+}
+function checkInDisc(id){
+  var d=discStreaks.find(function(d){return d.id===id;});
+  if(!d||d.checkedToday)return;
+  d.days++;d.best=Math.max(d.best,d.days);d.checkedToday=true;d.lastCheckin=today;
+  save('amp_disc_streaks',discStreaks);checkMilestone(d);confetti();renderDiscStreaks();
+}
+function resetDisc(id){
+  var d=discStreaks.find(function(d){return d.id===id;});
+  if(!d)return;
+  if(!confirm('Reset your streak? Your best record is saved.'))return;
+  d.days=0;d.checkedToday=false;d.lastCheckin=null;
+  save('amp_disc_streaks',discStreaks);renderDiscStreaks();
+}
+function checkMilestone(d){
+  var ms=MILESTONES.find(function(m){return m.days===d.days;});
+  if(ms) setTimeout(function(){alert('MILESTONE: '+ms.label+'\n\n'+d.days+' days of "'+( d.isPrivate?'Personal discipline':d.name)+'".\n\nMake some noise for yourself.');},300);
+}
+function checkinAnswer(stayed){
+  var dontItems=discStreaks.filter(function(d){return d.type==='dont'&&!d.checkedToday;});
+  if(stayed){dontItems.forEach(function(d){d.days++;d.best=Math.max(d.best,d.days);d.checkedToday=true;d.lastCheckin=today;checkMilestone(d);});confetti();alert('That is discipline. Every day you say no is a day you chose yourself.');}
+  else{dontItems.forEach(function(d){d.days=0;d.checkedToday=false;d.lastCheckin=null;});alert('Slip happens. What matters is you are back here right now. Reset and go again.');}
+  discCheckinDone=true;save('amp_disc_checkin_'+today,true);save('amp_disc_streaks',discStreaks);
+  document.getElementById('checkin-banner').style.display='none';renderDiscStreaks();
+}
+function renderDiscStreaks(){
+  var doList=document.getElementById('disc-do-list');
+  var dontList=document.getElementById('disc-dont-list');
+  discStreaks.forEach(function(d){if(d.lastCheckin&&d.lastCheckin!==today)d.checkedToday=false;});
+  var dontItems=discStreaks.filter(function(d){return d.type==='dont';});
+  var hr=new Date().getHours();
+  var banner=document.getElementById('checkin-banner');
+  if(dontItems.length>0&&hr>=6&&hr<12&&!discCheckinDone){
+    banner.style.display='flex';
+    document.getElementById('checkin-txt').textContent='Morning check-in: did you stay strong yesterday? ('+dontItems.filter(function(d){return !d.checkedToday;}).length+' streaks waiting)';
+    var promptEl=document.getElementById('checkin-prompt');
+    if(promptEl) promptEl.textContent=CHECKIN_PROMPTS[dayOfYear%CHECKIN_PROMPTS.length];
+  } else {banner.style.display='none';}
+
+  function cardHTML(d){
+    var isDont=d.type==='dont';
+    var displayName=d.isPrivate?'Personal discipline':d.name;
+    var pct=Math.min(100,(d.days/d.milestone)*100);
+    var barColor=isDont?'#7F77DD':'#1D9E75';
+    var streakClass=isDont?'dont-color':'do-color';
+    var cardClass=isDont?'dont-type':'do-type';
+    var checkLabel=isDont?(d.checkedToday?'Stayed strong today':'I stayed strong today'):(d.checkedToday?'Done today':'Mark done today');
+    var checkClass=isDont?'dont-check':'do-check';
+    var html='<div class="disc-card '+cardClass+'">';
+    html+='<button class="disc-del" onclick="deleteDisc('+d.id+')">x</button>';
+    html+='<div class="disc-name">'+displayName+'</div>';
+    html+='<div class="disc-streak '+streakClass+'">'+d.days+'</div>';
+    html+='<div class="disc-unit">days '+(isDont?'clean':'strong')+'</div>';
+    html+='<div class="disc-bar"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+barColor+';"></div></div>';
+    html+='<div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;">'+d.days+' / '+d.milestone+' days to milestone</div>';
+    if(d.best>0) html+='<div class="disc-best">Best: '+d.best+' days</div>';
+    html+='<div class="disc-actions">';
+    html+='<button class="disc-check-btn '+checkClass+(d.checkedToday?' checked':'')+'" onclick="'+(d.checkedToday?'':'checkInDisc('+d.id+')')+'">'+checkLabel+'</button>';
+    if(isDont&&!d.checkedToday) html+='<button class="btn btn-sm btn-r" onclick="resetDisc('+d.id+')">I slipped</button>';
+    html+='</div></div>';
+    return html;
+  }
+
+  var doItems=discStreaks.filter(function(d){return d.type==='do';});
+  var dontItemsAll=discStreaks.filter(function(d){return d.type==='dont';});
+  doList.innerHTML=doItems.length?doItems.map(cardHTML).join(''):'<div style="font-size:13px;color:rgba(255,255,255,0.25);padding:8px 0 14px;">No DO streaks yet. Add something you want to do every day.</div>';
+  dontList.innerHTML=dontItemsAll.length?dontItemsAll.map(cardHTML).join(''):'<div style="font-size:13px;color:rgba(255,255,255,0.25);padding:8px 0 14px;">No DON\'T streaks yet. Add something you are choosing to walk away from.</div>';
+}
+
+var allQuotes = QUOTES.concat(BIBLE_VERSES);
+var qIdx=Math.floor(Math.random()*QUOTES.length);
+var currentQuoteIsScripture=false;
+
+function getQuotePool(){return scriptureOn?allQuotes:QUOTES;}
+
+function toggleScripture(){
+  scriptureOn=!scriptureOn;
+  save('amp_scripture',scriptureOn);
+  renderScriptureToggle();
+  renderQuote();
+}
+
+function renderScriptureToggle(){
+  var tog=document.getElementById('scripture-toggle');
+  var knob=document.getElementById('scripture-knob');
+  if(!tog)return;
+  if(scriptureOn){tog.style.background='#EF9F27';knob.style.left='20px';}
+  else{tog.style.background='#2a2a2a';knob.style.left='3px';}
+}
+
+function renderQuote(){
+  var pool=getQuotePool();
+  var q=pool[qIdx%pool.length];
+  var isVerse=BIBLE_VERSES.indexOf(q)>=0;
+  document.getElementById('quote-text').textContent='"'+q.t+'"';
+  document.getElementById('quote-author').textContent='- '+q.a;
+  var badge=document.getElementById('quote-scripture-badge');
+  if(badge) badge.style.display=isVerse?'block':'none';
+  var qp=document.getElementById('quote-prompt');
+  if(qp&&q.q) qp.textContent='💭 '+q.q;
+}
+
+function nextQuote(){
+  var pool=getQuotePool();
+  qIdx=(qIdx+1)%pool.length;
+  renderQuote();
+}
+setInterval(nextQuote,30000);
+function setMotivTab(tab,btn){
+  document.querySelectorAll('.m-tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  ['quote','affirmation','challenge','community'].forEach(function(t){document.getElementById('tab-'+t).style.display=t===tab?'block':'none';});
+  if(tab==='community') loadCommunityQuotes();
+}
+async function generateAIChallenge(force){
+  var chalDone=load('amp_chal_'+today,false);
+  var cached=load('amp_chal_text_'+today,'');
+  var chalBtn=document.getElementById('chal-btn');
+  var chalText=document.getElementById('chal-text');
+  var chalLoading=document.getElementById('chal-loading');
+  var chalRefresh=document.getElementById('chal-refresh');
+  if(chalDone&&!force){
+    chalText.textContent=cached||CHALLENGES[dayOfYear%CHALLENGES.length].t;
+    chalBtn.textContent='Done ✓';chalBtn.style.opacity='0.5';
+    if(chalRefresh) chalRefresh.style.display='none';
+    return;
+  }
+  if(cached&&!force){chalText.textContent=cached;chalBtn.textContent='Mark complete';chalBtn.style.opacity='1';return;}
+  var goal=load('amp_name','')?load('amp_countdowns',[]).find(function(c){return c.primary;}):null;
+  var goalName=goal?goal.name:'';
+  if(!goalName){var allGoals=load('amp_countdowns',[]);if(allGoals.length) goalName=allGoals[0].name;}
+  if(chalLoading) chalLoading.style.display='block';
+  chalText.style.opacity='0.3';
+  if(chalRefresh) chalRefresh.style.display='none';
+  try{
+    var prompt=goalName
+      ?'Generate a single specific, actionable daily challenge for someone whose main goal is: "'+goalName+'". The challenge must be completable today. It should feel urgent and push the person slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person ("You", "Do", "Send", etc). No preamble. No title. No bullet. Just the challenge text.'
+      :'Generate a single specific, actionable daily challenge for someone working on an important personal goal. It must be completable today, feel urgent, and push them slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person. No preamble, no title.';
+    var resp=await fetch('https://bucolic-puffpuff-475ccd.netlify.app/.netlify/functions/push',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:120,messages:[{role:'user',content:prompt}]})
+    });
+    var data=await resp.json();
+    var text=data.choices&&data.choices[0]?data.choices[0].message.content.trim():CHALLENGES[dayOfYear%CHALLENGES.length].t;
+    save('amp_chal_text_'+today,text);
+    chalText.textContent=text;
+    chalBtn.textContent='Mark complete';
+    chalBtn.style.opacity='1';
+    if(chalRefresh) chalRefresh.style.display='inline-block';
+  }catch(e){
+    chalText.textContent=CHALLENGES[dayOfYear%CHALLENGES.length].t;
+    chalBtn.textContent='Mark complete';
+    chalBtn.style.opacity='1';
+    if(chalRefresh) chalRefresh.style.display='inline-block';
+  }
+  if(chalLoading) chalLoading.style.display='none';
+  chalText.style.opacity='1';
+}
+
+function completeChallenge(){
+  save('amp_chal_'+today,true);
+  var btn=document.getElementById('chal-btn');
+  var refresh=document.getElementById('chal-refresh');
+  btn.textContent='Done ✓';btn.style.opacity='0.5';
+  if(refresh) refresh.style.display='none';
+  confetti();
+}
+
+var SUPABASE_URL = 'https://qrjrxgktwxklpmvkzhlh.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_nGoE9sCTz5qJ3paqnFDlog_h9tUkwxf';
+
+async function sbFetch(path, method, body){
+  var opts = {method: method||'GET', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}};
+  if(body) opts.body = JSON.stringify(body);
+  var r = await fetch(SUPABASE_URL+'/rest/v1/'+path, opts);
+  return r.json();
+}
+
+async function loadCommunityQuotes(){
+  var list = document.getElementById('community-list');
+  if(!list) return;
+  list.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.25);padding:12px 0;">Loading community quotes...</div>';
+  try{
+    var data = await sbFetch('community_quotes?approved=eq.true&order=likes.desc&limit=50');
+    communityQuotes = data || [];
+    renderCommunityQuotes();
+  } catch(e){
+    list.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.25);padding:12px 0;">Could not load quotes. Check your connection.</div>';
+  }
+}
+
+async function submitCommunityQuote(){
+  var text = document.getElementById('cq-input').value.trim();
+  var name = document.getElementById('cq-name').value.trim() || 'Anonymous';
+  if(!text){alert('Write something first.');return;}
+  if(text.length < 10){alert('Make it meaningful — at least 10 characters.');return;}
+  try{
+    await sbFetch('community_quotes', 'POST', {text:text, author:name, likes:0, approved:false});
+    document.getElementById('cq-input').value='';
+    document.getElementById('cq-name').value='';
+    confetti();
+    alert('Submitted! Your quote is under review and will appear for everyone once approved. Thank you for contributing.');
+  } catch(e){
+    alert('Could not submit. Check your connection and try again.');
+  }
+}
+
+async function likeQuote(id){
+  var q = communityQuotes.find(function(q){return q.id===id;});
+  if(!q) return;
+  var newLikes = (q.likes||0) + (q.liked?-1:1);
+  q.liked = !q.liked;
+  q.likes = newLikes;
+  renderCommunityQuotes();
+  try{
+    await sbFetch('community_quotes?id=eq.'+id, 'PATCH', {likes: newLikes});
+  } catch(e){}
+}
+
+var communityQuotes = [];
+
+function renderCommunityQuotes(){
+  var list=document.getElementById('community-list');
+  if(!list) return;
+  if(!communityQuotes.length){
+    list.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,0.25);padding:16px 0;text-align:center;">No community quotes yet. Be the first to submit one.</div>';
+    return;
+  }
+  list.innerHTML=communityQuotes.map(function(q){
+    return '<div class="cq-card"><div class="cq-text">"'+q.text+'"</div><div class="cq-meta"><div class="cq-author">- '+q.author+'</div><button class="cq-like '+(q.liked?'liked':'')+'" onclick="likeQuote('+q.id+')">'+(q.liked?'💜':'🤍')+' '+(q.likes||0)+'</button></div></div>';
+  }).join('');
+}
+
+var pushHistory = load('amp_push_history', []);
+var pushLoading = false;
+
+function renderPushHistory(){
+  var container = document.getElementById('push-history');
+  if(!container) return;
+  if(!pushHistory.length){container.innerHTML='';return;}
+  var html = '<button class="push-clear" onclick="clearPush()">Clear conversation</button>';
+  pushHistory.forEach(function(msg){
+    var time = msg.time || '';
+    html += '<div class="push-bubble '+msg.role+'">';
+    html += '<div class="push-bubble-inner">'+msg.text.replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="push-bubble-time">'+time+'</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
+  // hide suggestions after first message
+  var sugg = document.getElementById('push-suggestions');
+  if(sugg) sugg.style.display = pushHistory.length ? 'none' : 'flex';
+}
+
+function useSuggestion(btn){
+  var inp = document.getElementById('push-input');
+  if(inp){ inp.value = btn.textContent; inp.focus(); }
+}
+
+function clearPush(){
+  if(!confirm('Clear this conversation?')) return;
+  pushHistory = [];
+  save('amp_push_history', pushHistory);
+  renderPushHistory();
+  var sugg = document.getElementById('push-suggestions');
+  if(sugg) sugg.style.display = 'flex';
+}
+
+var PUSH_LOADING_MSGS = [
+  'Thinking...', 'Being real with you...', 'No sugarcoating...', 'Cutting through the noise...'
+];
+
+async function sendPush(){
+  if(pushLoading) return;
+  var inp = document.getElementById('push-input');
+  var text = inp ? inp.value.trim() : '';
+  if(!text) return;
+  inp.value = '';
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  pushHistory.push({role:'user', text:text, time:timeStr});
+  save('amp_push_history', pushHistory);
+  renderPushHistory();
+  pushLoading = true;
+  var loadEl = document.getElementById('push-loading');
+  var loadTxt = document.getElementById('push-loading-txt');
+  if(loadEl) loadEl.style.display = 'block';
+  if(loadTxt) loadTxt.textContent = PUSH_LOADING_MSGS[Math.floor(Math.random()*PUSH_LOADING_MSGS.length)];
+  var name = load('amp_name','');
+  var primaryGoal = '';
+  var allCountdowns = load('amp_countdowns',[]);
+  var primary = allCountdowns.find(function(c){return c.primary;});
+  if(primary) primaryGoal = primary.name;
+  else if(allCountdowns.length) primaryGoal = allCountdowns[0].name;
+  var systemPrompt = 'You are the Push coach inside the Amplify accountability app. Your job is to be the one friend who tells the truth — direct, warm, no fluff, no toxic positivity. You push people forward without being cruel. You ask sharp questions. You do not validate excuses but you do validate feelings before redirecting. Keep responses under 150 words unless the topic genuinely needs more. Never use bullet points — write like a real person texting their friend who needs to hear the truth.'
+    + (name ? ' The user\'s name is '+name+'.' : '')
+    + (primaryGoal ? ' Their main goal right now is: "'+primaryGoal+'".' : '')
+    + ' If someone mentions self-harm, suicide, or a mental health crisis, respond with care and direct them to call or text 988 (Suicide and Crisis Lifeline). You are not a therapist. You are a coach.';
+  var messages = pushHistory.slice(-10).map(function(m){
+    return {role: m.role==='user'?'user':'assistant', content: m.text};
+  });
+  try{
+    var resp = await fetch('https://bucolic-puffpuff-475ccd.netlify.app/.netlify/functions/push',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:300,
+        messages: [{role:'system',content:systemPrompt}].concat(messages)
+      })
+    });
+    var data = await resp.json();
+    var reply = data.choices && data.choices[0] ? data.choices[0].message.content.trim() : "I'm here. Keep going.";
+    var replyTime = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    pushHistory.push({role:'coach', text:reply, time:replyTime});
+    save('amp_push_history', pushHistory);
+  } catch(e){
+    pushHistory.push({role:'coach', text:"Something went wrong on my end. But you're still here — that counts. Try again.", time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+    save('amp_push_history', pushHistory);
+  }
+  pushLoading = false;
+  if(loadEl) loadEl.style.display = 'none';
+  renderPushHistory();
+}
+
+var reminders=load('amp_reminders',[{id:1,label:'Morning push',time:'07:00',on:true},{id:2,label:'Midday check-in',time:'12:00',on:true},{id:3,label:'Evening accountability',time:'20:00',on:true}]);
+function renderReminders(){
+  var list=document.getElementById('reminder-list');
+  if(!reminders.length){list.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,0.25);padding:8px 0;">No reminders yet.</div>';return;}
+  list.innerHTML='';
+  reminders.forEach(function(r,i){
+    var row=document.createElement('div');row.className='rem-row';
+    row.innerHTML='<div style="flex:1;"><div style="font-size:13px;color:#fff;">'+r.label+'</div><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;">'+r.time+'</div></div><button class="toggle" style="background:'+(r.on?'#7F77DD':'#2a2a2a')+';" onclick="toggleReminder('+i+')"><div class="toggle-knob" style="left:'+(r.on?'20px':'3px')+';"></div></button><button class="del-btn" onclick="deleteReminder('+i+')">x</button>';
+    list.appendChild(row);
+  });
+}
+function addReminder(){var l=document.getElementById('new-rem-label').value.trim();var t=document.getElementById('new-rem-time').value;if(!l||!t){alert('Enter a label and time.');return;}reminders.push({id:Date.now(),label:l,time:t,on:true});document.getElementById('new-rem-label').value='';document.getElementById('new-rem-time').value='';save('amp_reminders',reminders);renderReminders();}
+function toggleReminder(i){reminders[i].on=!reminders[i].on;save('amp_reminders',reminders);renderReminders();}
+function deleteReminder(i){reminders.splice(i,1);save('amp_reminders',reminders);renderReminders();}
+// Capacitor Push Notifications
+var PushNotifications = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
+var LocalNotifications = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+
+async function requestNotif(){
+  if(window.Capacitor && window.Capacitor.isNativePlatform()){
+    try{
+      var result = await PushNotifications.requestPermissions();
+      if(result.receive === 'granted'){
+        await PushNotifications.register();
+        document.getElementById('alerts-notif-banner').style.display='none';
+        scheduleLocalNotifications();
+        alert('Notifications enabled! We will check in on you.');
+      } else {
+        alert('Please enable notifications in your iPhone Settings > Amplify.');
+      }
+    } catch(e){ console.log('Push error:',e); }
+    return;
+  }
+  if(!('Notification' in window)){alert('Notifications not supported here.');return;}
+  Notification.requestPermission().then(function(p){
+    if(p==='granted'){document.getElementById('alerts-notif-banner').style.display='none';new Notification('Amplify',{body:'You are in! We will check in on you.'});}
+  });
+}
+
+async function scheduleLocalNotifications(){
+  if(!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  try{
+    var perm = await LocalNotifications.requestPermissions();
+    if(perm.display !== 'granted') return;
+    await LocalNotifications.cancel({notifications:[{id:1},{id:2},{id:3}]}).catch(function(){});
+    var name = load('amp_name','');
+    var morningMsg = drillSergeantOn ? getDSQuote('morning') : 'Good morning'+(name?', '+name:'')+'! The clock does not care if you slept well. What is your first move?';
+    var middayMsg = drillSergeantOn ? getDSQuote('midday') : 'Halfway through. How many goals have you touched? Be honest.';
+    var eveningMsg = drillSergeantOn ? getDSQuote('evening') : 'Day is almost done. What did you actually do today?';
+    var now = new Date();
+    var morning = new Date(now); morning.setHours(8,0,0,0); if(morning<=now) morning.setDate(morning.getDate()+1);
+    var midday = new Date(now); midday.setHours(12,0,0,0); if(midday<=now) midday.setDate(midday.getDate()+1);
+    var evening = new Date(now); evening.setHours(20,0,0,0); if(evening<=now) evening.setDate(evening.getDate()+1);
+    await LocalNotifications.schedule({notifications:[
+      {id:1,title:'Amplify 🔥',body:morningMsg,schedule:{at:morning,repeats:true,every:'day'},sound:'default'},
+      {id:2,title:'Amplify ⚡',body:middayMsg,schedule:{at:midday,repeats:true,every:'day'},sound:'default'},
+      {id:3,title:'Amplify 🎯',body:eveningMsg,schedule:{at:evening,repeats:true,every:'day'},sound:'default'},
+    ]});
+    save('amp_notifs_scheduled',true);
+  } catch(e){ console.log('Local notif error:',e); }
+}
+
+var DS_QUOTES = {
+  morning: [
+    "The clock doesn't care if you're tired. Get up and finish the mission.",
+    "Every person who beat you today woke up when you were still hitting snooze. Move.",
+    "You set those goals. The excuses aren't in the plan. Execute.",
+    "Stop waiting to feel ready. Readiness is a lie. Start now.",
+    "Comfort is the enemy. You already know what to do. Do it."
+  ],
+  midday: [
+    "Half the day is gone. What do you actually have to show for it? Be honest.",
+    "The clock doesn't stop because you got distracted. Lock in. Now.",
+    "You told yourself this morning you'd be different today. Prove it.",
+    "Mediocrity checks in at noon too. So does discipline. Which are you?",
+    "Stop coasting. The second half starts right now. No more warm-up."
+  ],
+  evening: [
+    "Today is almost over and it's not coming back. What did you actually do?",
+    "Your future self is watching. What are you showing them right now?",
+    "Regret or results. You're choosing one right now whether you know it or not.",
+    "The people who passed you today didn't wait until they felt ready. Sleep on that.",
+    "You had 24 hours. Same as everyone who crushed it today. What's your answer?"
+  ],
+  timer: [
+    "Mission complete. Don't celebrate too long — the clock is still running.",
+    "Timer done. Now show up for the next one. No excuses.",
+    "You finished. Good. That was the minimum. What's next?",
+    "Done. Now rest for exactly as long as you need — not one second more.",
+    "Mission complete. You did what most people said they'd do and didn't. Good."
+  ]
+};
+var drillSergeantOn = load('amp_drill_sergeant', false);
+function toggleDrillSergeant(){
+  drillSergeantOn = !drillSergeantOn;
+  save('amp_drill_sergeant', drillSergeantOn);
+  renderDrillSergeantUI();
+  updateNotifPreviews();
+}
+function renderDrillSergeantUI(){
+  var toggle = document.getElementById('ds-toggle');
+  var knob = document.getElementById('ds-knob');
+  var badge = document.getElementById('ds-status-badge');
+  var preview = document.getElementById('ds-preview');
+  var previewText = document.getElementById('ds-preview-text');
+  if(!toggle) return;
+  if(drillSergeantOn){
+    toggle.style.background = '#E24B4A';
+    knob.style.left = '20px';
+    badge.textContent = 'Active';
+    badge.style.background = 'rgba(226,75,74,0.25)';
+    badge.style.color = '#ff6b6a';
+    badge.style.borderColor = 'rgba(226,75,74,0.4)';
+    preview.classList.add('visible');
+    var pool = DS_QUOTES.morning;
+    previewText.innerHTML = pool.map(function(q){return '<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;color:rgba(255,255,255,0.55);font-style:italic;line-height:1.5;">"'+q+'"</div>';}).join('');
+  } else {
+    toggle.style.background = '#2a2a2a';
+    knob.style.left = '3px';
+    badge.textContent = 'Off';
+    badge.style.background = '';
+    badge.style.color = '';
+    badge.style.borderColor = '';
+    preview.classList.remove('visible');
+  }
+}
+function getDSQuote(pool){
+  return DS_QUOTES[pool][Math.floor(Math.random()*DS_QUOTES[pool].length)];
+}
+function updateNotifPreviews(){
+  var name = load('amp_name','');
+  var mp = document.getElementById('notif-morning-preview');
+  var mdp = document.getElementById('notif-midday-preview');
+  var ep = document.getElementById('notif-evening-preview');
+  if(drillSergeantOn){
+    if(mp) mp.textContent = '"' + getDSQuote('morning') + '"';
+    if(mdp) mdp.textContent = '"' + getDSQuote('midday') + '"';
+    if(ep) ep.textContent = '"' + getDSQuote('evening') + '"';
+  } else {
+    if(mp) mp.textContent = '"Good morning'+(name?', '+name:'')+'! The clock does not care if you slept well. What is your first move?"';
+    if(mdp) mdp.textContent = '"Halfway through. How many goals have you touched? Be honest."';
+    if(ep) ep.textContent = '"Day is almost done. What did you actually do today?"';
+  }
+}
+
+function initApp(){
+  loadUser();
+  renderQuote();
+  renderTasks();
+  renderStreak();
+  renderCountdowns();
+  renderReminders();
+  renderCommunityQuotes();
+  renderDiscStreaks();
+  document.getElementById('aff-text').textContent=AFFIRMATIONS[dayOfYear%AFFIRMATIONS.length].t;
+  document.getElementById('aff-sub').textContent=AFFIRMATIONS[dayOfYear%AFFIRMATIONS.length].s;
+  generateAIChallenge(false);
+  if('Notification' in window&&Notification.permission==='granted') document.getElementById('alerts-notif-banner').style.display='none';
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(function(){});
+  renderDrillSergeantUI();
+  updateNotifPreviews();
+  renderPushHistory();
+  renderScriptureToggle();
+  setTimeout(function(){appReady=true;},300);
+}
+
+window.addEventListener('load',function(){
+  var onboarded=load('amp_onboarded',false);
+  if(!onboarded){
+    var d=new Date(Date.now()+30*24*3600000);
+    var pad=function(n){return String(n).padStart(2,'0');};
+    document.getElementById('ob-deadline').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+    document.getElementById('onboarding').style.display='flex';
+  } else {
+    initApp();
+  }
+});
+</script>
+</body>
+</html>
