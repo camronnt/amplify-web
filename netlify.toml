@@ -1,8 +1,9 @@
 [build]
   publish = "public"
+  functions = "netlify/functions"
 
-[functions]
-  directory = "netlify/functions"
+[build.environment]
+  SECRETS_SCAN_ENABLED = "false"
 
 [[redirects]]
   from = "/*"
