@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, orientation=portrait">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Amplify">
@@ -412,6 +412,37 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
   </div>
 </div>
 
+<!-- SETTINGS -->
+<div class="screen" id="screen-settings">
+  <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:4px;">Settings</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;">Make Amplify yours.</div>
+  <div class="card">
+    <div class="card-label">Your profile</div>
+    <div class="form-group">
+      <label class="form-label">Your name</label>
+      <input type="text" id="settings-name" placeholder="Your first name" maxlength="20">
+    </div>
+    <button class="btn btn-p" style="width:100%;" onclick="saveName()">Save name</button>
+  </div>
+  <div class="card">
+    <div class="card-label">Notifications</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Reschedule your daily check-ins based on your current Drill Sergeant setting.</div>
+    <button class="btn btn-g" style="width:100%;" onclick="scheduleLocalNotifications();alert('Notifications rescheduled!');">Reschedule notifications</button>
+  </div>
+  <div class="card">
+    <div class="card-label">Data</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Permanently delete all your goals, countdowns, streaks, and settings. Cannot be undone.</div>
+    <button class="btn btn-r" style="width:100%;" onclick="resetApp()">Reset all data</button>
+  </div>
+  <div class="card">
+    <div class="card-label">About</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.8;">
+      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#fff;">1.2</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Support</span><span style="color:#7F77DD;">theamplifyapp@gmail.com</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="nav">
   <button class="nav-btn active" onclick="showScreen('home',this)"><div class="nav-hero"><span style="font-size:18px;">⏱</span><span>Timers</span></div></button>
@@ -419,6 +450,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
   <button class="nav-btn" onclick="showScreen('fuel',this)"><span class="nav-icon">⚡</span>Fuel</button>
   <button class="nav-btn" onclick="showScreen('focus',this)"><span class="nav-icon">🔥</span>Push</button>
   <button class="nav-btn" onclick="showScreen('alerts',this)"><span class="nav-icon">🔔</span>Alerts</button>
+  <button class="nav-btn" onclick="showScreen('settings',this)"><span class="nav-icon">⚙️</span>Settings</button>
 </nav>
 
 <!-- MODALS -->
@@ -772,6 +804,7 @@ function showScreen(id,btn){
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('screen-'+id).classList.add('active');
   btn.classList.add('active');
+  if(id==='settings') openSettings();
   if(appReady) showGuide(id);
 }
 
@@ -779,6 +812,7 @@ function openModal(id){document.getElementById(id).style.display='flex';}
 function closeModal(id){document.getElementById(id).style.display='none';}
 
 function showGuide(tab){
+  if(tab==='settings') return;
   if(load('amp_guide_'+tab,false)) return;
   guideStep[tab]=0;
   renderGuide(tab);
@@ -1046,10 +1080,17 @@ function openShareModal(id){
   document.getElementById('share-quote-line').textContent='"'+q.t+'" - '+q.a;
   openModal('share-modal');
 }
-function shareNow(){
-  var text='I have '+document.getElementById('share-secs').textContent+' seconds left to achieve: '+document.getElementById('share-goal-label').textContent+'. Amplify is keeping me honest. Make some noise for yourself.';
-  if(navigator.share){navigator.share({title:'Amplify',text:text,url:'https://dulcet-kitten-282a63.netlify.app'});}
-  else{navigator.clipboard.writeText(text).then(function(){alert('Copied! Paste it anywhere.');});}
+async function shareNow(){
+  var goal=document.getElementById('share-goal-label').textContent;
+  var d=document.getElementById('share-d').textContent;
+  var h=document.getElementById('share-h').textContent;
+  var m=document.getElementById('share-m').textContent;
+  var text='⏱ '+goal+'\n'+d+' days '+h+' hrs '+m+' mins remaining\n\nTracking this on Amplify: Make Noise 🔥\nSearch "Amplify Make Noise" on the App Store';
+  if(window.Capacitor&&window.Capacitor.isNativePlatform()&&window.Capacitor.Plugins.Share){
+    try{await window.Capacitor.Plugins.Share.share({title:'Amplify: Make Noise',text:text,dialogTitle:'Share your countdown'});return;}catch(e){}
+  }
+  if(navigator.share){navigator.share({title:'Amplify: Make Noise',text:text}).catch(function(){});}
+  else{navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!');});}
 }
 
 function confetti(){
@@ -1618,6 +1659,25 @@ function updateNotifPreviews(){
     if(mdp) mdp.textContent = '"Halfway through. How many goals have you touched? Be honest."';
     if(ep) ep.textContent = '"Day is almost done. What did you actually do today?"';
   }
+}
+
+function saveName(){
+  var n=document.getElementById('settings-name').value.trim();
+  if(!n){alert('Please enter a name.');return;}
+  save('amp_name',n);
+  loadUser();
+  alert('Name saved! Hey, '+n+'.');
+}
+function openSettings(){
+  var name=load('amp_name','');
+  var inp=document.getElementById('settings-name');
+  if(inp) inp.value=name;
+}
+function resetApp(){
+  if(!confirm('Are you sure? This will delete everything — goals, streaks, countdowns, all of it.')) return;
+  if(!confirm('Last chance. This cannot be undone.')) return;
+  localStorage.clear();
+  location.reload();
 }
 
 function initApp(){
