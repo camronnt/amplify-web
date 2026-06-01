@@ -195,6 +195,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
     <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">The app will use your name to check in on you personally.</div>
     <input type="text" id="ob-name" placeholder="Your first name" style="font-size:18px;padding:14px 16px;" maxlength="20">
     <button class="btn btn-p" style="width:100%;" onclick="obGo(3)">Continue</button>
+    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="obGo(3)">Skip — I'll add this later</button>
     <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
   </div>
   <div id="ob-3" style="display:none;flex-direction:column;gap:16px;">
@@ -204,6 +205,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
     <input type="text" id="ob-goal" placeholder="e.g. Launch my app, Get fit, Pay off debt">
     <div class="form-group"><label class="form-label">Deadline</label><input type="datetime-local" id="ob-deadline"></div>
     <button class="btn btn-p" style="width:100%;" onclick="obGo(4)">Almost there</button>
+    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="obGo(4)">Skip — I'll add this later</button>
     <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
   </div>
   <div id="ob-4" style="display:none;flex-direction:column;gap:16px;">
@@ -344,7 +346,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
       <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;line-height:1.5;">Quotes are reviewed before going live. Usually approved within 24 hours.</div>
     </div>
     <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
-      <span>From the community</span>
+      <span id="community-count">From the community</span>
       <button onclick="loadCommunityQuotes()" style="background:none;border:none;color:rgba(127,119,221,0.5);font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;">↻ Refresh</button>
     </div>
     <div id="community-list"></div>
@@ -531,18 +533,23 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
       <div class="modal-title" style="margin-bottom:0;">Share your countdown</div>
       <button onclick="closeModal('share-modal')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:22px;cursor:pointer;">x</button>
     </div>
-    <div style="background:#0d0d0d;border-radius:16px;padding:24px;text-align:center;border:1px solid #2a2a2a;">
-      <div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Amplify</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:6px;" id="share-goal-label"></div>
-      <div style="font-size:48px;font-weight:800;color:#fff;letter-spacing:-2px;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:4px;" id="share-secs"></div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">seconds remaining</div>
-      <div style="display:flex;justify-content:center;gap:20px;margin-bottom:16px;">
-        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-d"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">days</div></div>
-        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-h"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">hrs</div></div>
-        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-m"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">mins</div></div>
-        <div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-s"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;">secs</div></div>
+    <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:20px;padding:28px 24px;text-align:center;border:1px solid rgba(127,119,221,0.3);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:rgba(127,119,221,0.1);border-radius:50%;"></div>
+      <div style="position:absolute;bottom:-30px;left:-30px;width:150px;height:150px;background:rgba(127,119,221,0.05);border-radius:50%;"></div>
+      <div style="font-size:11px;color:#7F77DD;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:16px;font-weight:600;">⚡ Amplify: Make Noise</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:8px;" id="share-goal-label"></div>
+      <div style="font-size:52px;font-weight:800;color:#fff;letter-spacing:-2px;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:4px;" id="share-secs"></div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">seconds remaining</div>
+      <div style="display:flex;justify-content:center;gap:16px;margin-bottom:20px;background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;">
+        <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-d"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">days</div></div>
+        <div style="color:rgba(255,255,255,0.1);font-size:20px;line-height:1.8;">:</div>
+        <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-h"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">hrs</div></div>
+        <div style="color:rgba(255,255,255,0.1);font-size:20px;line-height:1.8;">:</div>
+        <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-m"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">mins</div></div>
+        <div style="color:rgba(255,255,255,0.1);font-size:20px;line-height:1.8;">:</div>
+        <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;" id="share-s"></div><div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">secs</div></div>
       </div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.2);font-style:italic;" id="share-quote-line"></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);font-style:italic;" id="share-quote-line"></div>
     </div>
     <button class="btn btn-p" style="width:100%;margin-top:14px;" onclick="shareNow()">Share this</button>
     <div style="font-size:10px;color:rgba(255,255,255,0.2);text-align:center;margin-top:8px;">Screenshot and post it. Make some noise.</div>
@@ -1127,7 +1134,7 @@ function renderTasks(){
   list.innerHTML='';
   tasks.forEach(function(t,i){
     var row=document.createElement('div');row.className='goal-row';
-    row.innerHTML='<button class="mission-check '+(t.done?'done':'')+'" onclick="toggleTask('+i+')">'+(t.done?'':'')+'</button><div class="goal-txt '+(t.done?'done':'')+'">'+t.text+'</div><button class="del-btn" onclick="deleteTask('+i+')">x</button>';
+    row.innerHTML='<button class="mission-check '+(t.done?'done':'')+'" onclick="toggleTask('+i+')">'+(t.done?'':'')+'</button><div class="goal-txt '+(t.done?'done':'')+'">'+t.text+'</div><button class="del-btn" onclick="editTask('+i+')" style="color:#7F77DD;font-size:12px;">✏️</button><button class="del-btn" onclick="deleteTask('+i+')">x</button>';
     list.appendChild(row);
   });
   if(done>0){var sd=load('amp_streak_days',[]);if(sd.indexOf(today)===-1){sd.push(today);save('amp_streak_days',sd);}renderStreak();}
@@ -1135,6 +1142,20 @@ function renderTasks(){
 function addTask(){var inp=document.getElementById('new-task');if(!inp.value.trim())return;tasks.push({id:Date.now(),text:inp.value.trim(),done:false});inp.value='';save('amp_tasks_'+today,tasks);renderTasks();}
 function toggleTask(i){tasks[i].done=!tasks[i].done;save('amp_tasks_'+today,tasks);if(tasks[i].done)confetti();renderTasks();}
 function deleteTask(i){tasks.splice(i,1);save('amp_tasks_'+today,tasks);renderTasks();}
+function editTask(i){
+  var list=document.getElementById('task-list');
+  var rows=list.querySelectorAll('.goal-row');
+  var row=rows[i];
+  var currentText=tasks[i].text;
+  row.innerHTML='<input type="text" value="'+currentText.replace(/"/g,'&quot;')+'" style="flex:1;font-size:14px;padding:4px 8px;background:#1a1a1a;border:1px solid #7F77DD;border-radius:8px;color:#fff;" id="edit-task-inp-'+i+'"><button class="btn btn-p" style="padding:4px 12px;font-size:12px;margin-left:6px;" onclick="saveEditTask('+i+')">Save</button><button class="del-btn" onclick="renderTasks()" style="margin-left:4px;">✕</button>';
+  var inp=document.getElementById('edit-task-inp-'+i);
+  if(inp){inp.focus();inp.select();inp.onkeydown=function(e){if(e.key==='Enter')saveEditTask(i);};}
+}
+function saveEditTask(i){
+  var inp=document.getElementById('edit-task-inp-'+i);
+  if(inp&&inp.value.trim()){tasks[i].text=inp.value.trim();save('amp_tasks_'+today,tasks);}
+  renderTasks();
+}
 
 function renderStreak(){
   var sd=load('amp_streak_days',[]);var streak=0;var d=new Date();
@@ -1316,16 +1337,25 @@ async function generateAIChallenge(force){
     if(chalRefresh) chalRefresh.style.display='none';
     return;
   }
-  if(cached&&!force){chalText.textContent=cached;chalBtn.textContent='Mark complete';chalBtn.style.opacity='1';return;}
+  if(cached&&!force){chalText.textContent=cached;chalBtn.textContent='Mark complete';chalBtn.style.opacity='1';if(chalRefresh) chalRefresh.style.display='inline-block';return;}
   var goal=load('amp_name','')?load('amp_countdowns',[]).find(function(c){return c.primary;}):null;
   var goalName=goal?goal.name:'';
   if(!goalName){var allGoals=load('amp_countdowns',[]);if(allGoals.length) goalName=allGoals[0].name;}
+  var streakDays=load('amp_streak_days',[]).length;
+  var discStreaks=load('amp_disc_streaks',[]);
+  var doStreaks=discStreaks.filter(function(s){return s.type==='do';}).map(function(s){return s.name;}).join(', ');
+  var dontStreaks=discStreaks.filter(function(s){return s.type==='dont';}).map(function(s){return s.name;}).join(', ');
+  var context='';
+  if(goalName) context+='Main goal: "'+goalName+'". ';
+  if(streakDays>0) context+='Current goal streak: '+streakDays+' days. ';
+  if(doStreaks) context+='DO habits they track: '+doStreaks+'. ';
+  if(dontStreaks) context+='DON\'T habits they avoid: '+dontStreaks+'. ';
   if(chalLoading) chalLoading.style.display='block';
   chalText.style.opacity='0.3';
   if(chalRefresh) chalRefresh.style.display='none';
   try{
-    var prompt=goalName
-      ?'Generate a single specific, actionable daily challenge for someone whose main goal is: "'+goalName+'". The challenge must be completable today. It should feel urgent and push the person slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person ("You", "Do", "Send", etc). No preamble. No title. No bullet. Just the challenge text.'
+    var prompt=context
+      ?'Generate a single specific, actionable daily challenge based on this person\'s context: '+context+'The challenge must be completable today, feel urgent, and push them slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person ("You", "Do", "Send", etc). No preamble. No title. No bullet. Just the challenge text.'
       :'Generate a single specific, actionable daily challenge for someone working on an important personal goal. It must be completable today, feel urgent, and push them slightly outside their comfort zone. Write it as a direct instruction in 1-2 sentences, second person. No preamble, no title.';
     var resp=await fetch('https://zingy-kheer-f624a3.netlify.app/.netlify/functions/push',{
       method:'POST',
@@ -1415,9 +1445,12 @@ function renderCommunityQuotes(){
   var list=document.getElementById('community-list');
   if(!list) return;
   if(!communityQuotes.length){
-    list.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,0.25);padding:16px 0;text-align:center;">No community quotes yet. Be the first to submit one.</div>';
+    list.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,0.25);padding:24px 0;text-align:center;line-height:1.8;">No community quotes yet.<br>Be the first to submit one below 👇</div>';
     return;
   }
+  var total=communityQuotes.length;
+  var header=document.getElementById('community-count');
+  if(header) header.textContent=total+' quote'+(total===1?'':'s')+' from the community';
   list.innerHTML=communityQuotes.map(function(q){
     return '<div class="cq-card"><div class="cq-text">"'+q.text+'"</div><div class="cq-meta"><div class="cq-author">- '+q.author+'</div><button class="cq-like '+(q.liked?'liked':'')+'" onclick="likeQuote('+q.id+')">'+(q.liked?'💜':'🤍')+' '+(q.likes||0)+'</button></div></div>';
   }).join('');
@@ -1560,19 +1593,25 @@ async function scheduleLocalNotifications(){
   try{
     var perm = await LocalNotifications.requestPermissions();
     if(perm.display !== 'granted') return;
-    await LocalNotifications.cancel({notifications:[{id:1},{id:2},{id:3}]}).catch(function(){});
+    await LocalNotifications.cancel({notifications:[{id:1},{id:2},{id:3},{id:4}]}).catch(function(){});
     var name = load('amp_name','');
+    var streakDays = load('amp_streak_days',[]).length;
     var morningMsg = drillSergeantOn ? getDSQuote('morning') : 'Good morning'+(name?', '+name:'')+'! The clock does not care if you slept well. What is your first move?';
     var middayMsg = drillSergeantOn ? getDSQuote('midday') : 'Halfway through. How many goals have you touched? Be honest.';
     var eveningMsg = drillSergeantOn ? getDSQuote('evening') : 'Day is almost done. What did you actually do today?';
+    var streakMsg = streakDays > 0
+      ? (drillSergeantOn ? 'Your '+streakDays+'-day streak dies tonight if you do not open the app and finish something. Clock is running.' : '⚠️ Your '+streakDays+'-day streak is at risk! Complete at least one goal before midnight.')
+      : (drillSergeantOn ? 'You have no streak to lose — which means you have nothing to show for yourself. Fix that tonight.' : 'Complete a goal tonight to start building your streak 🔥');
     var now = new Date();
     var morning = new Date(now); morning.setHours(8,0,0,0); if(morning<=now) morning.setDate(morning.getDate()+1);
     var midday = new Date(now); midday.setHours(12,0,0,0); if(midday<=now) midday.setDate(midday.getDate()+1);
     var evening = new Date(now); evening.setHours(20,0,0,0); if(evening<=now) evening.setDate(evening.getDate()+1);
+    var streakAlert = new Date(now); streakAlert.setHours(21,0,0,0); if(streakAlert<=now) streakAlert.setDate(streakAlert.getDate()+1);
     await LocalNotifications.schedule({notifications:[
       {id:1,title:'Amplify 🔥',body:morningMsg,schedule:{at:morning,repeats:true,every:'day'},sound:'default'},
       {id:2,title:'Amplify ⚡',body:middayMsg,schedule:{at:midday,repeats:true,every:'day'},sound:'default'},
       {id:3,title:'Amplify 🎯',body:eveningMsg,schedule:{at:evening,repeats:true,every:'day'},sound:'default'},
+      {id:4,title:'Amplify 🚨',body:streakMsg,schedule:{at:streakAlert,repeats:true,every:'day'},sound:'default'},
     ]});
     save('amp_notifs_scheduled',true);
   } catch(e){ console.log('Local notif error:',e); }
