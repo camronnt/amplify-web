@@ -12,7 +12,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{background:#0d0d0d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;min-height:100vh;}
 .app{max-width:430px;margin:0 auto;min-height:100vh;background:#0d0d0d;}
-.screen{padding:20px 16px 100px;display:none;}
+.screen{padding:calc(env(safe-area-inset-top, 20px) + 20px) 16px 100px;display:none;}
 .screen.active{display:block;}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0d0d0d;border-top:1px solid #1e1e1e;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom,8px);}
 .nav-btn{flex:1;background:none;border:none;color:rgba(255,255,255,0.3);font-size:10px;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
@@ -194,8 +194,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
     <div style="font-size:28px;font-weight:800;color:#fff;">What do we call you?</div>
     <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">The app will use your name to check in on you personally.</div>
     <input type="text" id="ob-name" placeholder="Your first name" style="font-size:18px;padding:14px 16px;" maxlength="20">
-    <button class="btn btn-p" style="width:100%;" onclick="obGo(3)">Continue</button>
-    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="obGo(3)">Skip — I'll add this later</button>
+    <button class="btn btn-p" style="width:100%;" onclick="obGoName()">Continue</button>
     <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
   </div>
   <div id="ob-3" style="display:none;flex-direction:column;gap:16px;">
@@ -205,7 +204,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
     <input type="text" id="ob-goal" placeholder="e.g. Launch my app, Get fit, Pay off debt">
     <div class="form-group"><label class="form-label">Deadline</label><input type="datetime-local" id="ob-deadline"></div>
     <button class="btn btn-p" style="width:100%;" onclick="obGo(4)">Almost there</button>
-    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="obGo(4)">Skip — I'll add this later</button>
+    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="obSkipGoal()">Skip — I'll add this later</button>
     <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
   </div>
   <div id="ob-4" style="display:none;flex-direction:column;gap:16px;">
@@ -439,7 +438,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
   <div class="card">
     <div class="card-label">About</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.8;">
-      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#fff;">1.2</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#fff;">1.3</span></div>
       <div style="display:flex;justify-content:space-between;"><span>Support</span><span style="color:#7F77DD;">theamplifyapp@gmail.com</span></div>
     </div>
   </div>
@@ -868,8 +867,21 @@ function loadUser(){
 }
 
 var obCurrent=1;
+function obGoName(){
+  var n=document.getElementById('ob-name').value.trim();
+  if(!n){document.getElementById('ob-name').focus();document.getElementById('ob-name').style.borderColor='#E24B4A';setTimeout(function(){document.getElementById('ob-name').style.borderColor='';},1200);return;}
+  save('amp_name',n);
+  loadUser();
+  document.getElementById('ob-'+obCurrent).style.display='none';
+  obCurrent=3;
+  document.getElementById('ob-3').style.display='flex';
+}
+function obSkipGoal(){
+  document.getElementById('ob-'+obCurrent).style.display='none';
+  obCurrent=4;
+  document.getElementById('ob-4').style.display='flex';
+}
 function obGo(step){
-  if(step===3){var n=document.getElementById('ob-name').value.trim();if(!n){alert('Please enter your name.');return;}save('amp_name',n);loadUser();}
   if(step===4){var g=document.getElementById('ob-goal').value.trim();var dl=document.getElementById('ob-deadline').value;if(g&&dl){countdowns.push({id:Date.now(),name:g,targetTs:new Date(dl).getTime(),setAt:Date.now(),type:'deadline',primary:true,shameFired:false});save('amp_countdowns',countdowns);}}
   document.getElementById('ob-'+obCurrent).style.display='none';
   obCurrent=step;
@@ -1092,7 +1104,8 @@ async function shareNow(){
   var d=document.getElementById('share-d').textContent;
   var h=document.getElementById('share-h').textContent;
   var m=document.getElementById('share-m').textContent;
-  var text='⏱ '+goal+'\n'+d+' days '+h+' hrs '+m+' mins remaining\n\nTracking this on Amplify: Make Noise 🔥\nSearch "Amplify Make Noise" on the App Store';
+  var name=load('amp_name','');
+  var text='🔥 '+(name?name+' is':'I\'m')+' on the clock.\n\n"'+goal+'"\n\n⏱ '+d+'d '+h+'h '+m+'m remaining\n\nI\'m tracking this on Amplify: Make Noise.\nDownload it → search "Amplify Make Noise" on the App Store';
   if(window.Capacitor&&window.Capacitor.isNativePlatform()&&window.Capacitor.Plugins.Share){
     try{await window.Capacitor.Plugins.Share.share({title:'Amplify: Make Noise',text:text,dialogTitle:'Share your countdown'});return;}catch(e){}
   }
@@ -1334,10 +1347,12 @@ async function generateAIChallenge(force){
   if(chalDone&&!force){
     chalText.textContent=cached||CHALLENGES[dayOfYear%CHALLENGES.length].t;
     chalBtn.textContent='Done ✓';chalBtn.style.opacity='0.5';
-    if(chalRefresh) chalRefresh.style.display='none';
+    if(chalRefresh) chalRefresh.style.display='inline-block';
     return;
   }
   if(cached&&!force){chalText.textContent=cached;chalBtn.textContent='Mark complete';chalBtn.style.opacity='1';if(chalRefresh) chalRefresh.style.display='inline-block';return;}
+  // force=true clears cache and regenerates
+  if(force) save('amp_chal_text_'+today,'');
   var goal=load('amp_name','')?load('amp_countdowns',[]).find(function(c){return c.primary;}):null;
   var goalName=goal?goal.name:'';
   if(!goalName){var allGoals=load('amp_countdowns',[]);if(allGoals.length) goalName=allGoals[0].name;}
@@ -1384,7 +1399,7 @@ function completeChallenge(){
   var btn=document.getElementById('chal-btn');
   var refresh=document.getElementById('chal-refresh');
   btn.textContent='Done ✓';btn.style.opacity='0.5';
-  if(refresh) refresh.style.display='none';
+  if(refresh) refresh.style.display='inline-block';
   confetti();
 }
 
@@ -1541,7 +1556,8 @@ async function sendPush(){
     pushHistory.push({role:'coach', text:reply, time:replyTime});
     save('amp_push_history', pushHistory);
   } catch(e){
-    pushHistory.push({role:'coach', text:"Something went wrong on my end. But you're still here — that counts. Try again.", time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+    var errMsg = e && e.message ? e.message : 'Unknown error';
+    pushHistory.push({role:'coach', text:"Couldn't reach your coach right now ("+errMsg+"). Check your connection and try again.", time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
     save('amp_push_history', pushHistory);
   }
   pushLoading = false;
