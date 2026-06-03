@@ -51,6 +51,8 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
 .cd-bd-lbl{font-size:8px;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-top:2px;}
 .urgency{height:3px;background:#1e1e1e;border-radius:2px;margin-top:12px;overflow:hidden;}
 .urgency-fill{height:100%;border-radius:2px;}
+.progress-ring-wrap{display:flex;align-items:center;justify-content:center;margin:10px 0 4px;}
+.progress-ring-wrap svg{filter:drop-shadow(0 0 8px rgba(127,119,221,0.3));}
 .cd-del{position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,0.2);font-size:16px;cursor:pointer;padding:4px 6px;}
 .vibe-bar{background:#111;border:1px solid #1e1e1e;border-radius:14px;padding:14px 16px;margin-bottom:14px;}
 .vibe-label{font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;}
@@ -438,7 +440,7 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25);}
   <div class="card">
     <div class="card-label">About</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.8;">
-      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#fff;">1.3</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#fff;">1.4</span></div>
       <div style="display:flex;justify-content:space-between;"><span>Support</span><span style="color:#7F77DD;">theamplifyapp@gmail.com</span></div>
     </div>
   </div>
@@ -895,7 +897,21 @@ function obNotif(){
     });
   } else { obFinish(); }
 }
-function obFinish(){save('amp_onboarded',true);document.getElementById('onboarding').style.display='none';initApp();}
+function obFinish(){
+  save('amp_onboarded',true);
+  document.getElementById('onboarding').style.display='none';
+  // inject starter tasks if none added
+  var existingTasks=load('amp_tasks_'+today,[]);
+  if(!existingTasks.length){
+    var starters=[
+      {id:Date.now()+1,text:'Drink 8 glasses of water today',done:false},
+      {id:Date.now()+2,text:'Move your body for 10 minutes',done:false},
+      {id:Date.now()+3,text:'Do one hard thing you have been avoiding',done:false}
+    ];
+    save('amp_tasks_'+today,starters);
+  }
+  initApp();
+}
 
 function setVibe(v,btn){
   document.querySelectorAll('.vibe-btn').forEach(function(b){b.classList.remove('active');});
@@ -974,12 +990,22 @@ function renderCountdowns(){
     var secsColor={deadline:'#ff6b6a',milestone:'#a29bf0',daily:'#4dcca0',hourly:'#f4b842'}[c.type]||'#fff';
     var typeLabel={deadline:'Deadline',milestone:'Milestone',daily:'Daily',hourly:'Hourly'}[c.type]||c.type;
     var safeName=c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var ringPct=100-pct;
+    var radius=54;var circ=2*Math.PI*radius;
+    var ringOffset=circ*(1-ringPct/100);
+    var ringColor=pct<40?'#1D9E75':pct<70?'#EF9F27':'#E24B4A';
     var html='<div class="cd-card '+c.type+'-type" id="cd-'+c.id+'">';
     html+='<button class="cd-del" onclick="deleteCountdown('+c.id+')">x</button>';
     html+='<div style="margin-bottom:6px;">'+(c.primary?'<span class="primary-badge">Primary</span>':'')+' <span class="type-badge '+c.type+'">'+typeLabel+'</span></div>';
     html+='<div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">'+c.name+'</div>';
-    html+='<div class="cd-secs" style="color:'+secsColor+';" id="secs-'+c.id+'">'+dispVal+'</div>';
-    html+='<div class="cd-unit" id="unit-lbl-'+c.id+'">'+dispLabel+'</div>';
+    if(c.primary){
+      html+='<div class="progress-ring-wrap">';
+      html+='<svg width="140" height="140" viewBox="0 0 140 140"><circle cx="70" cy="70" r="'+radius+'" fill="none" stroke="#1e1e1e" stroke-width="8"/><circle cx="70" cy="70" r="'+radius+'" fill="none" stroke="'+ringColor+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+ringOffset+'" transform="rotate(-90 70 70)" id="ring-'+c.id+'"/><text x="70" y="66" text-anchor="middle" fill="'+secsColor+'" font-size="18" font-weight="700" font-family="-apple-system,sans-serif" id="ring-val-'+c.id+'">'+dispVal+'</text><text x="70" y="82" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="9" font-family="-apple-system,sans-serif" text-transform="uppercase">'+dispLabel.split(' ')[0]+'</text></svg>';
+      html+='</div>';
+    } else {
+      html+='<div class="cd-secs" style="color:'+secsColor+';" id="secs-'+c.id+'">'+dispVal+'</div>';
+      html+='<div class="cd-unit" id="unit-lbl-'+c.id+'">'+dispLabel+'</div>';
+    }
     html+='<div class="cd-unit-toggle">';
     ['seconds','minutes','hours','days','weeks','months'].forEach(function(u){
       html+='<button class="unit-pill'+(unit===u?' active':'')+'" onclick="setCountdownUnit('+c.id+',\''+u+'\')">'+u.charAt(0).toUpperCase()+u.slice(1)+'</button>';
@@ -1019,7 +1045,6 @@ function setCountdownUnit(id,unit){
 
 function tickCountdowns(){
   countdowns.forEach(function(c){
-    var el=document.getElementById('secs-'+c.id);if(!el)return;
     var diff=Math.max(0,c.targetTs-Date.now());
     var s=Math.floor(diff/1000);
     var unit=c.unit||'seconds';
@@ -1031,7 +1056,20 @@ function tickCountdowns(){
     else if(unit==='weeks'){dispVal=(s/604800).toFixed(2);}
     else if(unit==='months'){dispVal=(s/2592000).toFixed(2);}
     else{dispVal=s.toLocaleString();}
-    el.textContent=dispVal;
+    // update ring if primary, else update text
+    var ringVal=document.getElementById('ring-val-'+c.id);
+    if(ringVal){
+      ringVal.textContent=dispVal;
+      var pct=c.setAt?Math.min(100,((Date.now()-c.setAt)/(c.targetTs-c.setAt))*100):0;
+      var radius=54;var circ=2*Math.PI*radius;
+      var ringOffset=circ*(1-(100-pct)/100);
+      var ringColor=pct<40?'#1D9E75':pct<70?'#EF9F27':'#E24B4A';
+      var ringEl=document.getElementById('ring-'+c.id);
+      if(ringEl){ringEl.setAttribute('stroke-dashoffset',ringOffset);ringEl.setAttribute('stroke',ringColor);}
+    } else {
+      var el=document.getElementById('secs-'+c.id);if(!el)return;
+      el.textContent=dispVal;
+    }
     var d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;
     var dEl=document.getElementById('bd-d-'+c.id);
     if(dEl){dEl.textContent=d;document.getElementById('bd-h-'+c.id).textContent=h;document.getElementById('bd-m-'+c.id).textContent=m;document.getElementById('bd-s-'+c.id).textContent=sec;}
@@ -1039,7 +1077,6 @@ function tickCountdowns(){
     var barColor=pct<40?'#1D9E75':pct<70?'#EF9F27':'#E24B4A';
     var uf=document.getElementById('uf-'+c.id);
     if(uf){uf.style.width=pct+'%';uf.style.background=barColor;}
-    // Visual urgency escalation for deadline cards
     if(c.type==='deadline'){
       var card=document.getElementById('cd-'+c.id);
       var secsEl=document.getElementById('secs-'+c.id);
@@ -1576,9 +1613,47 @@ function renderReminders(){
     list.appendChild(row);
   });
 }
-function addReminder(){var l=document.getElementById('new-rem-label').value.trim();var t=document.getElementById('new-rem-time').value;if(!l||!t){alert('Enter a label and time.');return;}reminders.push({id:Date.now(),label:l,time:t,on:true});document.getElementById('new-rem-label').value='';document.getElementById('new-rem-time').value='';save('amp_reminders',reminders);renderReminders();}
-function toggleReminder(i){reminders[i].on=!reminders[i].on;save('amp_reminders',reminders);renderReminders();}
-function deleteReminder(i){reminders.splice(i,1);save('amp_reminders',reminders);renderReminders();}
+function addReminder(){
+  var l=document.getElementById('new-rem-label').value.trim();
+  var t=document.getElementById('new-rem-time').value;
+  if(!l||!t){alert('Enter a label and time.');return;}
+  var rid=Date.now();
+  reminders.push({id:rid,label:l,time:t,on:true});
+  document.getElementById('new-rem-label').value='';
+  document.getElementById('new-rem-time').value='';
+  save('amp_reminders',reminders);
+  scheduleReminderNotif({id:rid,label:l,time:t,on:true});
+  renderReminders();
+}
+async function scheduleReminderNotif(r){
+  if(!window.Capacitor||!window.Capacitor.isNativePlatform()) return;
+  try{
+    var parts=r.time.split(':');
+    var at=new Date();at.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
+    if(at<=new Date()) at.setDate(at.getDate()+1);
+    await LocalNotifications.schedule({notifications:[
+      {id:r.id,title:'Amplify 🔔',body:r.label,schedule:{at:at,repeats:true,every:'day'},sound:'default'}
+    ]});
+  }catch(e){console.log('Reminder schedule error:',e);}
+}
+function toggleReminder(i){
+  reminders[i].on=!reminders[i].on;
+  save('amp_reminders',reminders);
+  if(reminders[i].on){scheduleReminderNotif(reminders[i]);}
+  else{cancelReminderNotif(reminders[i].id);}
+  renderReminders();
+}
+async function cancelReminderNotif(rid){
+  if(!window.Capacitor||!window.Capacitor.isNativePlatform()) return;
+  try{await LocalNotifications.cancel({notifications:[{id:rid}]});}catch(e){}
+}
+function deleteReminder(i){
+  var rid=reminders[i].id;
+  reminders.splice(i,1);
+  save('amp_reminders',reminders);
+  cancelReminderNotif(rid);
+  renderReminders();
+}
 // Capacitor Push Notifications
 var PushNotifications = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
 var LocalNotifications = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
@@ -1623,11 +1698,15 @@ async function scheduleLocalNotifications(){
     var midday = new Date(now); midday.setHours(12,0,0,0); if(midday<=now) midday.setDate(midday.getDate()+1);
     var evening = new Date(now); evening.setHours(20,0,0,0); if(evening<=now) evening.setDate(evening.getDate()+1);
     var streakAlert = new Date(now); streakAlert.setHours(21,0,0,0); if(streakAlert<=now) streakAlert.setDate(streakAlert.getDate()+1);
+    var quoteNotif = new Date(now); quoteNotif.setHours(9,0,0,0); if(quoteNotif<=now) quoteNotif.setDate(quoteNotif.getDate()+1);
+    var quotePool = scriptureOn ? BIBLE_VERSES : QUOTES;
+    var dailyQuote = quotePool[Math.floor(Math.random()*quotePool.length)];
     await LocalNotifications.schedule({notifications:[
       {id:1,title:'Amplify 🔥',body:morningMsg,schedule:{at:morning,repeats:true,every:'day'},sound:'default'},
       {id:2,title:'Amplify ⚡',body:middayMsg,schedule:{at:midday,repeats:true,every:'day'},sound:'default'},
       {id:3,title:'Amplify 🎯',body:eveningMsg,schedule:{at:evening,repeats:true,every:'day'},sound:'default'},
       {id:4,title:'Amplify 🚨',body:streakMsg,schedule:{at:streakAlert,repeats:true,every:'day'},sound:'default'},
+      {id:5,title:'⚡ Today\'s fuel',body:'"'+dailyQuote.t+'" — '+dailyQuote.a,schedule:{at:quoteNotif,repeats:true,every:'day'},sound:'default'},
     ]});
     save('amp_notifs_scheduled',true);
   } catch(e){ console.log('Local notif error:',e); }
@@ -1669,6 +1748,8 @@ function toggleDrillSergeant(){
   save('amp_drill_sergeant', drillSergeantOn);
   renderDrillSergeantUI();
   updateNotifPreviews();
+  // reschedule notifications with new DS setting
+  scheduleLocalNotifications();
 }
 function renderDrillSergeantUI(){
   var toggle = document.getElementById('ds-toggle');
