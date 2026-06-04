@@ -10,28 +10,29 @@
 <title>Amplify</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{background:#0f0e0c;color:#e8e0d4;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;min-height:100vh;padding-top:env(safe-area-inset-top,0px);box-sizing:border-box;}
+html,body{background:#0f0e0c;color:#e8e0d4;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;min-height:100vh;padding-top:env(safe-area-inset-top,0px);box-sizing:border-box;line-height:1.6;}
 .app{max-width:430px;margin:0 auto;min-height:100vh;background:#0f0e0c;}
-.screen{padding:20px 16px 100px;display:none;}
+.screen{padding:28px 20px 120px;display:none;}
 .screen.active{display:block;}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0f0e0c;border-top:1px solid #261f14;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom,8px);}
-.nav-btn{flex:1;background:none;border:none;color:rgba(232,224,212,0.28);font-size:10px;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0f0e0c;border-top:1px solid #1e1a12;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom,8px);}
+.nav-btn{flex:1;background:none;border:none;color:rgba(232,224,212,0.28);font-size:10px;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;position:relative;}
 .nav-btn.active{color:#C9A96E;}
+.nav-btn.active::after{content:'';position:absolute;top:0;left:20%;width:60%;height:2px;background:#C9A96E;border-radius:0 0 2px 2px;}
 .nav-icon{font-size:18px;}
 .nav-hero{display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,#8B7040,#5C4820);border-radius:10px;padding:6px 14px 4px;gap:2px;margin-top:-10px;box-shadow:0 4px 16px rgba(139,112,64,0.35);}
 .nav-hero span{font-size:10px;font-weight:700;color:#e8e0d4;text-transform:uppercase;letter-spacing:0.07em;}
-.card{background:#161410;border:1px solid #261f14;border-radius:10px;padding:16px;margin-bottom:12px;}
+.card{background:#181510;border:1px solid #1e1a12;border-radius:14px;padding:18px;margin-bottom:14px;}
 .card-label{font-size:10px;color:rgba(232,224,212,0.28);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
-input[type=text],input[type=date],input[type=time],input[type=datetime-local],select,textarea{width:100%;background:#1c1814;border:1px solid #302618;border-radius:8px;color:#e8e0d4;font-size:14px;padding:11px 12px;outline:none;-webkit-appearance:none;appearance:none;font-family:-apple-system,sans-serif;}
-textarea{resize:none;min-height:80px;line-height:1.5;}
+input[type=text],input[type=date],input[type=time],input[type=datetime-local],select,textarea{width:100%;background:#1c1814;border:1px solid #2a2218;border-radius:8px;color:#e8e0d4;font-size:14px;padding:11px 12px;outline:none;-webkit-appearance:none;appearance:none;font-family:-apple-system,sans-serif;line-height:1.5;}
+textarea{resize:none;min-height:80px;line-height:1.6;}
 input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .btn{border:none;border-radius:8px;font-size:14px;padding:11px 18px;cursor:pointer;font-weight:600;font-family:-apple-system,sans-serif;display:inline-block;}
 .btn-p{background:#8B7040;color:#e8e0d4;}
-.btn-g{background:#1c1814;color:rgba(232,224,212,0.55);border:1px solid #302618;}
+.btn-g{background:#1c1814;color:rgba(232,224,212,0.55);border:1px solid #2a2218;}
 .btn-r{background:rgba(170,55,55,0.15);color:#c96060;border:1px solid rgba(170,55,55,0.22);}
 .btn-sm{font-size:11px;padding:7px 12px;}
 .row{display:flex;gap:8px;}
-.cd-card{border-radius:10px;padding:16px;margin-bottom:10px;position:relative;border:1px solid #261f14;background:#161410;}
+.cd-card{border-radius:14px;padding:18px;margin-bottom:12px;position:relative;border:1px solid #1e1a12;background:#181510;}
 .cd-card.deadline-type{border-color:rgba(170,55,55,0.4);background:#150c0c;animation:dpulse 3s ease-in-out infinite;}
 .cd-card.milestone-type{border-color:rgba(139,112,64,0.35);background:#131008;}
 .cd-card.daily-type{border-color:rgba(29,158,117,0.28);background:#0a130f;}
@@ -260,8 +261,9 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 
 <!-- TIMERS -->
 <div class="screen active" id="screen-home">
-  <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:2px;" id="home-greeting">Good morning,</div>
-  <div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:16px;" id="home-name">Let's go. ⚡</div>
+  <div style="font-size:13px;color:rgba(232,224,212,0.3);margin-bottom:2px;" id="home-greeting">Good morning,</div>
+  <div style="font-size:30px;font-weight:800;color:#e8e0d4;letter-spacing:-1px;margin-bottom:6px;font-family:Georgia,serif;" id="home-name">Let's go. ⚡</div>
+  <div style="font-size:14px;color:rgba(232,224,212,0.45);line-height:1.7;margin-bottom:18px;font-style:italic;" id="home-question"></div>
   <div class="vibe-bar">
     <div class="vibe-label">How are you showing up today?</div>
     <div class="vibe-opts">
@@ -315,14 +317,19 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   </div>
   <div class="card" style="margin-top:4px;">
     <div class="card-label">Gratitude log</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;line-height:1.5;">What are you grateful for today?</div>
+    <div style="font-size:12px;color:rgba(232,224,212,0.4);margin-bottom:12px;line-height:1.6;">What are you grateful for today?</div>
     <div class="row" style="margin-bottom:10px;">
       <input type="text" id="gratitude-input" placeholder="I am grateful for..." style="flex:1;" onkeydown="if(event.key==='Enter')addGratitude()">
       <button class="btn btn-p btn-sm" onclick="addGratitude()">Add</button>
     </div>
     <div id="gratitude-list"></div>
   </div>
-  <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;">Track what you're doing and what you're not.</div>
+  <div class="card" style="margin-top:0;">
+    <div class="card-label">Daily note</div>
+    <div style="font-size:12px;color:rgba(232,224,212,0.4);margin-bottom:12px;line-height:1.6;">Just write. No tracking, no streaks. This space is yours.</div>
+    <textarea id="daily-note-input" placeholder="Whatever's on your mind..." style="min-height:100px;" oninput="saveDailyNote()"></textarea>
+  </div>
+  <div style="font-size:12px;color:rgba(232,224,212,0.32);margin-bottom:14px;line-height:1.6;">Track what you're doing and what you're not.</div>
   <div class="disc-tabs">
     <button class="disc-tab active-do" onclick="setDiscTab('do',this)">DO streaks</button>
     <button class="disc-tab" onclick="setDiscTab('dont',this)">DON'T streaks</button>
@@ -1112,13 +1119,40 @@ function loadUser(){
   var name=load('amp_name','');
   var hr=new Date().getHours();
   var greet=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+  var questions=[
+    // morning 5-11
+    'What is the one thing that matters most today?',
+    'Who are you showing up for today?',
+    'What would make today feel like a win?'
+  ];
+  var middayQuestions=[
+    'Are you moving toward something or away from something?',
+    'What have you done today that you are proud of?',
+    'Is what you are doing right now moving the needle?'
+  ];
+  var eveningQuestions=[
+    'What are you proud of today?',
+    'What did today teach you?',
+    'Did you show up as the person you want to be?'
+  ];
+  var qPool=hr<12?questions:hr<17?middayQuestions:eveningQuestions;
+  var dayQ=qPool[new Date().getDate()%qPool.length];
   var g1=document.getElementById('home-greeting');
   var n1=document.getElementById('home-name');
+  var q1=document.getElementById('home-question');
   var g2=document.getElementById('goals-greeting');
   if(g1) g1.textContent=greet+(name?', '+name+'.':',');
-  if(n1) n1.textContent=name?name+', lets go.':'Lets go.';
+  if(n1) n1.textContent=name?name+', let\'s go.':'Let\'s go.';
+  if(q1) q1.textContent=dayQ;
   if(g2) g2.textContent="Today's goals"+(name?', '+name+'.':',');
+  // load daily note
+  var noteEl=document.getElementById('daily-note-input');
+  if(noteEl) noteEl.value=load('amp_daily_note_'+new Date().toDateString(),'');
   updateNotifPreviews();
+}
+function saveDailyNote(){
+  var noteEl=document.getElementById('daily-note-input');
+  if(noteEl) save('amp_daily_note_'+new Date().toDateString(),noteEl.value);
 }
 
 var obCurrent=1;
