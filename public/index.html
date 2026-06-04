@@ -355,7 +355,6 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
     <button class="m-tab active" onclick="setMotivTab('quote',this)">Quote</button>
     <button class="m-tab" onclick="setMotivTab('affirmation',this)">Affirmation</button>
     <button class="m-tab" onclick="setMotivTab('challenge',this)">Challenge</button>
-    <button class="m-tab" onclick="setMotivTab('community',this)">Community</button>
   </div>
   <div id="tab-quote">
     <div class="card">
@@ -391,7 +390,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
       <button id="chal-btn" onclick="completeChallenge()" style="display:inline-block;background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);border-radius:8px;color:#4dcca0;font-size:11px;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;">Mark complete</button>
     </div>
   </div>
-  <div id="tab-community" style="display:none;">
+  <div id="tab-community" style="display:none!important;">
     <div class="card" style="background:rgba(127,119,221,0.05);border-color:rgba(127,119,221,0.2);margin-bottom:12px;">
       <div class="card-label" style="color:#7F77DD;">Submit your quote</div>
       <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Share something that actually moves you. Real words hit different.</div>
@@ -566,7 +565,6 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
         <option value="minutes">Minutes</option>
         <option value="hours">Hours</option>
         <option value="days">Days</option>
-        <option value="weeks">Weeks</option>
         <option value="months">Months</option>
       </select>
     </div>
@@ -1294,7 +1292,7 @@ function renderCountdowns(){
       html+='<div class="cd-unit" id="unit-lbl-'+c.id+'">'+dispLabel+'</div>';
     }
     html+='<div class="cd-unit-toggle">';
-    ['seconds','minutes','hours','days','weeks','months'].forEach(function(u){
+    ['seconds','minutes','hours','days','months'].forEach(function(u){
       html+='<button class="unit-pill'+(unit===u?' active':'')+'" onclick="setCountdownUnit('+c.id+',\''+u+'\')">'+u.charAt(0).toUpperCase()+u.slice(1)+'</button>';
     });
     html+='</div>';
@@ -1630,9 +1628,8 @@ function renderDiscStreaks(){
 
 var allQuotes = QUOTES.concat(BIBLE_VERSES);
 var qIdx=Math.floor(Math.random()*QUOTES.length);
-var currentQuoteIsScripture=false;
 
-function getQuotePool(){return scriptureOn?allQuotes:QUOTES;}
+function getQuotePool(){return scriptureOn?BIBLE_VERSES:QUOTES;}
 
 function renderScriptureToggle(){
   var tog=document.getElementById('scripture-toggle');
@@ -1645,8 +1642,7 @@ function renderScriptureToggle(){
 function toggleScripture(){
   scriptureOn=!scriptureOn;
   save('amp_scripture',scriptureOn);
-  // pick a random quote from the newly selected pool
-  var pool=scriptureOn?allQuotes:QUOTES;
+  var pool=scriptureOn?BIBLE_VERSES:QUOTES;
   qIdx=Math.floor(Math.random()*pool.length);
   renderScriptureToggle();
   renderQuote();
