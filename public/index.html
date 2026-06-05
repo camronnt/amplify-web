@@ -214,11 +214,19 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   </div>
   <div id="ob-2" style="display:none;flex-direction:column;gap:16px;">
     <div style="font-size:52px;">👋</div>
-    <div style="font-size:28px;font-weight:800;color:#fff;">What do we call you?</div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">The app will use your name to check in on you personally.</div>
+    <div style="font-size:28px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;">What do we call you?</div>
+    <div style="font-size:14px;color:rgba(232,224,212,0.4);line-height:1.6;">The app will use your name to check in on you personally.</div>
     <input type="text" id="ob-name" placeholder="Your first name" style="font-size:18px;padding:14px 16px;" maxlength="20">
     <button class="btn btn-p" style="width:100%;" onclick="obGoName()">Continue</button>
-    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:20px;height:6px;border-radius:3px;background:#7F77DD;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div><div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;"></div></div>
+    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div><div style="width:20px;height:6px;border-radius:3px;background:#8B7040;"></div><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div></div>
+  </div>
+  <div id="ob-25" style="display:none;flex-direction:column;gap:16px;">
+    <div style="font-size:52px;">⚓</div>
+    <div style="font-size:28px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;">Stay anchored.</div>
+    <div style="font-size:14px;color:rgba(232,224,212,0.4);line-height:1.6;">Amplify checks in on you every morning, midday, and evening. Daily quotes, streak alerts, and reminders that actually land. Turn on notifications to get the most out of the app.</div>
+    <button class="btn btn-p" style="width:100%;" onclick="obNotifEarly()">Turn on notifications</button>
+    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="obGo(3)">Skip for now</button>
+    <div style="display:flex;gap:6px;justify-content:center;"><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div><div style="width:20px;height:6px;border-radius:3px;background:#8B7040;"></div><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div><div style="width:6px;height:6px;border-radius:50%;background:#261f14;"></div></div>
   </div>
   <div id="ob-3" style="display:none;flex-direction:column;gap:16px;">
     <div style="font-size:52px;">🌱</div>
@@ -325,7 +333,10 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
     <div id="gratitude-list"></div>
   </div>
   <div class="card" style="margin-top:0;">
-    <div class="card-label">Daily note</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="card-label" style="margin-bottom:0;">Daily note</div>
+      <div id="note-saved" style="font-size:10px;color:rgba(29,158,117,0);transition:color 0.3s;">saved ✓</div>
+    </div>
     <div style="font-size:12px;color:rgba(232,224,212,0.4);margin-bottom:12px;line-height:1.6;">Just write. No tracking, no streaks. This space is yours.</div>
     <textarea id="daily-note-input" placeholder="Whatever's on your mind..." style="min-height:100px;" oninput="saveDailyNote()"></textarea>
   </div>
@@ -526,7 +537,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   <div class="card">
     <div class="card-label">About</div>
     <div style="font-size:13px;color:rgba(232,224,212,0.4);line-height:1.8;">
-      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#e8e0d4;">1.5</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#e8e0d4;">1.6</span></div>
       <div style="display:flex;justify-content:space-between;"><span>Support</span><span style="color:#C9A96E;">theamplifyapp@gmail.com</span></div>
     </div>
   </div>
@@ -534,8 +545,8 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 
 <!-- NAV -->
 <nav class="nav">
-  <button class="nav-btn active" onclick="showScreen('home',this)"><div class="nav-hero"><span style="font-size:18px;">⏱</span><span>Timers</span></div></button>
-  <button class="nav-btn" onclick="showScreen('goals',this)"><span class="nav-icon">✅</span>Goals</button>
+  <button class="nav-btn active" onclick="showScreen('home',this)"><div class="nav-hero"><span style="font-size:18px;">🎯</span><span>Focus</span></div></button>
+  <button class="nav-btn" onclick="showScreen('goals',this)"><span class="nav-icon">🌱</span>Goals</button>
   <button class="nav-btn" onclick="showScreen('fuel',this)"><span class="nav-icon">⚡</span>Fuel</button>
   <button class="nav-btn" onclick="showScreen('focus',this)"><span class="nav-icon">🔥</span>Push</button>
   <button class="nav-btn" onclick="showScreen('alerts',this)"><span class="nav-icon">⚓</span>Anchors</button>
@@ -598,20 +609,6 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   </div>
 </div>
 
-<div class="overlay overlay-center" id="shame-modal" style="display:none;">
-  <div class="modal-box-center" style="background:#120a0a;border-color:rgba(226,75,74,0.4);">
-    <div style="font-size:20px;font-weight:700;color:#ff6b6a;margin-bottom:8px;">You missed it.</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:16px;" id="shame-goal-name"></div>
-    <div style="background:#1a0a0a;border:1px solid #2a1a1a;border-radius:12px;padding:14px;margin-bottom:16px;">
-      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Your public post</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.7);font-style:italic;line-height:1.5;" id="shame-post-text"></div>
-    </div>
-    <div class="row">
-      <button class="btn btn-r" style="flex:1;" onclick="postShame()">Post publicly</button>
-      <button class="btn btn-g" style="flex:1;" onclick="closeModal('shame-modal')">Skip</button>
-    </div>
-  </div>
-</div>
 
 <div class="overlay overlay-center" id="share-modal" style="display:none;">
   <div class="modal-box-center">
@@ -732,12 +729,25 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 
 <!-- PEACE OVERLAY -->
 <div class="peace-overlay" id="peace-overlay">
-  <button onclick="togglePeaceSound()" id="peace-sound-btn" style="position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(232,220,196,0.15);border-radius:20px;color:rgba(232,220,196,0.35);font-size:12px;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;">♪ Sound off</button>
   <div style="font-size:40px;margin-bottom:24px;opacity:0.6;">🕊</div>
   <div class="peace-quote" id="peace-quote-text"></div>
   <div class="peace-author" id="peace-quote-author"></div>
   <div class="peace-timer" id="peace-countdown">60</div>
-  <button onclick="closePeace()" style="background:none;border:1px solid rgba(232,220,196,0.15);border-radius:20px;color:rgba(232,220,196,0.35);font-size:13px;padding:10px 24px;cursor:pointer;font-family:-apple-system,sans-serif;">Close</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+    <button onclick="closePeace()" style="background:none;border:1px solid rgba(232,220,196,0.15);border-radius:20px;color:rgba(232,220,196,0.35);font-size:13px;padding:10px 24px;cursor:pointer;font-family:-apple-system,sans-serif;">Close</button>
+    <button onclick="togglePeaceSound()" id="peace-sound-btn" style="background:none;border:none;color:rgba(232,220,196,0.28);font-size:12px;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;letter-spacing:0.04em;">♪ Sound off</button>
+  </div>
+</div>
+
+<!-- MORNING RITUAL -->
+<div id="morning-ritual" style="display:none;position:fixed;inset:0;background:#0a0806;z-index:450;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;">
+  <div style="font-size:13px;color:rgba(232,224,212,0.28);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:32px;" id="ritual-greeting">Good morning</div>
+  <div style="font-size:22px;color:rgba(232,224,212,0.85);line-height:1.7;font-style:italic;font-family:Georgia,serif;margin-bottom:8px;" id="ritual-quote"></div>
+  <div style="font-size:12px;color:rgba(232,224,212,0.28);margin-bottom:36px;" id="ritual-author"></div>
+  <div style="width:40px;height:1px;background:#261f14;margin-bottom:36px;"></div>
+  <div style="font-size:17px;color:#C9A96E;font-family:Georgia,serif;line-height:1.6;margin-bottom:40px;" id="ritual-question"></div>
+  <div style="font-size:11px;color:rgba(232,224,212,0.2);margin-bottom:16px;" id="ritual-counter">10</div>
+  <button onclick="closeMorningRitual()" style="background:none;border:1px solid rgba(232,220,196,0.18);border-radius:20px;color:rgba(232,220,196,0.45);font-size:13px;padding:10px 28px;cursor:pointer;font-family:-apple-system,sans-serif;">I'm ready</button>
 </div>
 
 <script>
@@ -879,29 +889,57 @@ function buildPeaceDrone(){
     peaceAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
     var masterGain=peaceAudioCtx.createGain();
     masterGain.gain.setValueAtTime(0,peaceAudioCtx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(0.16,peaceAudioCtx.currentTime+3);
-    masterGain.connect(peaceAudioCtx.destination);
-    peaceAudioNodes.push(masterGain);
-    [[55,0.5],[110,0.25],[165,0.12],[82,0.18]].forEach(function(pair){
-      var freq=pair[0],vol=pair[1];
+    masterGain.gain.linearRampToValueAtTime(0.18,peaceAudioCtx.currentTime+4);
+    // tape warmth — soft waveshaper distortion
+    var waveshaper=peaceAudioCtx.createWaveShaper();
+    var curve=new Float32Array(256);
+    for(var i=0;i<256;i++){var x=i*2/256-1;curve[i]=x*(1.2+0.4*Math.abs(x))/(1+0.4*Math.abs(x));}
+    waveshaper.curve=curve;waveshaper.oversample='2x';
+    var tapeGain=peaceAudioCtx.createGain();tapeGain.gain.value=0.7;
+    masterGain.connect(waveshaper);waveshaper.connect(tapeGain);tapeGain.connect(peaceAudioCtx.destination);
+    peaceAudioNodes.push(masterGain,waveshaper,tapeGain);
+    // detuned chord: root, slightly flat major third, flat fifth — Mac DeMarco's lazy tuning
+    var chord=[130.8, 163.0, 195.2, 261.2];
+    var detunes=[-8, 6, -4, 9]; // slightly detuned cents for that "not quite in tune" warmth
+    chord.forEach(function(freq,idx){
       var osc=peaceAudioCtx.createOscillator();
       var gain=peaceAudioCtx.createGain();
+      // slow warble LFO — like a tape machine wobbling
       var lfo=peaceAudioCtx.createOscillator();
       var lfoGain=peaceAudioCtx.createGain();
-      lfo.frequency.value=0.07+Math.random()*0.06;
-      lfoGain.gain.value=freq*0.004;
+      lfo.frequency.value=0.4+idx*0.07; // slightly different rate per note
+      lfoGain.gain.value=freq*0.006;
       lfo.connect(lfoGain);lfoGain.connect(osc.frequency);lfo.start();
-      osc.type='sine';osc.frequency.value=freq;gain.gain.value=vol;
+      osc.type=idx%2===0?'triangle':'sine'; // mix of triangle and sine for warmth
+      osc.frequency.value=freq;
+      osc.detune.value=detunes[idx];
+      gain.gain.value=0.28-idx*0.04;
       osc.connect(gain);gain.connect(masterGain);osc.start();
-      peaceAudioNodes.push(osc,gain,lfo,lfoGain);
+      // slow amplitude swell per note — breathing feel
+      var swellLfo=peaceAudioCtx.createOscillator();
+      var swellGain=peaceAudioCtx.createGain();
+      swellLfo.frequency.value=0.12+idx*0.03;
+      swellGain.gain.value=0.06;
+      swellLfo.connect(swellGain);swellGain.connect(gain.gain);swellLfo.start();
+      peaceAudioNodes.push(osc,gain,lfo,lfoGain,swellLfo,swellGain);
     });
-    var bufSize=peaceAudioCtx.sampleRate*2;
+    // warm low rumble — like a bass string just barely touched
+    var bassOsc=peaceAudioCtx.createOscillator();
+    var bassGain=peaceAudioCtx.createGain();
+    var bassFilter=peaceAudioCtx.createBiquadFilter();
+    bassOsc.type='sine';bassOsc.frequency.value=65.4;bassOsc.detune.value=-5;
+    bassFilter.type='lowpass';bassFilter.frequency.value=120;bassFilter.Q.value=0.8;
+    bassGain.gain.value=0.35;
+    bassOsc.connect(bassFilter);bassFilter.connect(bassGain);bassGain.connect(masterGain);bassOsc.start();
+    peaceAudioNodes.push(bassOsc,bassGain,bassFilter);
+    // very subtle vinyl noise
+    var bufSize=peaceAudioCtx.sampleRate*3;
     var buf=peaceAudioCtx.createBuffer(1,bufSize,peaceAudioCtx.sampleRate);
     var data=buf.getChannelData(0);
-    for(var i=0;i<bufSize;i++) data[i]=(Math.random()*2-1);
+    for(var j=0;j<bufSize;j++) data[j]=(Math.random()*2-1)*0.3;
     var noise=peaceAudioCtx.createBufferSource();noise.buffer=buf;noise.loop=true;
-    var noiseFilter=peaceAudioCtx.createBiquadFilter();noiseFilter.type='lowpass';noiseFilter.frequency.value=160;
-    var noiseGain=peaceAudioCtx.createGain();noiseGain.gain.value=0.035;
+    var noiseFilter=peaceAudioCtx.createBiquadFilter();noiseFilter.type='highpass';noiseFilter.frequency.value=2000;
+    var noiseGain=peaceAudioCtx.createGain();noiseGain.gain.value=0.012;
     noise.connect(noiseFilter);noiseFilter.connect(noiseGain);noiseGain.connect(masterGain);noise.start();
     peaceAudioNodes.push(noise,noiseFilter,noiseGain);
   }catch(e){peaceAudioCtx=null;}
@@ -1031,12 +1069,12 @@ var MILESTONES = [
 ];
 var GUIDE_DATA = {
   home: [
-    {e:"⏱",t:"Countdown to anything",b:"Add a countdown to any goal with a deadline. The seconds tick live so you always feel the time passing."},
+    {e:"🎯",t:"Countdown to anything",b:"Add a countdown to any goal with a deadline. The seconds tick live so you always feel the time passing."},
     {e:"🔴",t:"Deadline vs Milestone",b:"Deadline cards pulse red and get louder as time runs out. Milestone cards feel celebratory. Pick the right energy for each goal."},
     {e:"📸",t:"Prove you finished it",b:"Deadline cards have a Prove Done button. Take a photo of the finished task to dismiss the countdown. No shortcuts."}
   ],
   goals: [
-    {e:"✅",t:"Daily goals",b:"Add what you need to do today. Check them off to build your streak. Every checkoff fires confetti."},
+    {e:"🌱",t:"Daily goals",b:"Add what you need to do today. Check them off to build your streak. Every checkoff fires confetti."},
     {e:"🔥",t:"Keep your streak alive",b:"Complete at least one goal every day. Miss a day and the streak resets. The dots show your last 14 days."},
     {e:"⚔️",t:"Discipline streaks",b:"Scroll down for DO and DON'T streaks. Track habits you are building and things you are walking away from."}
   ],
@@ -1140,7 +1178,7 @@ function loadUser(){
   var q1=document.getElementById('home-question');
   var g2=document.getElementById('goals-greeting');
   if(g1) g1.textContent=greet+(name?', '+name+'.':',');
-  if(n1) n1.textContent=name?name+', let\'s go.':'Let\'s go.';
+  if(n1) n1.textContent=name?name+', lets go.':'Lets go.';
   if(q1) q1.textContent=dayQ;
   if(g2) g2.textContent="Today's goals"+(name?', '+name+'.':',');
   // load daily note
@@ -1148,9 +1186,18 @@ function loadUser(){
   if(noteEl) noteEl.value=load('amp_daily_note_'+new Date().toDateString(),'');
   updateNotifPreviews();
 }
+var noteSaveTimer=null;
 function saveDailyNote(){
   var noteEl=document.getElementById('daily-note-input');
   if(noteEl) save('amp_daily_note_'+new Date().toDateString(),noteEl.value);
+  var indicator=document.getElementById('note-saved');
+  if(indicator){
+    indicator.style.color='rgba(29,158,117,0.7)';
+    clearTimeout(noteSaveTimer);
+    noteSaveTimer=setTimeout(function(){
+      if(indicator) indicator.style.color='rgba(29,158,117,0)';
+    },1500);
+  }
 }
 
 var obCurrent=1;
@@ -1160,8 +1207,16 @@ function obGoName(){
   save('amp_name',n);
   loadUser();
   document.getElementById('ob-'+obCurrent).style.display='none';
-  obCurrent=3;
-  document.getElementById('ob-3').style.display='flex';
+  obCurrent=25;
+  document.getElementById('ob-25').style.display='flex';
+}
+async function obNotifEarly(){
+  if(window.Capacitor&&window.Capacitor.isNativePlatform()){
+    try{await LocalNotifications.requestPermissions();}catch(e){}
+  } else if('Notification' in window){
+    try{await Notification.requestPermission();}catch(e){}
+  }
+  obGo(3);
 }
 function obSkipGoal(){
   document.getElementById('ob-'+obCurrent).style.display='none';
@@ -1170,9 +1225,11 @@ function obSkipGoal(){
 }
 function obGo(step){
   if(step===5){var g=document.getElementById('ob-goal').value.trim();var dl=document.getElementById('ob-deadline').value;if(g&&dl){countdowns.push({id:Date.now(),name:g,targetTs:new Date(dl).getTime(),setAt:Date.now(),type:'deadline',primary:true,shameFired:false});save('amp_countdowns',countdowns);}}
-  document.getElementById('ob-'+obCurrent).style.display='none';
+  var cur=document.getElementById('ob-'+obCurrent);
+  if(cur) cur.style.display='none';
   obCurrent=step;
-  document.getElementById('ob-'+step).style.display='flex';
+  var next=document.getElementById('ob-'+step);
+  if(next) next.style.display='flex';
 }
 function obNotif(){
   if('Notification' in window){
@@ -1255,7 +1312,7 @@ function setPrimary(id){countdowns.forEach(function(c){c.primary=c.id===id;});sa
 
 function renderCountdowns(){
   var list=document.getElementById('countdown-list');
-  if(!countdowns.length){list.innerHTML='<div class="card" style="text-align:center;padding:24px 16px;"><div style="font-size:32px;margin-bottom:10px;">⏱</div><div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6;">No countdowns yet. Add your first goal above.</div></div>';return;}
+  if(!countdowns.length){list.innerHTML='<div class="card" style="text-align:center;padding:24px 16px;"><div style="font-size:32px;margin-bottom:10px;">🎯</div><div style="font-size:14px;color:rgba(232,224,212,0.4);line-height:1.6;">No countdowns yet. Add your first goal above.</div></div>';return;}
   var sorted=countdowns.slice().sort(function(a,b){return (b.primary?1:0)-(a.primary?1:0);});
   list.innerHTML=sorted.map(function(c){
     var diff=Math.max(0,c.targetTs-Date.now());
@@ -1390,22 +1447,15 @@ function openProveModal(id,name){proveId=id;document.getElementById('photo-task-
 function handlePhoto(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){document.getElementById('photo-img').src=ev.target.result;document.getElementById('photo-preview').style.display='block';document.getElementById('photo-confirm').style.display='block';};reader.readAsDataURL(file);}
 function confirmPhoto(){closeModal('photo-modal');if(proveId){deleteCountdown(proveId);proveId=null;}renderCountdowns();confetti();alert('Task verified. Keep going.');}
 
-var shameData=null;
 function checkDeadlines(){
   var changed=false;
   countdowns.forEach(function(c){
     if(c.type==='deadline'&&!c.shameFired&&c.targetTs<Date.now()){
       c.shameFired=true;changed=true;
-      var msgs=['I set a deadline for "'+c.name+'" and I missed it. Holding myself accountable publicly.','I did not finish "'+c.name+'" on time. No excuses. Posting this so I cannot pretend it did not happen.'];
-      shameData={name:c.name,msg:msgs[Math.floor(Math.random()*msgs.length)]};
-      document.getElementById('shame-goal-name').textContent='Your deadline for "'+c.name+'" has passed.';
-      document.getElementById('shame-post-text').textContent=shameData.msg;
-      openModal('shame-modal');
     }
   });
   if(changed) save('amp_countdowns',countdowns);
 }
-function postShame(){if(!shameData)return;sbFetch('community_quotes','POST',{text:shameData.msg,author:'Accountability post',likes:0,approved:true}).then(function(){loadCommunityQuotes();});closeModal('shame-modal');shameData=null;alert('Posted. Now get back on it.');}
 setInterval(checkDeadlines,10000);
 
 function openShareModal(id){
@@ -1427,7 +1477,14 @@ async function shareNow(){
   var h=document.getElementById('share-h').textContent;
   var m=document.getElementById('share-m').textContent;
   var name=load('amp_name','');
-  var text='🔥 '+(name?name+' is':'I\'m')+' on the clock.\n\n"'+goal+'"\n\n⏱ '+d+'d '+h+'h '+m+'m remaining\n\nI\'m tracking this on Amplify: Make Noise.\nDownload it → search "Amplify Make Noise" on the App Store';
+  // find the countdown to get targetTs
+  var cd=countdowns.find(function(c){return c.name===goal;});
+  var shareUrl='';
+  if(cd){
+    var params=new URLSearchParams({name:cd.name,ts:cd.targetTs,from:name||'Someone'});
+    shareUrl='\n\n🔗 See my countdown live: https://zingy-kheer-f624a3.netlify.app/?'+params.toString();
+  }
+  var text='🔥 '+(name?name+' is':'I am')+' on the clock.\n\n"'+goal+'"\n\n⏱ '+d+'d '+h+'h '+m+'m remaining\n\nTracking this on Amplify: Make Noise for Yourself.'+shareUrl+'\n\nGet the app → search "Amplify Make Noise" on the App Store';
   if(window.Capacitor&&window.Capacitor.isNativePlatform()&&window.Capacitor.Plugins.Share){
     try{await window.Capacitor.Plugins.Share.share({title:'Amplify: Make Noise',text:text,dialogTitle:'Share your countdown'});return;}catch(e){}
   }
@@ -1472,7 +1529,19 @@ function renderTasks(){
     row.innerHTML='<button class="mission-check '+(t.done?'done':'')+'" onclick="toggleTask('+i+')">'+(t.done?'':'')+'</button><div class="goal-txt '+(t.done?'done':'')+'">'+t.text+'</div><button class="del-btn" onclick="editTask('+i+')" style="color:#7F77DD;font-size:12px;">✏️</button><button class="del-btn" onclick="deleteTask('+i+')">x</button>';
     list.appendChild(row);
   });
-  if(done>0){var sd=load('amp_streak_days',[]);if(sd.indexOf(today)===-1){sd.push(today);save('amp_streak_days',sd);}renderStreak();}
+  if(done>0){
+    var sd=load('amp_streak_days',[]);
+    if(sd.indexOf(today)===-1){
+      sd.push(today);
+      save('amp_streak_days',sd);
+      // check streak milestones
+      var newStreak=sd.length;
+      if(newStreak===7||newStreak===14||newStreak===30||newStreak===60||newStreak===100){
+        setTimeout(function(){sendStreakMilestone(newStreak);},1200);
+      }
+    }
+    renderStreak();
+  }
 }
 function addTask(){var inp=document.getElementById('new-task');if(!inp.value.trim())return;tasks.push({id:Date.now(),text:inp.value.trim(),done:false});inp.value='';save('amp_tasks_'+today,tasks);renderTasks();}
 function toggleTask(i){
@@ -1872,13 +1941,26 @@ async function sendPush(){
   var primary = allCountdowns.find(function(c){return c.primary;});
   if(primary) primaryGoal = primary.name;
   else if(allCountdowns.length) primaryGoal = allCountdowns[0].name;
-  var systemPrompt = 'You are the Push coach inside the Amplify accountability app. Your job is to be the one friend who tells the truth — direct, warm, no fluff, no toxic positivity. You push people forward without being cruel. You ask sharp questions. You do not validate excuses but you do validate feelings before redirecting. Keep responses under 150 words unless the topic genuinely needs more. Never use bullet points — write like a real person texting their friend who needs to hear the truth.'
-    + (name ? ' The user\'s name is '+name+'.' : '')
-    + (primaryGoal ? ' Their main goal right now is: "'+primaryGoal+'".' : '')
-    + ' If someone mentions self-harm, suicide, or a mental health crisis, respond with care and direct them to call or text 988 (Suicide and Crisis Lifeline). You are not a therapist. You are a coach.';
-  var messages = pushHistory.slice(-10).map(function(m){
-    return {role: m.role==='user'?'user':'assistant', content: m.text};
-  });
+  var streakDays = load('amp_streak_days',[]).length;
+  var discStreaks = load('amp_disc_streaks',[]);
+  var doHabits = discStreaks.filter(function(s){return s.type==='do'&&s.days>0;}).map(function(s){return s.name+' ('+s.days+' days)';}).join(', ');
+  var dontHabits = discStreaks.filter(function(s){return s.type==='dont'&&s.days>0;}).map(function(s){return s.name+' ('+s.days+' days)';}).join(', ');
+  // build memory context from last 3 exchanges
+  var recentHistory = pushHistory.slice(-7);
+  var memoryContext = '';
+  if(recentHistory.length > 1){
+    memoryContext = ' Here is recent context from your conversation: '
+      + recentHistory.slice(0,-1).map(function(m){return (m.role==='user'?'User':'You')+': '+m.text;}).join(' | ');
+  }
+  var systemPrompt = 'You are the Push coach inside Amplify — a no-excuses accountability app. You are the one person in someone\'s life who tells them the truth with love. Direct. Warm. Never vague. Never preachy. You ask one sharp question at a time, not five. You validate feelings for one sentence then redirect toward action. You never use bullet points. You write like a real person — short texts, not essays. Under 120 words unless the moment genuinely needs more.'
+    + (name ? ' The person you are coaching is '+name+'.' : '')
+    + (primaryGoal ? ' Their main goal right now is "'+primaryGoal+'". Every conversation should connect back to this when relevant.' : '')
+    + (streakDays > 0 ? ' They are on a '+streakDays+'-day streak. Acknowledge this if it comes up — streaks are identity.' : '')
+    + (doHabits ? ' They are building these habits: '+doHabits+'.' : '')
+    + (dontHabits ? ' They are avoiding: '+dontHabits+'.' : '')
+    + memoryContext
+    + ' If someone mentions self-harm, suicide, or crisis — respond with care and say: "Please reach out to 988 (call or text). I\'m a coach, not a therapist, and you deserve real support right now."';
+  var messages = [{role:'user', content: pushHistory[pushHistory.length-1].text}];
   try{
     var resp = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -1908,6 +1990,53 @@ async function sendPush(){
   pushLoading = false;
   if(loadEl) loadEl.style.display = 'none';
   renderPushHistory();
+}
+
+async function sendStreakMilestone(days){
+  var name=load('amp_name','');
+  var primaryGoal='';
+  var allCountdowns=load('amp_countdowns',[]);
+  var primary=allCountdowns.find(function(c){return c.primary;});
+  if(primary) primaryGoal=primary.name;
+  var milestoneMsg = days+' days in a row'+(name?', '+name:'')+'. '+(primaryGoal?'Still working toward "'+primaryGoal+'". ':'')+'Say something real about what this streak means and what comes next. Under 80 words. No bullet points. Make it land.';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':'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',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:150,
+        system:'You are the Push coach in Amplify. A user just hit a streak milestone. Acknowledge it in a way that feels personal, earned, and forward-looking. Direct and warm. No bullet points. Under 80 words.',
+        messages:[{role:'user',content:milestoneMsg}]
+      })
+    });
+    var data=await resp.json();
+    var reply=data.content&&data.content[0]?data.content[0].text.trim():'';
+    if(reply){
+      pushHistory.push({role:'coach',text:'🔥 '+days+' day streak — '+reply,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+      save('amp_push_history',pushHistory);
+      renderPushHistory();
+      // show a streak overlay
+      showStreakMilestone(days);
+    }
+  }catch(e){}
+}
+
+function showStreakMilestone(days){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;';
+  var emojis={7:'🔥',14:'⚡',30:'💎',60:'👑',100:'🏆'};
+  overlay.innerHTML='<div style="font-size:64px;margin-bottom:16px;">'+(emojis[days]||'🔥')+'</div>'
+    +'<div style="font-size:36px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;margin-bottom:8px;">'+days+' days</div>'
+    +'<div style="font-size:16px;color:rgba(232,224,212,0.6);margin-bottom:32px;line-height:1.6;">That is not nothing.<br>That is who you are becoming.</div>'
+    +'<button onclick="this.parentNode.remove()" style="background:#8B7040;border:none;border-radius:8px;color:#e8e0d4;font-size:15px;font-weight:700;padding:14px 32px;cursor:pointer;font-family:-apple-system,sans-serif;">Keep going</button>';
+  document.body.appendChild(overlay);
+  setTimeout(function(){if(overlay.parentNode) overlay.remove();},6000);
 }
 
 var reminders=load('amp_reminders',[{id:1,label:'Morning push',time:'07:00',on:true},{id:2,label:'Midday check-in',time:'12:00',on:true},{id:3,label:'Evening accountability',time:'20:00',on:true}]);
@@ -2136,6 +2265,43 @@ function resetApp(){
   location.reload();
 }
 
+function checkMorningRitual(){
+  var hr=new Date().getHours();
+  if(hr>=5&&hr<9){
+    var lastRitual=load('amp_last_ritual','');
+    if(lastRitual===today) return;
+    save('amp_last_ritual',today);
+    var name=load('amp_name','');
+    var pool=getQuotePool();
+    var q=pool[Math.floor(Math.random()*pool.length)];
+    var questions=['What is the one thing that matters most today?','Who are you showing up for today?','What would make today feel like a win?','What are you choosing to do differently today?','What does success look like by tonight?'];
+    var dq=questions[new Date().getDate()%questions.length];
+    document.getElementById('ritual-greeting').textContent='Good morning'+(name?', '+name:'');
+    document.getElementById('ritual-quote').textContent='"'+q.t+'"';
+    document.getElementById('ritual-author').textContent='— '+q.a;
+    document.getElementById('ritual-question').textContent=dq;
+    document.getElementById('morning-ritual').style.display='flex';
+    setTimeout(function(){document.getElementById('morning-ritual').style.display='none';},30000);
+  }
+}
+function closeMorningRitual(){
+  document.getElementById('morning-ritual').style.display='none';
+}
+
+function checkReEngagement(){
+  if(!window.Capacitor||!window.Capacitor.isNativePlatform()) return;
+  try{
+    var lastOpen=load('amp_last_open',0);
+    var now=Date.now();
+    if(lastOpen&&(now-lastOpen)>172800000){
+      var streakDays=load('amp_streak_days',[]).length;
+      var msg=streakDays>0?'You haven\'t checked in. Your '+streakDays+'-day streak is waiting.':'You haven\'t checked in. The work doesn\'t do itself.';
+      LocalNotifications.schedule({notifications:[{id:99,title:'Amplify',body:msg,schedule:{at:new Date(now+5000)},sound:'default'}]}).catch(function(){});
+    }
+    save('amp_last_open',now);
+  }catch(e){}
+}
+
 function initApp(){
   loadUser();
   renderQuote();
@@ -2157,8 +2323,38 @@ function initApp(){
   updateNotifPreviews();
   renderPushHistory();
   renderScriptureToggle();
-  setTimeout(function(){appReady=true;},300);
+  checkReEngagement();
+  setTimeout(function(){
+    appReady=true;
+    checkMorningRitual();
+  },400);
 }
+
+// handle shared countdown links
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var sharedName=params.get('name');
+  var sharedTs=params.get('ts');
+  var sharedFrom=params.get('from');
+  if(sharedName&&sharedTs){
+    var overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:#0f0e0c;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;';
+    var ts=parseInt(sharedTs);
+    function getCountdownHTML(){
+      var diff=Math.max(0,ts-Date.now());var s=Math.floor(diff/1000);
+      var d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),mn=Math.floor((s%3600)/60),sc=s%60;
+      return d+'d '+h+'h '+mn+'m '+sc+'s';
+    }
+    overlay.innerHTML='<div style="font-size:12px;color:rgba(232,224,212,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:24px;">'+(sharedFrom?sharedFrom+' is on the clock':'Someone is on the clock')+'</div>'
+      +'<div style="font-size:22px;font-weight:700;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:24px;line-height:1.3;">"'+sharedName+'"</div>'
+      +'<div style="font-size:48px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;font-variant-numeric:tabular-nums;margin-bottom:8px;letter-spacing:-2px;" id="share-view-timer">'+getCountdownHTML()+'</div>'
+      +'<div style="font-size:11px;color:rgba(232,224,212,0.25);margin-bottom:40px;">remaining</div>'
+      +'<a href="https://apps.apple.com/app/id6772685979" style="display:inline-block;background:#8B7040;border-radius:8px;color:#e8e0d4;font-size:15px;font-weight:700;padding:14px 28px;text-decoration:none;font-family:-apple-system,sans-serif;margin-bottom:12px;">Get Amplify on the App Store</a>'
+      +'<div style="font-size:11px;color:rgba(232,224,212,0.25);">Make Noise for Yourself</div>';
+    document.body.appendChild(overlay);
+    setInterval(function(){var el=document.getElementById('share-view-timer');if(el)el.textContent=getCountdownHTML();},1000);
+  }
+})();
 
 window.addEventListener('load',function(){
   var onboarded=load('amp_onboarded',false);
