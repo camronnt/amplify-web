@@ -267,11 +267,37 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   </div>
 </div>
 
-<!-- TIMERS -->
+<!-- FOCUS/TIMERS -->
 <div class="screen active" id="screen-home">
-  <div style="font-size:13px;color:rgba(232,224,212,0.3);margin-bottom:2px;" id="home-greeting">Good morning,</div>
-  <div style="font-size:30px;font-weight:800;color:#e8e0d4;letter-spacing:-1px;margin-bottom:6px;font-family:Georgia,serif;" id="home-name">Let's go. ⚡</div>
-  <div style="font-size:14px;color:rgba(232,224,212,0.45);line-height:1.7;margin-bottom:18px;font-style:italic;" id="home-question"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div>
+      <div style="font-size:13px;color:rgba(232,224,212,0.3);margin-bottom:2px;" id="home-greeting">Good morning,</div>
+      <div style="font-size:28px;font-weight:800;color:#e8e0d4;letter-spacing:-1px;font-family:Georgia,serif;" id="home-name">Lets go.</div>
+    </div>
+    <div id="completion-ring-wrap" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <svg width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="28" fill="none" stroke="#1e1a12" stroke-width="5"/>
+        <circle cx="36" cy="36" r="28" fill="none" stroke="#C9A96E" stroke-width="5" stroke-linecap="round"
+          stroke-dasharray="176" stroke-dashoffset="176" transform="rotate(-90 36 36)" id="ring-progress" style="transition:stroke-dashoffset 0.6s ease;"/>
+        <text x="36" y="41" text-anchor="middle" fill="#C9A96E" font-size="15" font-weight="700" font-family="Georgia,serif" id="ring-count">0/3</text>
+      </svg>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div id="dot-morning" style="width:6px;height:6px;border-radius:50%;background:#1e1a12;transition:background 0.3s;"></div>
+          <div style="font-size:8px;color:rgba(232,224,212,0.22);text-transform:uppercase;letter-spacing:0.05em;">open</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div id="dot-goals" style="width:6px;height:6px;border-radius:50%;background:#1e1a12;transition:background 0.3s;"></div>
+          <div style="font-size:8px;color:rgba(232,224,212,0.22);text-transform:uppercase;letter-spacing:0.05em;">goals</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div id="dot-note" style="width:6px;height:6px;border-radius:50%;background:#1e1a12;transition:background 0.3s;"></div>
+          <div style="font-size:8px;color:rgba(232,224,212,0.22);text-transform:uppercase;letter-spacing:0.05em;">note</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:rgba(232,224,212,0.45);line-height:1.7;margin-bottom:18px;margin-top:8px;font-style:italic;" id="home-question"></div>
   <div class="vibe-bar">
     <div class="vibe-label">How are you showing up today?</div>
     <div class="vibe-opts">
@@ -292,8 +318,9 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 
 <!-- GOALS -->
 <div class="screen" id="screen-goals">
-  <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:2px;" id="goals-greeting">Today's goals,</div>
-  <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:16px;">make some noise.</div>
+  <div style="font-size:13px;color:rgba(232,224,212,0.3);margin-bottom:2px;" id="goals-greeting">Today's goals,</div>
+  <div style="font-size:26px;font-weight:700;color:#e8e0d4;margin-bottom:12px;font-family:Georgia,serif;">make some noise.</div>
+  <button id="ai-tasks-btn" onclick="generateAITasks()" style="width:100%;background:rgba(139,112,64,0.08);border:1px solid rgba(139,112,64,0.2);border-radius:10px;color:rgba(201,169,110,0.7);font-size:13px;padding:11px 16px;cursor:pointer;font-family:-apple-system,sans-serif;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;">✨ Generate today's tasks with AI</button>
   <div id="checkin-banner" class="checkin-banner" style="display:none;">
     <div style="flex:1;">
       <div class="checkin-txt" id="checkin-txt">Morning check-in: did you stay strong yesterday?</div>
@@ -537,7 +564,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   <div class="card">
     <div class="card-label">About</div>
     <div style="font-size:13px;color:rgba(232,224,212,0.4);line-height:1.8;">
-      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#e8e0d4;">1.6</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Version</span><span style="color:#e8e0d4;">1.7</span></div>
       <div style="display:flex;justify-content:space-between;"><span>Support</span><span style="color:#C9A96E;">theamplifyapp@gmail.com</span></div>
     </div>
   </div>
@@ -597,17 +624,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   </div>
 </div>
 
-<div class="overlay overlay-center" id="photo-modal" style="display:none;">
-  <div class="modal-box-center">
-    <div style="font-size:20px;font-weight:700;color:#ff6b6a;margin-bottom:8px;">Prove it.</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:16px;" id="photo-task-name">Take a photo of your completed task.</div>
-    <div id="photo-preview" style="display:none;margin-bottom:12px;"><img id="photo-img" style="width:100%;border-radius:12px;display:block;"></div>
-    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(event)">
-    <button class="btn btn-p" style="width:100%;margin-bottom:8px;" onclick="document.getElementById('photo-input').click()">Take photo</button>
-    <button id="photo-confirm" class="btn btn-g" style="width:100%;margin-bottom:8px;display:none;" onclick="confirmPhoto()">Task done - dismiss deadline</button>
-    <button class="btn btn-g" style="width:100%;font-size:11px;color:rgba(255,255,255,0.3);" onclick="closeModal('photo-modal')">Cancel</button>
-  </div>
-</div>
+
 
 
 <div class="overlay overlay-center" id="share-modal" style="display:none;">
@@ -1190,6 +1207,7 @@ var noteSaveTimer=null;
 function saveDailyNote(){
   var noteEl=document.getElementById('daily-note-input');
   if(noteEl) save('amp_daily_note_'+new Date().toDateString(),noteEl.value);
+  updateCompletionRing();
   var indicator=document.getElementById('note-saved');
   if(indicator){
     indicator.style.color='rgba(29,158,117,0.7)';
@@ -1363,11 +1381,10 @@ function renderCountdowns(){
     html+='<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">';
     if(!c.primary) html+='<button class="btn btn-g btn-sm" onclick="setPrimary('+c.id+')">Set primary</button>';
     if(c.type==='deadline') html+='<button class="tick-btn" id="tick-'+c.id+'" onclick="toggleTick('+c.id+')">Sound on</button>';
-    if(c.type==='deadline') html+='<button class="prove-btn" onclick="openProveModal('+c.id+',\''+safeName+'\')">Prove done</button>';
     html+='<button class="btn btn-g btn-sm" onclick="openShareModal('+c.id+')">Share</button>';
     html+='</div>';
     if(c.type==='deadline'){
-      html+='<button class="mission-btn" onclick="openProveModal('+c.id+',\''+safeName+'\')">';
+      html+='<button class="mission-btn" onclick="deleteCountdown('+c.id+');confetti();">';
       html+='<span class="m-icon">🏁</span>';
       html+='<span><span style="display:block;">Mission Accomplished</span><span class="m-sub">Tap to prove it & dismiss</span></span>';
       html+='</button>';
@@ -1442,11 +1459,6 @@ function toggleTick(id){
   else{playTick();tickIntervals[id]=setInterval(playTick,1000);if(btn){btn.textContent='Sound off';}}
 }
 
-var proveId=null;
-function openProveModal(id,name){proveId=id;document.getElementById('photo-task-name').textContent='Prove you completed: '+name;document.getElementById('photo-preview').style.display='none';document.getElementById('photo-confirm').style.display='none';document.getElementById('photo-input').value='';openModal('photo-modal');}
-function handlePhoto(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){document.getElementById('photo-img').src=ev.target.result;document.getElementById('photo-preview').style.display='block';document.getElementById('photo-confirm').style.display='block';};reader.readAsDataURL(file);}
-function confirmPhoto(){closeModal('photo-modal');if(proveId){deleteCountdown(proveId);proveId=null;}renderCountdowns();confetti();alert('Task verified. Keep going.');}
-
 function checkDeadlines(){
   var changed=false;
   countdowns.forEach(function(c){
@@ -1471,25 +1483,211 @@ function openShareModal(id){
   document.getElementById('share-quote-line').textContent='"'+q.t+'" - '+q.a;
   openModal('share-modal');
 }
+// COMPLETION RING
+function updateCompletionRing(){
+  var morningDone = load('amp_opened_'+today, false);
+  var goalsDone = (function(){
+    var t=load('amp_tasks_'+today,[]);
+    return t.length>0&&t.every(function(x){return x.done;});
+  })();
+  var noteDone = (load('amp_daily_note_'+new Date().toDateString(),'').length > 0);
+  var count = (morningDone?1:0)+(goalsDone?1:0)+(noteDone?1:0);
+  var ring = document.getElementById('ring-progress');
+  var countEl = document.getElementById('ring-count');
+  var dotM = document.getElementById('dot-morning');
+  var dotG = document.getElementById('dot-goals');
+  var dotN = document.getElementById('dot-note');
+  if(ring){
+    var circ=176;
+    var offset=circ-(circ*(count/3));
+    ring.setAttribute('stroke-dashoffset',offset);
+    ring.setAttribute('stroke',count===3?'#1D9E75':'#C9A96E');
+  }
+  if(countEl) countEl.textContent=count+'/3';
+  if(dotM) dotM.style.background=morningDone?'#C9A96E':'#1e1a12';
+  if(dotG) dotG.style.background=goalsDone?'#C9A96E':'#1e1a12';
+  if(dotN) dotN.style.background=noteDone?'#C9A96E':'#1e1a12';
+}
+
+// AI DAILY TASKS
+async function generateAITasks(){
+  var btn=document.getElementById('ai-tasks-btn');
+  if(btn){btn.textContent='Generating...';btn.style.opacity='0.5';btn.disabled=true;}
+  var name=load('amp_name','');
+  var primaryGoal='';
+  var allCDs=load('amp_countdowns',[]);
+  var primary=allCDs.find(function(c){return c.primary;});
+  if(primary) primaryGoal=primary.name;
+  var streakDays=load('amp_streak_days',[]).length;
+  var discStreaks=load('amp_disc_streaks',[]);
+  var doHabits=discStreaks.filter(function(s){return s.type==='do';}).map(function(s){return s.name;}).join(', ');
+  var context='Generate exactly 3 specific, actionable tasks for today.'
+    +(primaryGoal?' Main goal: "'+primaryGoal+'".'  :'')
+    +(streakDays>0?' They are on a '+streakDays+'-day streak.':'')
+    +(doHabits?' DO habits: '+doHabits+'.'  :'')
+    +' Each task should be completable in one day, specific, and move the needle. Return ONLY a JSON array of strings, no preamble, no markdown. Example: ["Task one","Task two","Task three"]';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,system:'Return only a JSON array of 3 task strings. No markdown, no explanation.',messages:[{role:'user',content:context}]})
+    });
+    var data=await resp.json();
+    var text=data.content&&data.content[0]?data.content[0].text.trim():'';
+    var clean=text.replace(/```json|```/g,'').trim();
+    var taskArr=JSON.parse(clean);
+    if(Array.isArray(taskArr)){
+      var existing=load('amp_tasks_'+today,[]);
+      taskArr.forEach(function(t){
+        if(typeof t==='string'&&t.trim()){
+          existing.push({id:Date.now()+Math.random(),text:t.trim(),done:false});
+        }
+      });
+      save('amp_tasks_'+today,existing);
+      tasks=existing;
+      renderTasks();
+    }
+  }catch(e){}
+  if(btn){btn.innerHTML='✨ Generate today\'s tasks with AI';btn.style.opacity='1';btn.disabled=false;}
+}
+
+// LONG-TERM PUSH AI MEMORY
+function savePushInsight(text){
+  var insights=load('amp_push_insights',[]);
+  var today2=new Date().toLocaleDateString();
+  // extract key phrases — store last 10 insights
+  insights.push({date:today2,text:text.substring(0,200)});
+  if(insights.length>10) insights=insights.slice(-10);
+  save('amp_push_insights',insights);
+}
+function getPushMemoryContext(){
+  var insights=load('amp_push_insights',[]);
+  if(!insights.length) return '';
+  var recent=insights.slice(-4);
+  return ' Long-term memory from past sessions (reference these naturally when relevant, not every message): '
+    +recent.map(function(i){return '['+i.date+']: '+i.text;}).join(' | ');
+}
+
+// WEEKLY SUNDAY SUMMARY
+async function checkWeeklySummary(){
+  var dayOfWeek=new Date().getDay(); // 0=Sunday
+  if(dayOfWeek!==0) return;
+  var lastSummary=load('amp_last_weekly_summary','');
+  var thisWeek=new Date().toLocaleDateString('en-US',{week:'numeric',year:'numeric'});
+  if(lastSummary===thisWeek) return;
+  save('amp_last_weekly_summary',thisWeek);
+  var name=load('amp_name','');
+  var streakDays=load('amp_streak_days',[]).length;
+  var insights=load('amp_push_insights',[]);
+  var recentInsights=insights.slice(-5).map(function(i){return i.text;}).join('. ');
+  var prompt='Weekly check-in for '+(name||'this person')+'. Streak: '+streakDays+' days. Recent journal: '+recentInsights+'. Write a warm, personal Sunday reflection from their coach. Reference what you know about them. Under 100 words. No bullet points. Make it feel like a letter, not a report.';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,system:'You are the Push coach in Amplify. Write a warm personal Sunday weekly reflection. Under 100 words. No bullet points.',messages:[{role:'user',content:prompt}]})
+    });
+    var data=await resp.json();
+    var reply=data.content&&data.content[0]?data.content[0].text.trim():'';
+    if(reply){
+      pushHistory.push({role:'coach',text:'📋 Weekly reflection — '+reply,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+      save('amp_push_history',pushHistory);
+      renderPushHistory();
+    }
+  }catch(e){}
+}
+
+// PROGRESS CARD after 5-day streak
+function checkProgressCard(){
+  var streakDays=load('amp_streak_days',[]).length;
+  if(streakDays>0&&streakDays%5===0){
+    var lastCard=load('amp_last_progress_card',0);
+    if(lastCard===streakDays) return;
+    save('amp_last_progress_card',streakDays);
+    setTimeout(function(){showProgressCard(streakDays);},2000);
+  }
+}
+async function showProgressCard(streakDays){
+  var name=load('amp_name','');
+  var insights=load('amp_push_insights',[]);
+  var summary=insights.slice(-3).map(function(i){return i.text;}).join('. ');
+  var prompt='The user has a '+streakDays+'-day streak'+(name?', name: '+name:'')+'. Recent context: '+summary+'. Write 2 sentences: how their coach sees their progress. Warm, specific, forward-looking. No fluff.';
+  var coachView='You are showing up consistently. Keep building.';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:100,system:'Two sentences. Warm and specific. No bullet points.',messages:[{role:'user',content:prompt}]})
+    });
+    var data=await resp.json();
+    if(data.content&&data.content[0]) coachView=data.content[0].text.trim();
+  }catch(e){}
+  var card=document.createElement('div');
+  card.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;';
+  card.innerHTML='<div style="font-size:13px;color:rgba(232,224,212,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">How your coach sees you</div>'
+    +'<div style="font-size:48px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;margin-bottom:8px;">'+streakDays+'</div>'
+    +'<div style="font-size:12px;color:rgba(232,224,212,0.3);margin-bottom:24px;text-transform:uppercase;letter-spacing:0.08em;">days strong</div>'
+    +'<div style="font-size:16px;color:rgba(232,224,212,0.82);line-height:1.7;font-style:italic;font-family:Georgia,serif;margin-bottom:36px;">"'+coachView+'"</div>'
+    +'<button onclick="this.parentNode.remove()" style="background:#8B7040;border:none;border-radius:8px;color:#e8e0d4;font-size:15px;font-weight:700;padding:14px 32px;cursor:pointer;font-family:-apple-system,sans-serif;">Keep going</button>';
+  document.body.appendChild(card);
+  setTimeout(function(){if(card.parentNode) card.remove();},8000);
+}
+
+// SHARE CARD AS IMAGE
 async function shareNow(){
   var goal=document.getElementById('share-goal-label').textContent;
   var d=document.getElementById('share-d').textContent;
   var h=document.getElementById('share-h').textContent;
   var m=document.getElementById('share-m').textContent;
   var name=load('amp_name','');
-  // find the countdown to get targetTs
   var cd=countdowns.find(function(c){return c.name===goal;});
   var shareUrl='';
   if(cd){
     var params=new URLSearchParams({name:cd.name,ts:cd.targetTs,from:name||'Someone'});
-    shareUrl='\n\n🔗 See my countdown live: https://zingy-kheer-f624a3.netlify.app/?'+params.toString();
+    shareUrl='https://zingy-kheer-f624a3.netlify.app/?'+params.toString();
   }
-  var text='🔥 '+(name?name+' is':'I am')+' on the clock.\n\n"'+goal+'"\n\n⏱ '+d+'d '+h+'h '+m+'m remaining\n\nTracking this on Amplify: Make Noise for Yourself.'+shareUrl+'\n\nGet the app → search "Amplify Make Noise" on the App Store';
+  // try canvas image share
+  try{
+    var canvas=document.createElement('canvas');
+    canvas.width=600;canvas.height=400;
+    var ctx=canvas.getContext('2d');
+    // background gradient
+    var grad=ctx.createLinearGradient(0,0,600,400);
+    grad.addColorStop(0,'#1a1208');grad.addColorStop(1,'#0f0e0c');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,600,400);
+    // border
+    ctx.strokeStyle='rgba(201,169,110,0.3)';ctx.lineWidth=1;ctx.strokeRect(20,20,560,360);
+    // header
+    ctx.fillStyle='rgba(201,169,110,0.6)';ctx.font='700 11px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.fillText('AMPLIFY: MAKE NOISE',300,55);
+    // goal name
+    ctx.fillStyle='#e8e0d4';ctx.font='700 28px Georgia,serif';
+    ctx.fillText(goal.length>28?goal.substring(0,28)+'...':goal,300,110);
+    // countdown
+    ctx.fillStyle='#C9A96E';ctx.font='700 64px Georgia,serif';
+    ctx.fillText(d+'d '+h+'h '+m+'m',300,190);
+    ctx.fillStyle='rgba(232,224,212,0.3)';ctx.font='500 12px -apple-system,sans-serif';
+    ctx.fillText('REMAINING',300,215);
+    // name
+    if(name){ctx.fillStyle='rgba(232,224,212,0.45)';ctx.font='500 14px -apple-system,sans-serif';ctx.fillText(name+' is on the clock',300,265);}
+    // app store link
+    ctx.fillStyle='rgba(201,169,110,0.5)';ctx.font='500 11px -apple-system,sans-serif';
+    ctx.fillText('apps.apple.com/app/id6772685979',300,360);
+    var dataUrl=canvas.toDataURL('image/png');
+    var blob=await(await fetch(dataUrl)).blob();
+    var file=new File([blob],'amplify-countdown.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Amplify: Make Noise',text:(shareUrl?'See it live: '+shareUrl:'')});
+      return;
+    }
+  }catch(e){}
+  // fallback to text
+  var text='🔥 '+(name?name+' is':'I am')+' on the clock.\n\n"'+goal+'"\n\n⏱ '+d+'d '+h+'h '+m+'m remaining\n\nTracking this on Amplify: Make Noise.'+(shareUrl?'\n\nSee it live: '+shareUrl:'')+'\n\nGet the app: apps.apple.com/app/id6772685979';
   if(window.Capacitor&&window.Capacitor.isNativePlatform()&&window.Capacitor.Plugins.Share){
-    try{await window.Capacitor.Plugins.Share.share({title:'Amplify: Make Noise',text:text,dialogTitle:'Share your countdown'});return;}catch(e){}
+    try{await window.Capacitor.Plugins.Share.share({title:'Amplify',text:text,dialogTitle:'Share your countdown'});return;}catch(e){}
   }
-  if(navigator.share){navigator.share({title:'Amplify: Make Noise',text:text}).catch(function(){});}
-  else{navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!');});}
+  if(navigator.share){navigator.share({title:'Amplify',text:text}).catch(function(){});}
+  else{navigator.clipboard.writeText(text).then(function(){alert('Copied!');});}
 }
 
 function confetti(){
@@ -1929,6 +2127,7 @@ async function sendPush(){
   var timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   pushHistory.push({role:'user', text:text, time:timeStr});
   save('amp_push_history', pushHistory);
+  savePushInsight(text);
   renderPushHistory();
   pushLoading = true;
   var loadEl = document.getElementById('push-loading');
@@ -1958,6 +2157,7 @@ async function sendPush(){
     + (streakDays > 0 ? ' They are on a '+streakDays+'-day streak. Acknowledge this if it comes up — streaks are identity.' : '')
     + (doHabits ? ' They are building these habits: '+doHabits+'.' : '')
     + (dontHabits ? ' They are avoiding: '+dontHabits+'.' : '')
+    + getPushMemoryContext()
     + memoryContext
     + ' If someone mentions self-harm, suicide, or crisis — respond with care and say: "Please reach out to 988 (call or text). I\'m a coach, not a therapist, and you deserve real support right now."';
   var messages = [{role:'user', content: pushHistory[pushHistory.length-1].text}];
@@ -2114,7 +2314,6 @@ async function scheduleLocalNotifications(){
   try{
     var perm = await LocalNotifications.requestPermissions();
     if(perm.display !== 'granted') return;
-    // cancel ALL pending notifications (system + reminders) before rescheduling
     var pending = await LocalNotifications.getPending();
     if(pending && pending.notifications && pending.notifications.length){
       await LocalNotifications.cancel({notifications: pending.notifications.map(function(n){return {id:n.id};})});
@@ -2122,42 +2321,61 @@ async function scheduleLocalNotifications(){
     var name = load('amp_name','');
     var streakDays = load('amp_streak_days',[]).length;
     var morningMsg = drillSergeantOn ? getDSQuote('morning') : 'Take a breath — then take your first step. What matters most today'+(name?', '+name:'')+'?';
-    var middayMsg = drillSergeantOn ? getDSQuote('midday') : 'Halfway there. You\'ve still got time — how are you using it?';
+    var middayMsg = drillSergeantOn ? getDSQuote('midday') : 'Halfway there. You still have time — how are you using it?';
     var eveningMsg = drillSergeantOn ? getDSQuote('evening') : 'The day is winding down. Be honest with yourself — what did you actually do?';
     var streakMsg = streakDays > 0
-      ? (drillSergeantOn ? 'Your '+streakDays+'-day streak dies tonight if you do not open the app and finish something. Clock is running.' : '⚠️ Your '+streakDays+'-day streak is at risk! Complete at least one goal before midnight.')
-      : (drillSergeantOn ? 'You have no streak to lose — which means you have nothing to show for yourself. Fix that tonight.' : 'Complete a goal tonight to start building your streak 🔥');
-    var now = new Date();
-    var morning = new Date(now); morning.setHours(8,0,0,0); if(morning<=now) morning.setDate(morning.getDate()+1);
-    var midday = new Date(now); midday.setHours(12,0,0,0); if(midday<=now) midday.setDate(midday.getDate()+1);
-    var evening = new Date(now); evening.setHours(20,0,0,0); if(evening<=now) evening.setDate(evening.getDate()+1);
-    var streakAlert = new Date(now); streakAlert.setHours(21,0,0,0); if(streakAlert<=now) streakAlert.setDate(streakAlert.getDate()+1);
-    var quoteNotif = new Date(now); quoteNotif.setHours(9,0,0,0); if(quoteNotif<=now) quoteNotif.setDate(quoteNotif.getDate()+1);
+      ? (drillSergeantOn ? 'Your '+streakDays+'-day streak dies tonight if you do not open the app and finish something.' : 'Your '+streakDays+'-day streak is at risk. Complete at least one goal before midnight.')
+      : (drillSergeantOn ? 'You have no streak to lose — which means you have nothing to show for yourself. Fix that tonight.' : 'Complete a goal tonight to start building your streak.');
     var quotePool = scriptureOn ? BIBLE_VERSES : QUOTES;
-    var dailyQuote = quotePool[Math.floor(Math.random()*quotePool.length)];
-    var quoteTitle = scriptureOn ? '✝️ Scripture for today' : '⚡ Today\'s fuel';
-    var morningTitle = drillSergeantOn ? '🪖 Sergeant' : 'Amplify 🌅';
-    var middayTitle = drillSergeantOn ? '🪖 Sergeant' : 'Amplify ☀️';
-    var eveningTitle = drillSergeantOn ? '🪖 Sergeant' : 'Amplify 🌙';
+    var morningQuote = quotePool[Math.floor(Math.random()*quotePool.length)];
+    var nightQuote = BIBLE_VERSES[Math.floor(Math.random()*BIBLE_VERSES.length)];
+    var quoteTitle = scriptureOn ? 'Scripture for today' : 'Today\'s fuel';
+    var morningTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
+    var middayTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
+    var eveningTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
+
+    // helper: get next occurrence of a specific hour/minute
+    function nextAt(hr, mn){
+      var d = new Date();
+      d.setSeconds(0); d.setMilliseconds(0);
+      d.setHours(hr, mn, 0, 0);
+      if(d.getTime() <= Date.now()) d.setDate(d.getDate()+1);
+      return d;
+    }
+
     var notifsToSchedule = [
-      {id:1,title:morningTitle,body:morningMsg,schedule:{at:morning,repeats:true,every:'day'},sound:'default'},
-      {id:2,title:middayTitle,body:middayMsg,schedule:{at:midday,repeats:true,every:'day'},sound:'default'},
-      {id:3,title:eveningTitle,body:eveningMsg,schedule:{at:evening,repeats:true,every:'day'},sound:'default'},
-      {id:4,title:'Amplify 🚨',body:streakMsg,schedule:{at:streakAlert,repeats:true,every:'day'},sound:'default'},
-      {id:5,title:quoteTitle,body:'"'+dailyQuote.t+'" — '+dailyQuote.a,schedule:{at:quoteNotif,repeats:true,every:'day'},sound:'default'},
+      {id:1, title:morningTitle, body:morningMsg, schedule:{at:nextAt(8,0), repeats:true, every:'day'}, sound:'default'},
+      {id:2, title:middayTitle, body:middayMsg, schedule:{at:nextAt(12,0), repeats:true, every:'day'}, sound:'default'},
+      {id:3, title:eveningTitle, body:eveningMsg, schedule:{at:nextAt(20,0), repeats:true, every:'day'}, sound:'default'},
+      {id:4, title:'Amplify', body:streakMsg, schedule:{at:nextAt(21,0), repeats:true, every:'day'}, sound:'default'},
+      {id:5, title:quoteTitle, body:'"'+morningQuote.t+'" — '+morningQuote.a, schedule:{at:nextAt(9,0), repeats:true, every:'day'}, sound:'default'},
+      {id:6, title:'Before you rest', body:'"'+nightQuote.t+'" — '+nightQuote.a, schedule:{at:nextAt(20,30), repeats:true, every:'day'}, sound:'default'},
+      {id:7, title:'Amplify', body:'What are you grateful for today? Take 30 seconds.', schedule:{at:nextAt(17,0), repeats:true, every:'day'}, sound:'default'},
     ];
+
     // re-add active reminders
     var savedReminders = load('amp_reminders',[]);
     savedReminders.forEach(function(r){
       if(r.on){
         var parts=r.time.split(':');
-        var at=new Date();at.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
-        if(at<=new Date()) at.setDate(at.getDate()+1);
-        notifsToSchedule.push({id:r.id,title:'Amplify 🔔',body:r.label,schedule:{at:at,repeats:true,every:'day'},sound:'default'});
+        notifsToSchedule.push({id:r.id, title:'Amplify', body:r.label, schedule:{at:nextAt(parseInt(parts[0]),parseInt(parts[1])), repeats:true, every:'day'}, sound:'default'});
       }
     });
     await LocalNotifications.schedule({notifications: notifsToSchedule});
-    save('amp_notifs_scheduled',true);
+    save('amp_notifs_scheduled', true);
+
+    // set up notification tap handlers for deep linking
+    LocalNotifications.addListener('localNotificationActionPerformed', function(action){
+      var id = action.notification.id;
+      var screen = 'home';
+      if(id===7) screen='goals'; // gratitude -> goals
+      else if(id===1||id===5||id===6) screen='home'; // morning/quote/night -> home
+      else if(id===2) screen='goals'; // midday -> goals
+      else if(id===3||id===4) screen='focus'; // evening/streak -> push
+      var btn = document.querySelector('.nav-btn[onclick*="'+screen+'"]');
+      if(btn) btn.click();
+    }).catch(function(){});
+
   } catch(e){ console.log('Local notif error:',e); }
 }
 
@@ -2314,6 +2532,7 @@ function initApp(){
   renderGratitude();
   applyAppVibe();
   initQuietHours();
+  updateCompletionRing();
   document.getElementById('aff-text').textContent=AFFIRMATIONS[dayOfYear%AFFIRMATIONS.length].t;
   document.getElementById('aff-sub').textContent=AFFIRMATIONS[dayOfYear%AFFIRMATIONS.length].s;
   generateAIChallenge(false);
@@ -2324,9 +2543,14 @@ function initApp(){
   renderPushHistory();
   renderScriptureToggle();
   checkReEngagement();
+  checkProgressCard();
   setTimeout(function(){
     appReady=true;
     checkMorningRitual();
+    checkWeeklySummary();
+    // mark as opened today (any time)
+    save('amp_opened_'+today, true);
+    updateCompletionRing();
   },400);
 }
 
