@@ -116,6 +116,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .preset.active{background:rgba(139,112,64,0.14);border-color:#8B7040;color:#C9A96E;}
 .rem-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1c1814;}
 .rem-row:last-of-type{border-bottom:none;}
+.goal-chip{background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.25);border-radius:20px;color:#C9A96E;font-size:12px;font-weight:600;padding:7px 14px;cursor:pointer;font-family:-apple-system,sans-serif;}
 .push-suggest{background:#1c1814;border:1px solid #302618;border-radius:6px;color:rgba(232,224,212,0.36);font-size:11px;padding:6px 12px;cursor:pointer;font-family:-apple-system,sans-serif;white-space:nowrap;}
 .push-suggest:active{background:rgba(139,112,64,0.12);border-color:#8B7040;color:#C9A96E;}
 .push-bubble{margin-bottom:14px;}
@@ -453,6 +454,21 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
     <div style="font-size:11px;color:rgba(255,255,255,0.25);line-height:1.6;margin-bottom:4px;">Your AI coach. Ask anything — goals, setbacks, relationships, hard days. You get honesty, not comfort.</div>
     <div style="font-size:10px;color:rgba(255,255,255,0.15);font-style:italic;">Push is not a substitute for professional help. If you're in crisis, please reach out to someone who can be there in person.</div>
   </div>
+  <!-- No-goal discovery banner -->
+  <div id="push-no-goal-banner" style="display:none;margin-bottom:14px;">
+    <div class="card" style="background:rgba(201,169,110,0.06);border-color:rgba(201,169,110,0.2);padding:16px;">
+      <div style="font-size:13px;font-weight:700;color:#C9A96E;margin-bottom:6px;">You don't have a goal set.</div>
+      <div style="font-size:12px;color:rgba(232,224,212,0.55);line-height:1.6;margin-bottom:14px;">You've been showing up anyway — that discipline deserves a direction. What are you working toward?</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="goal-chip" onclick="startGoalDiscovery('build a daily habit')">Build a habit</button>
+        <button class="goal-chip" onclick="startGoalDiscovery('finish a project I've been putting off')">Finish a project</button>
+        <button class="goal-chip" onclick="startGoalDiscovery('get healthier')">Get healthy</button>
+        <button class="goal-chip" onclick="startGoalDiscovery('grow something I'm building')">Grow something</button>
+        <button class="goal-chip" onclick="startGoalDiscovery('figure out what I actually want')">Figure out what I want</button>
+        <button class="goal-chip" onclick="startGoalDiscovery('get my finances right')">Fix my finances</button>
+      </div>
+    </div>
+  </div>
   <div id="push-history" style="margin-bottom:12px;"></div>
   <div id="push-suggestions" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
     <button class="push-suggest" onclick="useSuggestion(this)">How do I stay consistent?</button>
@@ -546,7 +562,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
   <div class="card">
     <div class="card-label">Notifications</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Reschedule your daily check-ins based on your current Drill Sergeant setting.</div>
-    <button class="btn btn-g" style="width:100%;" onclick="scheduleLocalNotifications();alert('Notifications rescheduled!');">Reschedule notifications</button>
+    <button class="btn btn-g" style="width:100%;" onclick="scheduleLocalNotifications(true);alert('Notifications rescheduled!');">Reschedule notifications</button>
   </div>
   <div class="card">
     <div class="card-label">Data</div>
@@ -786,42 +802,56 @@ var QUOTES = [
   {t:"The secret of getting ahead is getting started.",a:"Mark Twain",q:"What have you been putting off that you could start in the next 5 minutes?"},
   {t:"Success is the sum of small efforts repeated day in and day out.",a:"Robert Collier",q:"What small effort did you repeat today?"},
   {t:"It does not matter how slowly you go as long as you do not stop.",a:"Confucius",q:"Are you moving, even slowly? What would stopping cost you?"},
-  {t:"Believe you can and you're halfway there.",a:"Theodore Roosevelt",q:"What belief is holding you back right now?"},
   {t:"The harder you work for something, the greater you'll feel when you achieve it.",a:"Unknown",q:"How hard are you actually working for this?"},
-  {t:"Dream it. Wish it. Do it.",a:"Unknown",q:"Which stage are you stuck in — dreaming, wishing, or doing?"},
   {t:"Don't stop when you're tired. Stop when you're done.",a:"Unknown",q:"How close to done are you actually?"},
   {t:"Wake up with determination. Go to bed with satisfaction.",a:"Unknown",q:"What would you need to do today to feel satisfied tonight?"},
-  {t:"Little things make big days.",a:"Unknown",q:"What little thing can you do right now that matters?"},
-  {t:"It's going to be hard, but hard is not impossible.",a:"Unknown",q:"What feels hard right now — and what would impossible actually look like?"},
   {t:"Don't wish for it. Work for it.",a:"Unknown",q:"Are you wishing or working right now?"},
   {t:"You didn't come this far to only come this far.",a:"Unknown",q:"How far have you actually come? Take a second to acknowledge it."},
-  {t:"The only bad workout is the one that didn't happen.",a:"Unknown",q:"What did you skip today that you could still do?"},
   {t:"Motivation gets you started. Habit keeps you going.",a:"Jim Ryun",q:"What habit are you building that will outlast your motivation?"},
-  {t:"Success doesn't come to you. You go to it.",a:"Marva Collins",q:"What step toward success did you take today?"},
   {t:"Be stronger than your strongest excuse.",a:"Unknown",q:"What excuse have you been using — and what is it costing you?"},
   {t:"Your future is created by what you do today, not tomorrow.",a:"Robert Kiyosaki",q:"What are you doing today that your future self will thank you for?"},
-  {t:"The difference between ordinary and extraordinary is that little extra.",a:"Jimmy Johnson",q:"What extra thing could you do today that most people wouldn't?"},
-  {t:"Don't limit your challenges. Challenge your limits.",a:"Unknown",q:"Where are you playing it too safe right now?"},
-  {t:"You have to be at your personal best when it matters most.",a:"Unknown",q:"Is today a day that matters? Are you showing up like it is?"},
   {t:"Either you run the day or the day runs you.",a:"Jim Rohn",q:"Who is running your day right now?"},
-  {t:"The only way to do great work is to love what you do.",a:"Steve Jobs",q:"Are you working toward something you actually care about?"},
   {t:"You miss 100% of the shots you don't take.",a:"Wayne Gretzky",q:"What shot are you not taking right now because you're afraid to miss?"},
   {t:"Whether you think you can or think you can't, you're right.",a:"Henry Ford",q:"What story are you telling yourself about what's possible?"},
   {t:"In the middle of difficulty lies opportunity.",a:"Albert Einstein",q:"What opportunity is hiding inside your current struggle?"},
   {t:"The best time to plant a tree was 20 years ago. The second best time is now.",a:"Chinese Proverb",q:"What are you waiting for that you could start right now?"},
   {t:"Hardships often prepare ordinary people for an extraordinary destiny.",a:"C.S. Lewis",q:"What hardship are you in right now that might be preparing you for something bigger?"},
   {t:"It always seems impossible until it's done.",a:"Nelson Mandela",q:"What feels impossible right now that you know you need to do anyway?"},
-  {t:"Strive not to be a success, but rather to be of value.",a:"Albert Einstein",q:"What value are you bringing to your goal and the people around you?"},
   {t:"Life is 10% what happens to you and 90% how you react to it.",a:"Charles R. Swindoll",q:"How are you choosing to react to what's happening in your life right now?"},
   {t:"The mind is everything. What you think, you become.",a:"Buddha",q:"What are you thinking about most — and is it moving you forward or backward?"},
-  {t:"An unexamined life is not worth living.",a:"Socrates",q:"When did you last sit down and honestly evaluate where you are?"},
-  {t:"Eighty percent of success is showing up.",a:"Woody Allen",q:"Are you showing up consistently — even on the days it doesn't feel worth it?"},
   {t:"Your time is limited. Don't waste it living someone else's life.",a:"Steve Jobs",q:"Whose version of success are you actually chasing?"},
-  {t:"The greatest glory in living lies not in never falling, but in rising every time we fall.",a:"Nelson Mandela",q:"What are you rising from right now?"},
-  {t:"You only live once, but if you do it right, once is enough.",a:"Mae West",q:"Are you doing it right? What would that look like?"},
-  {t:"If life were predictable it would cease to be life and be without flavor.",a:"Eleanor Roosevelt",q:"What unpredictable thing are you facing that might actually be a gift?"},
-  {t:"If you look at what you have in life, you'll always have more.",a:"Oprah Winfrey",q:"What do you already have that you've been taking for granted?"},
-  {t:"If you want to live a happy life, tie it to a goal, not to people or things.",a:"Albert Einstein",q:"What goal is your happiness tied to right now?"}
+  {t:"We are what we repeatedly do. Excellence, then, is not an act but a habit.",a:"Aristotle",q:"What are you repeatedly doing — and is it building the person you want to be?"},
+  {t:"The only person you are destined to become is the person you decide to be.",a:"Ralph Waldo Emerson",q:"Who have you decided to be — and are your actions matching that decision?"},
+  {t:"If you are not willing to risk the usual, you will have to settle for the ordinary.",a:"Jim Rohn",q:"What risk are you avoiding that's keeping you ordinary?"},
+  {t:"The future belongs to those who believe in the beauty of their dreams.",a:"Eleanor Roosevelt",q:"Do you actually believe in what you're building?"},
+  {t:"You have power over your mind — not outside events. Realize this, and you will find strength.",a:"Marcus Aurelius",q:"What outside event are you letting control your focus today?"},
+  {t:"It is not the mountain we conquer, but ourselves.",a:"Edmund Hillary",q:"What part of yourself are you conquering right now?"},
+  {t:"You can't go back and change the beginning, but you can start where you are and change the ending.",a:"C.S. Lewis",q:"Where are you starting from today — and where do you want the ending to be?"},
+  {t:"Winning is not always the horses who runs the fastest, but the one who refuses to quit.",a:"Unknown",q:"Where do you need to refuse to quit right now?"},
+  {t:"Hard work beats talent when talent doesn't work hard.",a:"Tim Notke",q:"Are you outworking your natural ability today?"},
+  {t:"The difference between who you are and who you want to be is what you do.",a:"Unknown",q:"What are you doing today to close that gap?"},
+  {t:"Don't tell people your plans. Show them your results.",a:"Unknown",q:"What result can you produce today instead of talking about it?"},
+  {t:"Small daily improvements over time lead to stunning results.",a:"Robin Sharma",q:"What tiny improvement can you make today that your future self will feel?"},
+  {t:"Suffer the pain of discipline, or suffer the pain of regret.",a:"Jim Rohn",q:"What discipline are you avoiding that will cost you later?"},
+  {t:"Nobody who ever gave their best regretted it.",a:"George Halas",q:"Are you giving your best right now — really?"},
+  {t:"Comfort is a slow death.",a:"Amplify",q:"Where are you too comfortable right now?"},
+  {t:"The person who shows up every day beats the person who shows up when inspired.",a:"Amplify",q:"Are you a daily person or an inspired person — which one wins?"},
+  {t:"Identity is built rep by rep, not declared.",a:"Amplify",q:"What rep are you putting in today to become who you say you are?"},
+  {t:"Stop negotiating with the version of you that wants to quit.",a:"Amplify",q:"What negotiation are you in right now that you need to end?"},
+  {t:"The gap between where you are and where you want to be is filled with work, not wishes.",a:"Amplify",q:"What work are you doing today to close that gap?"},
+  {t:"Champions don't show up to get the best out of a training session. Training sessions are there to get the best out of champions.",a:"Henry Groman",q:"What are you training for right now?"},
+  {t:"Don't downgrade your dream to match your current reality. Upgrade your conviction to match your destiny.",a:"Unknown",q:"Are you shrinking your goals to fit your fears?"},
+  {t:"The cave you fear to enter holds the treasure you seek.",a:"Joseph Campbell",q:"What are you afraid to enter right now that might be exactly what you need?"},
+  {t:"One day or day one. You decide.",a:"Unknown",q:"Is today one day — or day one?"},
+  {t:"Your speed doesn't matter. Forward is forward.",a:"Unknown",q:"Are you moving forward today, even if slowly?"},
+  {t:"Discipline is the bridge between goals and accomplishment.",a:"Jim Rohn",q:"How strong is your bridge today?"},
+  {t:"The secret to getting results that last is to never stop making improvements.",a:"James Clear",q:"What are you improving this week that will compound?"},
+  {t:"You don't rise to the level of your goals, you fall to the level of your systems.",a:"James Clear",q:"What system are you building that runs even when you don't feel like it?"},
+  {t:"A man who conquers himself is greater than one who conquers a thousand men in battle.",a:"Buddha",q:"What are you conquering in yourself right now?"},
+  {t:"Iron sharpens iron.",a:"Proverbs 27:17",q:"Who is sharpening you — and are you sharpening someone else?"},
+  {t:"The successful warrior is the average man, with laser-like focus.",a:"Bruce Lee",q:"What are you focused on so intently that nothing else matters?"},
+  {t:"We suffer more in imagination than in reality.",a:"Seneca",q:"What are you dreading that will probably be fine once you start?"},
+  {t:"Waste no more time arguing what a good man should be. Be one.",a:"Marcus Aurelius",q:"What would a good version of you do right now?"}
 ];
 
 var BIBLE_VERSES = [
@@ -831,32 +861,51 @@ var BIBLE_VERSES = [
   {t:"Trust in the Lord with all your heart and lean not on your own understanding.",a:"Proverbs 3:5",q:"Where are you relying on your own understanding instead of trusting the process?"},
   {t:"But those who hope in the Lord will renew their strength. They will soar on wings like eagles.",a:"Isaiah 40:31",q:"Where do you need your strength renewed today?"},
   {t:"For God gave us a spirit not of fear but of power and love and self-control.",a:"2 Timothy 1:7",q:"What fear are you letting control you right now?"},
-  {t:"Come to me, all who labor and are heavy laden, and I will give you rest.",a:"Matthew 11:28",q:"What burden are you carrying that you need to put down?"},
   {t:"The Lord is my strength and my shield; my heart trusts in him.",a:"Psalm 28:7",q:"Are you trusting in your own strength or something greater?"},
   {t:"Do not be anxious about anything, but in every situation, present your requests to God.",a:"Philippians 4:6",q:"What are you anxious about right now that you haven't fully surrendered?"},
-  {t:"She is clothed with strength and dignity, and she laughs without fear of the future.",a:"Proverbs 31:25",q:"What would your day look like if you had no fear of the future?"},
+  {t:"She is clothed with strength and dignity, and she laughs without fear of the future.",a:"Proverbs 31:25 NLT",q:"What would your day look like if you had no fear of the future?"},
   {t:"And we know that in all things God works for the good of those who love him.",a:"Romans 8:28",q:"What difficult thing in your life might be working for your good?"},
   {t:"Even though I walk through the darkest valley, I will fear no evil, for you are with me.",a:"Psalm 23:4",q:"What valley are you walking through right now — and do you believe you're not alone in it?"},
   {t:"No discipline seems pleasant at the time, but painful. Later on, however, it produces a harvest of righteousness.",a:"Hebrews 12:11",q:"What discipline are you avoiding that you know will produce good fruit?"},
   {t:"Commit to the Lord whatever you do, and he will establish your plans.",a:"Proverbs 16:3",q:"Have you committed your goal to something bigger than yourself?"},
   {t:"Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.",a:"Galatians 6:9",q:"Are you close to giving up? What would it mean to keep going just one more day?"},
   {t:"The Lord will fight for you; you need only to be still.",a:"Exodus 14:14",q:"What battle are you trying to fight alone that you need to let go of?"},
-  {t:"Delight yourself in the Lord, and he will give you the desires of your heart.",a:"Psalm 37:4",q:"Are your desires aligned with who you're becoming?"},
   {t:"Be transformed by the renewing of your mind.",a:"Romans 12:2",q:"What thought pattern do you need to renew today?"},
   {t:"For where your treasure is, there your heart will be also.",a:"Matthew 6:21",q:"Where is your time and energy actually going — and is that where your heart wants to be?"},
   {t:"I press on toward the goal to win the prize for which God has called me.",a:"Philippians 3:14",q:"What prize are you pressing toward — and is today's effort worthy of it?"},
   {t:"The heart of man plans his way, but the Lord establishes his steps.",a:"Proverbs 16:9",q:"Are you planning hard while staying open to where the path actually leads?"},
-  {t:"Do not conform to the pattern of this world, but be transformed by the renewing of your mind.",a:"Romans 12:2",q:"Where are you conforming to a pattern that isn't serving you?"},
-  {t:"Have I not commanded you? Be strong and courageous.",a:"Joshua 1:9",q:"What act of courage is required of you today?"},
   {t:"With man this is impossible, but with God all things are possible.",a:"Matthew 19:26",q:"What feels impossible right now that you need to stop trying to do alone?"},
   {t:"The Lord is close to the brokenhearted and saves those who are crushed in spirit.",a:"Psalm 34:18",q:"Are you carrying pain right now that you haven't acknowledged?"},
   {t:"Ask and it will be given to you; seek and you will find; knock and the door will be opened.",a:"Matthew 7:7",q:"What door are you standing in front of, afraid to knock?"},
   {t:"You are the light of the world. A city set on a hill cannot be hidden.",a:"Matthew 5:14",q:"Are you hiding your light right now — and why?"},
   {t:"Whatever you do, work at it with all your heart.",a:"Colossians 3:23",q:"Are you giving your whole heart to what's in front of you today?"},
-  {t:"For the Spirit God gave us does not make us timid, but gives us power.",a:"2 Timothy 1:7",q:"Where are you being timid when you should be bold?"},
-  {t:"Create in me a pure heart, O God, and renew a steadfast spirit within me.",a:"Psalm 51:10",q:"What do you need renewed in yourself right now?"}
+  {t:"Create in me a pure heart, O God, and renew a steadfast spirit within me.",a:"Psalm 51:10",q:"What do you need renewed in yourself right now?"},
+  {t:"God blesses those who work for peace.",a:"Matthew 5:9 NLT",q:"Where do you need to be a peacemaker today — starting with yourself?"},
+  {t:"Have I not commanded you? Be strong and courageous. Do not be frightened.",a:"Joshua 1:9",q:"What act of courage is required of you today?"},
+  {t:"Delight yourself in the Lord, and he will give you the desires of your heart.",a:"Psalm 37:4",q:"Are your desires aligned with who you're becoming?"},
+  {t:"Come to me, all who labor and are heavy laden, and I will give you rest.",a:"Matthew 11:28",q:"What burden are you carrying that you need to put down?"},
+  {t:"Do not conform to the pattern of this world, but be transformed by the renewing of your mind.",a:"Romans 12:2",q:"Where are you conforming to a pattern that isn't serving you?"},
+  {t:"For we walk by faith, not by sight.",a:"2 Corinthians 5:7",q:"What are you trusting in right now that you can't yet see?"},
+  {t:"Now faith is the substance of things hoped for, the evidence of things not seen.",a:"Hebrews 11:1",q:"What are you hoping for that hasn't shown up yet — and are you still believing?"},
+  {t:"The Lord is my shepherd; I shall not want.",a:"Psalm 23:1",q:"What are you striving for out of fear of lack instead of trust in provision?"},
+  {t:"Cast all your anxiety on him because he cares for you.",a:"1 Peter 5:7",q:"What worry have you been carrying alone that you haven't handed over?"},
+  {t:"Do not be overcome by evil, but overcome evil with good.",a:"Romans 12:21",q:"Where can you respond with good today instead of reacting?"},
+  {t:"God is our refuge and strength, an ever-present help in trouble.",a:"Psalm 46:1",q:"What trouble are you in right now that you haven't brought to God?"},
+  {t:"Greater love has no one than this: to lay down one's life for one's friends.",a:"John 15:13",q:"Who are you showing up for beyond just yourself?"},
+  {t:"Be still and know that I am God.",a:"Psalm 46:10",q:"When did you last get quiet enough to hear something other than your own noise?"},
+  {t:"Seek first the kingdom of God and his righteousness, and all these things will be added to you.",a:"Matthew 6:33",q:"What are you seeking first — and does it align with what you say matters most?"},
+  {t:"I have learned, in whatever state I am, to be content.",a:"Philippians 4:11",q:"Where are you at war with your current circumstances instead of working within them?"},
+  {t:"But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control.",a:"Galatians 5:22-23",q:"Which of these fruits is most lacking in you today — and what would it look like to grow it?"},
+  {t:"For I am the Lord your God who takes hold of your right hand and says, do not fear; I will help you.",a:"Isaiah 41:13",q:"What are you afraid of today that God is already standing in?"},
+  {t:"The name of the Lord is a strong tower; the righteous run to it and are safe.",a:"Proverbs 18:10",q:"Where are you running for safety that isn't actually safe?"},
+  {t:"Your word is a lamp for my feet, a light on my path.",a:"Psalm 119:105",q:"What step right in front of you do you need light for today?"},
+  {t:"He gives strength to the weary and increases the power of the weak.",a:"Isaiah 40:29",q:"Are you willing to admit you're tired — and ask for what you actually need?"},
+  {t:"And let us run with perseverance the race marked out for us.",a:"Hebrews 12:1",q:"Are you running your race — or someone else's?"},
+  {t:"Do not despise these small beginnings, for the Lord rejoices to see the work begin.",a:"Zechariah 4:10 NLT",q:"What small beginning are you dismissing that God might be celebrating?"},
+  {t:"You intended to harm me, but God intended it for good.",a:"Genesis 50:20",q:"What hardship in your past is God using for your good right now?"},
+  {t:"For the Lord gives wisdom; from his mouth come knowledge and understanding.",a:"Proverbs 2:6",q:"What decision are you facing where you need wisdom more than cleverness?"},
+  {t:"Do not let your hearts be troubled. You believe in God; believe also in me.",a:"John 14:1",q:"What is troubling your heart today that you need to release?"}
 ];
-
 var scriptureOn = load('amp_scripture', true);
 var appMood = load('amp_mood','fired');
 var appVibe = load('amp_vibe','focus');
@@ -1913,7 +1962,7 @@ function toggleScripture(){
   qIdx=Math.floor(Math.random()*pool.length);
   renderScriptureToggle();
   renderQuote();
-  scheduleLocalNotifications();
+  scheduleLocalNotifications(true);
 }
 
 function renderQuote(){
@@ -2097,6 +2146,23 @@ function renderPushHistory(){
   // hide suggestions after first message
   var sugg = document.getElementById('push-suggestions');
   if(sugg) sugg.style.display = pushHistory.length ? 'none' : 'flex';
+  updateNoGoalBanner();
+}
+
+function updateNoGoalBanner(){
+  var banner = document.getElementById('push-no-goal-banner');
+  if(!banner) return;
+  var allCountdowns = load('amp_countdowns',[]);
+  var hasGoal = allCountdowns.length > 0;
+  banner.style.display = (!hasGoal && pushHistory.length === 0) ? 'block' : 'none';
+}
+
+function startGoalDiscovery(category){
+  var banner = document.getElementById('push-no-goal-banner');
+  if(banner) banner.style.display = 'none';
+  var inp = document.getElementById('push-input');
+  if(inp) inp.value = 'I want to work on: ' + category + '. Help me figure out a real goal.';
+  sendPush();
 }
 
 function useSuggestion(btn){
@@ -2151,9 +2217,11 @@ async function sendPush(){
     memoryContext = ' Here is recent context from your conversation: '
       + recentHistory.slice(0,-1).map(function(m){return (m.role==='user'?'User':'You')+': '+m.text;}).join(' | ');
   }
+  var goalDiscoveryMode = !primaryGoal && pushHistory.length <= 2;
   var systemPrompt = 'You are the Push coach inside Amplify — a no-excuses accountability app. You are the one person in someone\'s life who tells them the truth with love. Direct. Warm. Never vague. Never preachy. You ask one sharp question at a time, not five. You validate feelings for one sentence then redirect toward action. You never use bullet points. You write like a real person — short texts, not essays. Under 120 words unless the moment genuinely needs more.'
     + (name ? ' The person you are coaching is '+name+'.' : '')
-    + (primaryGoal ? ' Their main goal right now is "'+primaryGoal+'". Every conversation should connect back to this when relevant.' : '')
+    + (goalDiscoveryMode ? ' The user has no goal set. They just told you a life area they want to work on. Ask ONE sharp question to help them get specific — something measurable or time-bound. In your next message suggest a concrete goal like: "How about setting this as your goal: [specific goal]?" Keep it under 80 words. Make them feel the possibility, not the pressure.' : '')
+    + (!goalDiscoveryMode && primaryGoal ? ' Their main goal right now is "'+primaryGoal+'". Every conversation should connect back to this when relevant.' : '')
     + (streakDays > 0 ? ' They are on a '+streakDays+'-day streak. Acknowledge this if it comes up — streaks are identity.' : '')
     + (doHabits ? ' They are building these habits: '+doHabits+'.' : '')
     + (dontHabits ? ' They are avoiding: '+dontHabits+'.' : '')
@@ -2239,7 +2307,15 @@ function showStreakMilestone(days){
   setTimeout(function(){if(overlay.parentNode) overlay.remove();},6000);
 }
 
-var reminders=load('amp_reminders',[{id:1,label:'Morning push',time:'07:00',on:true},{id:2,label:'Midday check-in',time:'12:00',on:true},{id:3,label:'Evening accountability',time:'20:00',on:true}]);
+var reminders=load('amp_reminders',[{id:1001,label:'Morning push',time:'07:00',on:true},{id:1002,label:'Midday check-in',time:'12:00',on:true},{id:1003,label:'Evening accountability',time:'20:00',on:true}]);
+// Migrate any old reminder IDs (1,2,3) to safe range (1001+) on first load
+(function migrateReminderIds(){
+  var changed=false;
+  reminders.forEach(function(r){
+    if(r.id < 1000){r.id = r.id + 1000; changed=true;}
+  });
+  if(changed) save('amp_reminders', reminders);
+})();
 function renderReminders(){
   var list=document.getElementById('reminder-list');
   if(!reminders.length){list.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,0.25);padding:8px 0;">No reminders yet.</div>';return;}
@@ -2264,7 +2340,7 @@ function addReminder(){
 }
 async function scheduleReminderNotif(r){
   // delegate to the unified scheduler which cancels all then reschedules cleanly
-  scheduleLocalNotifications();
+  scheduleLocalNotifications(true);
 }
 function toggleReminder(i){
   reminders[i].on=!reminders[i].on;
@@ -2295,7 +2371,7 @@ async function requestNotif(){
       if(result.receive === 'granted'){
         await PushNotifications.register();
         document.getElementById('alerts-notif-banner').style.display='none';
-        scheduleLocalNotifications();
+        scheduleLocalNotifications(true);
         alert('Notifications enabled! We will check in on you.');
       } else {
         alert('Please enable notifications in your iPhone Settings > Amplify.');
@@ -2309,69 +2385,145 @@ async function requestNotif(){
   });
 }
 
-async function scheduleLocalNotifications(){
+async function scheduleLocalNotifications(force){
   if(!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
   try{
     var perm = await LocalNotifications.requestPermissions();
     if(perm.display !== 'granted') return;
+
+    // Only reschedule if forced (settings change) or fewer than 7 core notifs pending
     var pending = await LocalNotifications.getPending();
-    if(pending && pending.notifications && pending.notifications.length){
-      await LocalNotifications.cancel({notifications: pending.notifications.map(function(n){return {id:n.id};})});
-    }
+    var pendingCount = (pending && pending.notifications) ? pending.notifications.filter(function(n){return n.id < 1000;}).length : 0;
+    if(!force && pendingCount >= 7) return;
+
+    // Cancel existing core notifications (ids < 1000) but leave custom reminders (id>=1000)
+    var toCancel = (pending && pending.notifications) ? pending.notifications.filter(function(n){return n.id < 1000;}) : [];
+    if(toCancel.length) await LocalNotifications.cancel({notifications: toCancel.map(function(n){return {id:n.id};})});
+
     var name = load('amp_name','');
     var streakDays = load('amp_streak_days',[]).length;
-    var morningMsg = drillSergeantOn ? getDSQuote('morning') : 'Take a breath — then take your first step. What matters most today'+(name?', '+name:'')+'?';
-    var middayMsg = drillSergeantOn ? getDSQuote('midday') : 'Halfway there. You still have time — how are you using it?';
-    var eveningMsg = drillSergeantOn ? getDSQuote('evening') : 'The day is winding down. Be honest with yourself — what did you actually do?';
-    var streakMsg = streakDays > 0
-      ? (drillSergeantOn ? 'Your '+streakDays+'-day streak dies tonight if you do not open the app and finish something.' : 'Your '+streakDays+'-day streak is at risk. Complete at least one goal before midnight.')
-      : (drillSergeantOn ? 'You have no streak to lose — which means you have nothing to show for yourself. Fix that tonight.' : 'Complete a goal tonight to start building your streak.');
     var quotePool = scriptureOn ? BIBLE_VERSES : QUOTES;
-    var morningQuote = quotePool[Math.floor(Math.random()*quotePool.length)];
-    var nightQuote = BIBLE_VERSES[Math.floor(Math.random()*BIBLE_VERSES.length)];
-    var quoteTitle = scriptureOn ? 'Scripture for today' : 'Today\'s fuel';
+    var quoteTitle = scriptureOn ? 'Scripture for today' : "Today's fuel";
     var morningTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
-    var middayTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
+    var middayTitle  = drillSergeantOn ? 'Sergeant' : 'Amplify';
     var eveningTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
 
-    // helper: get next occurrence of a specific hour/minute
-    function nextAt(hr, mn){
+    // Schedule explicit one-time notifications for next 14 days.
+    // repeats:true/every:'day' drifts on iOS after any reschedule — explicit dates do not.
+    var DAYS = 14;
+    var notifsToSchedule = [];
+
+    // Returns a Date at hr:mn on (today + dayOffset)
+    function dateAt(dayOffset, hr, mn){
       var d = new Date();
-      d.setSeconds(0); d.setMilliseconds(0);
       d.setHours(hr, mn, 0, 0);
-      if(d.getTime() <= Date.now()) d.setDate(d.getDate()+1);
+      d.setDate(d.getDate() + dayOffset);
       return d;
     }
 
-    var notifsToSchedule = [
-      {id:1, title:morningTitle, body:morningMsg, schedule:{at:nextAt(8,0), repeats:true, every:'day'}, sound:'default'},
-      {id:2, title:middayTitle, body:middayMsg, schedule:{at:nextAt(12,0), repeats:true, every:'day'}, sound:'default'},
-      {id:3, title:eveningTitle, body:eveningMsg, schedule:{at:nextAt(20,0), repeats:true, every:'day'}, sound:'default'},
-      {id:4, title:'Amplify', body:streakMsg, schedule:{at:nextAt(21,0), repeats:true, every:'day'}, sound:'default'},
-      {id:5, title:quoteTitle, body:'"'+morningQuote.t+'" — '+morningQuote.a, schedule:{at:nextAt(9,0), repeats:true, every:'day'}, sound:'default'},
-      {id:6, title:'Before you rest', body:'"'+nightQuote.t+'" — '+nightQuote.a, schedule:{at:nextAt(20,30), repeats:true, every:'day'}, sound:'default'},
-      {id:7, title:'Amplify', body:'What are you grateful for today? Take 30 seconds.', schedule:{at:nextAt(17,0), repeats:true, every:'day'}, sound:'default'},
-    ];
+    // Day 0 = today if slot is still in the future (60s buffer), else day 1
+    function startDay(hr, mn){
+      var slot = new Date(); slot.setHours(hr, mn, 0, 0);
+      return (slot.getTime() > Date.now() + 60000) ? 0 : 1;
+    }
 
-    // re-add active reminders
+    for(var day = 0; day < DAYS; day++){
+      var morningMsg = drillSergeantOn ? getDSQuote('morning') : 'Take a breath — then take your first step. What matters most today'+(name?', '+name:'')+'?';
+      var middayMsg  = drillSergeantOn ? getDSQuote('midday')  : 'Halfway there. You still have time — how are you using it?';
+      var eveningMsg = drillSergeantOn ? getDSQuote('evening') : 'The day is winding down. Be honest with yourself — what did you actually do?';
+      // Rotate streak messages so each night feels different
+      var streakMsgPool;
+      if(streakDays > 0){
+        if(drillSergeantOn){
+          streakMsgPool = [
+            'Your '+streakDays+'-day streak dies tonight if you do not finish something. Clock is running.',
+            streakDays+' days. Don’t be the person who breaks it over nothing. Get it done.',
+            'You’ve built '+streakDays+' days. One lazy night erases all of it. Not tonight.',
+            streakDays+'-day streak on the line. Finish at least one goal before midnight. No excuses.',
+            'You didn’t stack '+streakDays+' days to quit now. Complete something. Tonight.'
+          ];
+        } else {
+          streakMsgPool = [
+            'Your '+streakDays+'-day streak is at risk. Complete at least one goal before midnight.',
+            streakDays+' days strong — don’t let tonight be the one that breaks it.',
+            'You’ve shown up '+streakDays+' days in a row. One more to go. Finish something tonight.',
+            streakDays+'-day streak. End today with something done, not something postponed.',
+            'Day '+streakDays+' isn’t official until you complete a goal. You’ve got time.'
+          ];
+        }
+      } else {
+        if(drillSergeantOn){
+          streakMsgPool = [
+            'No streak. Nothing to show. Fix that tonight before midnight.',
+            'Day zero. That’s where you are. It changes tonight or it doesn’t — your call.',
+            'You have no streak because you haven’t finished anything. Change that right now.',
+            'Zero days. The only direction is up. Complete one goal tonight.',
+            'No streak means no momentum. Build one. Tonight. One goal. Go.'
+          ];
+        } else {
+          streakMsgPool = [
+            'Complete a goal tonight to start building your streak.',
+            'Every streak starts with day one. Tonight could be yours.',
+            'No streak yet — but that changes the moment you finish one goal tonight.',
+            'Day one is waiting for you. All it takes is finishing one thing tonight.',
+            'Start your streak tonight. One goal. That’s it.'
+          ];
+        }
+      }
+      var streakMsg = streakMsgPool[(day + Math.floor(Date.now()/86400000)) % streakMsgPool.length];
+      // Pick morningQuote — shuffle index per day so each day gets a different one
+      var morningQuote = quotePool[(Math.floor(Math.random()*1000) + day * 7) % quotePool.length];
+      // Pick nightQuote from BIBLE_VERSES, ensuring it's different from morningQuote
+      var nightIdx = (Math.floor(Math.random()*1000) + day * 13) % BIBLE_VERSES.length;
+      if(scriptureOn && BIBLE_VERSES[nightIdx].t === morningQuote.t){
+        nightIdx = (nightIdx + 1) % BIBLE_VERSES.length;
+      }
+      var nightQuote = BIBLE_VERSES[nightIdx];
+
+      // ID scheme: slot*100 + day  (keeps all core notifs under id 1000)
+      // slots: 1=8am morning, 2=12pm midday, 3=8pm evening, 4=9pm streak, 5=9am quote, 6=8:30pm night verse, 7=5pm gratitude
+      var d;
+      d = startDay(8,0)   + day; if(d < DAYS) notifsToSchedule.push({id:100+day, title:morningTitle, body:morningMsg, schedule:{at:dateAt(d,8,0)},    sound:'default'});
+      d = startDay(12,0)  + day; if(d < DAYS) notifsToSchedule.push({id:200+day, title:middayTitle,  body:middayMsg,  schedule:{at:dateAt(d,12,0)},   sound:'default'});
+      d = startDay(20,0)  + day; if(d < DAYS) notifsToSchedule.push({id:300+day, title:eveningTitle, body:eveningMsg, schedule:{at:dateAt(d,20,0)},   sound:'default'});
+      d = startDay(21,0)  + day; if(d < DAYS) notifsToSchedule.push({id:400+day, title:'Amplify',    body:streakMsg,  schedule:{at:dateAt(d,21,0)},   sound:'default'});
+      d = startDay(9,0)   + day; if(d < DAYS) notifsToSchedule.push({id:500+day, title:quoteTitle,   body:'"'+morningQuote.t+'" — '+morningQuote.a, schedule:{at:dateAt(d,9,0)},  sound:'default'});
+      d = startDay(20,30) + day; if(d < DAYS) notifsToSchedule.push({id:600+day, title:'Before you rest', body:'"'+nightQuote.t+'" — '+nightQuote.a, schedule:{at:dateAt(d,20,30)}, sound:'default'});
+      d = startDay(17,0)  + day; if(d < DAYS) notifsToSchedule.push({id:700+day, title:'Amplify',    body:'What are you grateful for today? Take 30 seconds.', schedule:{at:dateAt(d,17,0)}, sound:'default'});
+    }
+
+    // Safety net: drop any that somehow ended up in the past
+    notifsToSchedule = notifsToSchedule.filter(function(n){ return n.schedule.at.getTime() > Date.now() + 60000; });
+
+    // Add active custom reminders (ids >= 1000)
     var savedReminders = load('amp_reminders',[]);
     savedReminders.forEach(function(r){
-      if(r.on){
-        var parts=r.time.split(':');
-        notifsToSchedule.push({id:r.id, title:'Amplify', body:r.label, schedule:{at:nextAt(parseInt(parts[0]),parseInt(parts[1])), repeats:true, every:'day'}, sound:'default'});
+      if(r.on && r.id >= 1000){
+        var parts = r.time.split(':');
+        var hr = parseInt(parts[0]); var mn = parseInt(parts[1]);
+        for(var rd = 0; rd < DAYS; rd++){
+          var rday = startDay(hr,mn) + rd;
+          if(rday < DAYS){
+            var rdate = dateAt(rday, hr, mn);
+            if(rdate.getTime() > Date.now() + 60000){
+              notifsToSchedule.push({id: r.id*100 + rd, title:'Amplify', body:r.label, schedule:{at:rdate}, sound:'default'});
+            }
+          }
+        }
       }
     });
-    await LocalNotifications.schedule({notifications: notifsToSchedule});
+
+    if(notifsToSchedule.length) await LocalNotifications.schedule({notifications: notifsToSchedule});
     save('amp_notifs_scheduled', true);
 
-    // set up notification tap handlers for deep linking
+    // Notification tap -> deep link to correct tab
     LocalNotifications.addListener('localNotificationActionPerformed', function(action){
-      var id = action.notification.id;
+      var slot = Math.floor(action.notification.id / 100);
       var screen = 'home';
-      if(id===7) screen='goals'; // gratitude -> goals
-      else if(id===1||id===5||id===6) screen='home'; // morning/quote/night -> home
-      else if(id===2) screen='goals'; // midday -> goals
-      else if(id===3||id===4) screen='focus'; // evening/streak -> push
+      if(slot===7) screen='goals';
+      else if(slot===1||slot===5||slot===6) screen='home';
+      else if(slot===2) screen='goals';
+      else if(slot===3||slot===4) screen='focus';
       var btn = document.querySelector('.nav-btn[onclick*="'+screen+'"]');
       if(btn) btn.click();
     }).catch(function(){});
@@ -2416,7 +2568,7 @@ function toggleDrillSergeant(){
   renderDrillSergeantUI();
   updateNotifPreviews();
   // reschedule notifications with new DS setting
-  scheduleLocalNotifications();
+  scheduleLocalNotifications(true);
 }
 function renderDrillSergeantUI(){
   var toggle = document.getElementById('ds-toggle');
@@ -2520,6 +2672,16 @@ function checkReEngagement(){
   }catch(e){}
 }
 
+function checkDailyReschedule(){
+  // Once per calendar day, force-reschedule so streak count and messages are fresh
+  var lastReschedule = load('amp_last_reschedule_date','');
+  var todayStr = new Date().toISOString().slice(0,10);
+  if(lastReschedule !== todayStr){
+    save('amp_last_reschedule_date', todayStr);
+    scheduleLocalNotifications(true);
+  }
+}
+
 function initApp(){
   loadUser();
   renderQuote();
@@ -2543,6 +2705,7 @@ function initApp(){
   renderPushHistory();
   renderScriptureToggle();
   checkReEngagement();
+  checkDailyReschedule();
   checkProgressCard();
   setTimeout(function(){
     appReady=true;
