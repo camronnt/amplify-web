@@ -2422,8 +2422,10 @@ async function scheduleLocalNotifications(force){
     }
 
     // Day 0 = today if slot is still in the future (60s buffer), else day 1
+    // Correctly handles both hour and minute so 8:30pm != 8:00pm
     function startDay(hr, mn){
-      var slot = new Date(); slot.setHours(hr, mn, 0, 0);
+      var slot = new Date();
+      slot.setHours(hr, mn, 0, 0);
       return (slot.getTime() > Date.now() + 60000) ? 0 : 1;
     }
 
@@ -2482,14 +2484,23 @@ async function scheduleLocalNotifications(force){
 
       // ID scheme: slot*100 + day  (keeps all core notifs under id 1000)
       // slots: 1=8am morning, 2=12pm midday, 3=8pm evening, 4=9pm streak, 5=9am quote, 6=8:30pm night verse, 7=5pm gratitude
-      var d;
-      d = startDay(8,0)   + day; if(d < DAYS) notifsToSchedule.push({id:100+day, title:morningTitle, body:morningMsg, schedule:{at:dateAt(d,8,0)},    sound:'default'});
-      d = startDay(12,0)  + day; if(d < DAYS) notifsToSchedule.push({id:200+day, title:middayTitle,  body:middayMsg,  schedule:{at:dateAt(d,12,0)},   sound:'default'});
-      d = startDay(20,0)  + day; if(d < DAYS) notifsToSchedule.push({id:300+day, title:eveningTitle, body:eveningMsg, schedule:{at:dateAt(d,20,0)},   sound:'default'});
-      d = startDay(21,0)  + day; if(d < DAYS) notifsToSchedule.push({id:400+day, title:'Amplify',    body:streakMsg,  schedule:{at:dateAt(d,21,0)},   sound:'default'});
-      d = startDay(9,0)   + day; if(d < DAYS) notifsToSchedule.push({id:500+day, title:quoteTitle,   body:'"'+morningQuote.t+'" — '+morningQuote.a, schedule:{at:dateAt(d,9,0)},  sound:'default'});
-      d = startDay(20,30) + day; if(d < DAYS) notifsToSchedule.push({id:600+day, title:'Before you rest', body:'"'+nightQuote.t+'" — '+nightQuote.a, schedule:{at:dateAt(d,20,30)}, sound:'default'});
-      d = startDay(17,0)  + day; if(d < DAYS) notifsToSchedule.push({id:700+day, title:'Amplify',    body:'What are you grateful for today? Take 30 seconds.', schedule:{at:dateAt(d,17,0)}, sound:'default'});
+      // Each slot gets its own day offset so they never bleed into each other
+      // ID ranges: 100-113=8am, 200-213=12pm, 300-313=8pm, 400-413=9pm,
+      //            500-513=9am quote, 600-613=8:30pm verse, 700-713=5pm gratitude
+      var d1  = startDay(8,0)   + day;
+      var d2  = startDay(12,0)  + day;
+      var d3  = startDay(20,0)  + day;
+      var d4  = startDay(21,0)  + day;
+      var d5  = startDay(9,0)   + day;
+      var d6  = startDay(20,30) + day;  // 8:30pm — uses its own independent offset
+      var d7  = startDay(17,0)  + day;
+      if(d1 < DAYS) notifsToSchedule.push({id:100+day, title:morningTitle, body:morningMsg,                                                    schedule:{at:dateAt(d1,8,0)},    sound:'default'});
+      if(d2 < DAYS) notifsToSchedule.push({id:200+day, title:middayTitle,  body:middayMsg,                                                     schedule:{at:dateAt(d2,12,0)},   sound:'default'});
+      if(d3 < DAYS) notifsToSchedule.push({id:300+day, title:eveningTitle, body:eveningMsg,                                                    schedule:{at:dateAt(d3,20,0)},   sound:'default'});
+      if(d4 < DAYS) notifsToSchedule.push({id:400+day, title:'Amplify',    body:streakMsg,                                                     schedule:{at:dateAt(d4,21,0)},   sound:'default'});
+      if(d5 < DAYS) notifsToSchedule.push({id:500+day, title:quoteTitle,   body:'“'+morningQuote.t+'” — '+morningQuote.a,         schedule:{at:dateAt(d5,9,0)},    sound:'default'});
+      if(d6 < DAYS) notifsToSchedule.push({id:600+day, title:'Before you rest', body:'“'+nightQuote.t+'” — '+nightQuote.a,       schedule:{at:dateAt(d6,20,30)},  sound:'default'});
+      if(d7 < DAYS) notifsToSchedule.push({id:700+day, title:'Amplify',    body:'What are you grateful for today? Take 30 seconds.',           schedule:{at:dateAt(d7,17,0)},   sound:'default'});
     }
 
     // Safety net: drop any that somehow ended up in the past
