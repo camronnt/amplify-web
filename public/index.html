@@ -2394,7 +2394,7 @@ async function scheduleLocalNotifications(force){
     // Only reschedule if forced (settings change) or fewer than 7 core notifs pending
     var pending = await LocalNotifications.getPending();
     var pendingCount = (pending && pending.notifications) ? pending.notifications.filter(function(n){return n.id < 1000;}).length : 0;
-    if(!force && pendingCount >= 7) return;
+    if(!force && pendingCount >= 20) return; // reschedule when ~3 days remain
 
     // Cancel existing core notifications (ids < 1000) but leave custom reminders (id>=1000)
     var toCancel = (pending && pending.notifications) ? pending.notifications.filter(function(n){return n.id < 1000;}) : [];
@@ -2410,7 +2410,7 @@ async function scheduleLocalNotifications(force){
 
     // Schedule explicit one-time notifications for next 14 days.
     // repeats:true/every:'day' drifts on iOS after any reschedule — explicit dates do not.
-    var DAYS = 14;
+    var DAYS = 9; // iOS caps at 64 local notifs; 9 days x 7 slots = 63
     var notifsToSchedule = [];
 
     // Returns a Date at hr:mn on (today + dayOffset)
@@ -2498,8 +2498,10 @@ async function scheduleLocalNotifications(force){
       if(d2 < DAYS) notifsToSchedule.push({id:200+day, title:middayTitle,  body:middayMsg,                                                     schedule:{at:dateAt(d2,12,0)},   sound:'default'});
       if(d3 < DAYS) notifsToSchedule.push({id:300+day, title:eveningTitle, body:eveningMsg,                                                    schedule:{at:dateAt(d3,20,0)},   sound:'default'});
       if(d4 < DAYS) notifsToSchedule.push({id:400+day, title:'Amplify',    body:streakMsg,                                                     schedule:{at:dateAt(d4,21,0)},   sound:'default'});
-      if(d5 < DAYS) notifsToSchedule.push({id:500+day, title:quoteTitle,   body:'“'+morningQuote.t+'” — '+morningQuote.a,         schedule:{at:dateAt(d5,9,0)},    sound:'default'});
-      if(d6 < DAYS) notifsToSchedule.push({id:600+day, title:'Before you rest', body:'“'+nightQuote.t+'” — '+nightQuote.a,       schedule:{at:dateAt(d6,20,30)},  sound:'default'});
+      var qBody = (morningQuote.t.length > 120 ? morningQuote.t.slice(0,117)+'...' : morningQuote.t) + ' — ' + morningQuote.a;
+      var nBody = (nightQuote.t.length > 120 ? nightQuote.t.slice(0,117)+'...' : nightQuote.t) + ' — ' + nightQuote.a;
+      if(d5 < DAYS) notifsToSchedule.push({id:500+day, title:quoteTitle,        body:qBody, schedule:{at:dateAt(d5,9,0)},    sound:'default'});
+      if(d6 < DAYS) notifsToSchedule.push({id:600+day, title:'Before you rest', body:nBody, schedule:{at:dateAt(d6,20,30)},  sound:'default'});
       if(d7 < DAYS) notifsToSchedule.push({id:700+day, title:'Amplify',    body:'What are you grateful for today? Take 30 seconds.',           schedule:{at:dateAt(d7,17,0)},   sound:'default'});
     }
 
