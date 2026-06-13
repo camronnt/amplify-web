@@ -1576,9 +1576,9 @@ async function generateAITasks(){
     +(doHabits?' DO habits: '+doHabits+'.'  :'')
     +' Each task should be completable in one day, specific, and move the needle. Return ONLY a JSON array of strings, no preamble, no markdown. Example: ["Task one","Task two","Task three"]';
   try{
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+    var resp=await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'},
       body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,system:'Return only a JSON array of 3 task strings. No markdown, no explanation.',messages:[{role:'user',content:context}]})
     });
     var data=await resp.json();
@@ -1631,9 +1631,9 @@ async function checkWeeklySummary(){
   var recentInsights=insights.slice(-5).map(function(i){return i.text;}).join('. ');
   var prompt='Weekly check-in for '+(name||'this person')+'. Streak: '+streakDays+' days. Recent journal: '+recentInsights+'. Write a warm, personal Sunday reflection from their coach. Reference what you know about them. Under 100 words. No bullet points. Make it feel like a letter, not a report.';
   try{
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+    var resp=await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'},
       body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,system:'You are the Push coach in Amplify. Write a warm personal Sunday weekly reflection. Under 100 words. No bullet points.',messages:[{role:'user',content:prompt}]})
     });
     var data=await resp.json();
@@ -1663,9 +1663,9 @@ async function showProgressCard(streakDays){
   var prompt='The user has a '+streakDays+'-day streak'+(name?', name: '+name:'')+'. Recent context: '+summary+'. Write 2 sentences: how their coach sees their progress. Warm, specific, forward-looking. No fluff.';
   var coachView='You are showing up consistently. Keep building.';
   try{
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+    var resp=await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'},
       body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:100,system:'Two sentences. Warm and specific. No bullet points.',messages:[{role:'user',content:prompt}]})
     });
     var data=await resp.json();
@@ -2231,13 +2231,11 @@ async function sendPush(){
     + ' If someone mentions self-harm, suicide, or crisis — respond with care and say: "Please reach out to 988 (call or text). I\'m a coach, not a therapist, and you deserve real support right now."';
   var messages = [{role:'user', content: pushHistory[pushHistory.length-1].text}];
   try{
-    var resp = await fetch('https://api.anthropic.com/v1/messages',{
+    var resp = await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key':'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',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
       },
       body:JSON.stringify({
         model:'claude-haiku-4-5-20251001',
@@ -2269,13 +2267,11 @@ async function sendStreakMilestone(days){
   if(primary) primaryGoal=primary.name;
   var milestoneMsg = days+' days in a row'+(name?', '+name:'')+'. '+(primaryGoal?'Still working toward "'+primaryGoal+'". ':'')+'Say something real about what this streak means and what comes next. Under 80 words. No bullet points. Make it land.';
   try{
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+    var resp=await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/functions/v1/anthropic-proxy',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key':'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',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
       },
       body:JSON.stringify({
         model:'claude-haiku-4-5-20251001',
