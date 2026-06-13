@@ -1963,6 +1963,7 @@ function toggleScripture(){
   renderScriptureToggle();
   renderQuote();
   scheduleLocalNotifications(true);
+  syncPushPrefs();
 }
 
 function renderQuote(){
@@ -2372,6 +2373,7 @@ async function requestNotif(){
         await PushNotifications.register();
         document.getElementById('alerts-notif-banner').style.display='none';
         scheduleLocalNotifications(true);
+        registerDeviceForPush();
         alert('Notifications enabled! We will check in on you.');
       } else {
         alert('Please enable notifications in your iPhone Settings > Amplify.');
@@ -2391,157 +2393,210 @@ async function scheduleLocalNotifications(force){
     var perm = await LocalNotifications.requestPermissions();
     if(perm.display !== 'granted') return;
 
-    // Only reschedule if forced (settings change) or fewer than 7 core notifs pending
-    var pending = await LocalNotifications.getPending();
-    var pendingCount = (pending && pending.notifications) ? pending.notifications.filter(function(n){return n.id < 1000;}).length : 0;
-    if(!force && pendingCount >= 20) return; // reschedule when ~3 days remain
+    // ── HYBRID PUSH ARCHITECTURE ──────────────────────────────────────────────
+    // All quote/verse/morning/midday/afternoon/gratitude/evening slots are now
+    // handled server-side by the Supabase Edge Function (send-push) which fires
+    // at the correct LOCAL time for every user's timezone without needing the
+    // app to be open. Local notifications here handle ONLY the 9pm streak slot
+    // because streak count lives on-device and the server can't know it without
+    // a full sync layer.
+    //
+    // Custom reminders (user-set, id >= 1000) also stay local since they are
+    // per-device by definition.
+    // ─────────────────────────────────────────────────────────────────────────
 
-    // Cancel existing core notifications (ids < 1000) but leave custom reminders (id>=1000)
-    var toCancel = (pending && pending.notifications) ? pending.notifications.filter(function(n){return n.id < 1000;}) : [];
+    var pending = await LocalNotifications.getPending();
+    // Only count streak + reminder notifs (ids 90-96 and 900+)
+    var pendingCount = (pending && pending.notifications)
+      ? pending.notifications.filter(function(n){ return n.id >= 90; }).length : 0;
+    if(!force && pendingCount >= 10) return;
+
+    // Cancel only streak slots (90-96) — leave custom reminders (900+) alone
+    var toCancel = (pending && pending.notifications)
+      ? pending.notifications.filter(function(n){ return n.id >= 90 && n.id < 900; }) : [];
     if(toCancel.length) await LocalNotifications.cancel({notifications: toCancel.map(function(n){return {id:n.id};})});
 
-    var name = load('amp_name','');
-    var streakDays = load('amp_streak_days',[]).length;
-    var quotePool = scriptureOn ? BIBLE_VERSES : QUOTES;
-    var quoteTitle = scriptureOn ? 'Scripture for today' : "Today's fuel";
-    var morningTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
-    var middayTitle  = drillSergeantOn ? 'Sergeant' : 'Amplify';
-    var eveningTitle = drillSergeantOn ? 'Sergeant' : 'Amplify';
+    var streakDays  = load('amp_streak_days',[]).length;
+    var acctTitle   = drillSergeantOn ? 'Sergeant' : 'Amplify';
+    var todayNum    = Math.floor(Date.now() / 86400000);
 
-    // Schedule explicit one-time notifications for next 14 days.
-    // repeats:true/every:'day' drifts on iOS after any reschedule — explicit dates do not.
-    var DAYS = 9; // iOS caps at 64 local notifs; 9 days x 7 slots = 63
+    // 7 days x 1 slot (streak only) = 7 notifs — safely under iOS 64 cap.
+    // All other slots (quotes, morning, evening, etc.) are now server-side via
+    // the Supabase Edge Function which fires at the correct local time per timezone.
+    var DAYS = 7;
     var notifsToSchedule = [];
 
-    // Returns a Date at hr:mn on (today + dayOffset)
     function dateAt(dayOffset, hr, mn){
       var d = new Date();
-      d.setHours(hr, mn, 0, 0);
       d.setDate(d.getDate() + dayOffset);
+      d.setHours(hr, mn, 0, 0);
       return d;
     }
-
-    // Day 0 = today if slot is still in the future (60s buffer), else day 1
-    // Correctly handles both hour and minute so 8:30pm != 8:00pm
     function startDay(hr, mn){
       var slot = new Date();
       slot.setHours(hr, mn, 0, 0);
       return (slot.getTime() > Date.now() + 60000) ? 0 : 1;
     }
 
+    // SLOT 9 - 9pm streak notification (LOCAL ONLY - streak count is device-side)
     for(var day = 0; day < DAYS; day++){
-      var morningMsg = drillSergeantOn ? getDSQuote('morning') : 'Take a breath — then take your first step. What matters most today'+(name?', '+name:'')+'?';
-      var middayMsg  = drillSergeantOn ? getDSQuote('midday')  : 'Halfway there. You still have time — how are you using it?';
-      var eveningMsg = drillSergeantOn ? getDSQuote('evening') : 'The day is winding down. Be honest with yourself — what did you actually do?';
-      // Rotate streak messages so each night feels different
       var streakMsgPool;
       if(streakDays > 0){
-        if(drillSergeantOn){
-          streakMsgPool = [
-            'Your '+streakDays+'-day streak dies tonight if you do not finish something. Clock is running.',
-            streakDays+' days. Don’t be the person who breaks it over nothing. Get it done.',
-            'You’ve built '+streakDays+' days. One lazy night erases all of it. Not tonight.',
-            streakDays+'-day streak on the line. Finish at least one goal before midnight. No excuses.',
-            'You didn’t stack '+streakDays+' days to quit now. Complete something. Tonight.'
-          ];
-        } else {
-          streakMsgPool = [
-            'Your '+streakDays+'-day streak is at risk. Complete at least one goal before midnight.',
-            streakDays+' days strong — don’t let tonight be the one that breaks it.',
-            'You’ve shown up '+streakDays+' days in a row. One more to go. Finish something tonight.',
-            streakDays+'-day streak. End today with something done, not something postponed.',
-            'Day '+streakDays+' isn’t official until you complete a goal. You’ve got time.'
-          ];
-        }
+        streakMsgPool = drillSergeantOn ? [
+          'Your '+streakDays+'-day streak dies tonight if you don\'t finish something. Clock is running.',
+          streakDays+' days. Don\'t be the person who breaks it over nothing. Get it done.',
+          'You\'ve built '+streakDays+' days. One lazy night erases all of it. Not tonight.',
+          streakDays+'-day streak on the line. Finish at least one goal before midnight. No excuses.',
+          'You didn\'t stack '+streakDays+' days to quit now. Complete something. Tonight.'
+        ] : [
+          'Your '+streakDays+'-day streak is at risk. Complete at least one goal before midnight.',
+          streakDays+' days strong — don\'t let tonight be the one that breaks it.',
+          'You\'ve shown up '+streakDays+' days in a row. One more to go. Finish something tonight.',
+          streakDays+'-day streak. End today with something done, not something postponed.',
+          'Day '+streakDays+' isn\'t official until you complete a goal. You\'ve got time.'
+        ];
       } else {
-        if(drillSergeantOn){
-          streakMsgPool = [
-            'No streak. Nothing to show. Fix that tonight before midnight.',
-            'Day zero. That’s where you are. It changes tonight or it doesn’t — your call.',
-            'You have no streak because you haven’t finished anything. Change that right now.',
-            'Zero days. The only direction is up. Complete one goal tonight.',
-            'No streak means no momentum. Build one. Tonight. One goal. Go.'
-          ];
-        } else {
-          streakMsgPool = [
-            'Complete a goal tonight to start building your streak.',
-            'Every streak starts with day one. Tonight could be yours.',
-            'No streak yet — but that changes the moment you finish one goal tonight.',
-            'Day one is waiting for you. All it takes is finishing one thing tonight.',
-            'Start your streak tonight. One goal. That’s it.'
-          ];
-        }
+        streakMsgPool = drillSergeantOn ? [
+          'No streak. Nothing to show. Fix that tonight before midnight.',
+          'Day zero. That\'s where you are. It changes tonight or it doesn\'t — your call.',
+          'You have no streak because you haven\'t finished anything. Change that right now.',
+          'Zero days. The only direction is up. Complete one goal tonight.',
+          'No streak means no momentum. Build one. Tonight. One goal. Go.'
+        ] : [
+          'Complete a goal tonight to start building your streak.',
+          'Every streak starts with day one. Tonight could be yours.',
+          'No streak yet — but that changes the moment you finish one goal tonight.',
+          'Day one is waiting for you. All it takes is finishing one thing tonight.',
+          'Start your streak tonight. One goal. That\'s it.'
+        ];
       }
-      var streakMsg = streakMsgPool[(day + Math.floor(Date.now()/86400000)) % streakMsgPool.length];
-      // Pick morningQuote — shuffle index per day so each day gets a different one
-      var morningQuote = quotePool[(Math.floor(Math.random()*1000) + day * 7) % quotePool.length];
-      // Pick nightQuote from BIBLE_VERSES, ensuring it's different from morningQuote
-      var nightIdx = (Math.floor(Math.random()*1000) + day * 13) % BIBLE_VERSES.length;
-      if(scriptureOn && BIBLE_VERSES[nightIdx].t === morningQuote.t){
-        nightIdx = (nightIdx + 1) % BIBLE_VERSES.length;
-      }
-      var nightQuote = BIBLE_VERSES[nightIdx];
-
-      // ID scheme: slot*100 + day  (keeps all core notifs under id 1000)
-      // slots: 1=8am morning, 2=12pm midday, 3=8pm evening, 4=9pm streak, 5=9am quote, 6=8:30pm night verse, 7=5pm gratitude
-      // Each slot gets its own day offset so they never bleed into each other
-      // ID ranges: 100-113=8am, 200-213=12pm, 300-313=8pm, 400-413=9pm,
-      //            500-513=9am quote, 600-613=8:30pm verse, 700-713=5pm gratitude
-      var d1  = startDay(8,0)   + day;
-      var d2  = startDay(12,0)  + day;
-      var d3  = startDay(20,0)  + day;
-      var d4  = startDay(21,0)  + day;
-      var d5  = startDay(9,0)   + day;
-      var d6  = startDay(20,30) + day;  // 8:30pm — uses its own independent offset
-      var d7  = startDay(17,0)  + day;
-      if(d1 < DAYS) notifsToSchedule.push({id:100+day, title:morningTitle, body:morningMsg,                                                    schedule:{at:dateAt(d1,8,0)},    sound:'default'});
-      if(d2 < DAYS) notifsToSchedule.push({id:200+day, title:middayTitle,  body:middayMsg,                                                     schedule:{at:dateAt(d2,12,0)},   sound:'default'});
-      if(d3 < DAYS) notifsToSchedule.push({id:300+day, title:eveningTitle, body:eveningMsg,                                                    schedule:{at:dateAt(d3,20,0)},   sound:'default'});
-      if(d4 < DAYS) notifsToSchedule.push({id:400+day, title:'Amplify',    body:streakMsg,                                                     schedule:{at:dateAt(d4,21,0)},   sound:'default'});
-      var qBody = (morningQuote.t.length > 120 ? morningQuote.t.slice(0,117)+'...' : morningQuote.t) + ' — ' + morningQuote.a;
-      var nBody = (nightQuote.t.length > 120 ? nightQuote.t.slice(0,117)+'...' : nightQuote.t) + ' — ' + nightQuote.a;
-      if(d5 < DAYS) notifsToSchedule.push({id:500+day, title:quoteTitle,        body:qBody, schedule:{at:dateAt(d5,9,0)},    sound:'default'});
-      if(d6 < DAYS) notifsToSchedule.push({id:600+day, title:'Before you rest', body:nBody, schedule:{at:dateAt(d6,20,30)},  sound:'default'});
-      if(d7 < DAYS) notifsToSchedule.push({id:700+day, title:'Amplify',    body:'What are you grateful for today? Take 30 seconds.',           schedule:{at:dateAt(d7,17,0)},   sound:'default'});
+      var streakMsg = streakMsgPool[(todayNum + day) % streakMsgPool.length];
+      var d9 = startDay(21, 0) + day;
+      if(d9 < DAYS) notifsToSchedule.push({
+        id: 90 + day, title: acctTitle,
+        body: streakMsg,
+        schedule: {at: dateAt(d9, 21, 0)}, sound: 'default'
+      });
     }
 
-    // Safety net: drop any that somehow ended up in the past
-    notifsToSchedule = notifsToSchedule.filter(function(n){ return n.schedule.at.getTime() > Date.now() + 60000; });
-
-    // Add active custom reminders (ids >= 1000)
+    // CUSTOM REMINDERS (LOCAL) - user-set reminders stay on device
+    // Safe IDs: 900 + (rIdx * 10) + day — never collides with streak (90-96)
     var savedReminders = load('amp_reminders',[]);
-    savedReminders.forEach(function(r){
-      if(r.on && r.id >= 1000){
-        var parts = r.time.split(':');
-        var hr = parseInt(parts[0]); var mn = parseInt(parts[1]);
-        for(var rd = 0; rd < DAYS; rd++){
-          var rday = startDay(hr,mn) + rd;
-          if(rday < DAYS){
-            var rdate = dateAt(rday, hr, mn);
-            if(rdate.getTime() > Date.now() + 60000){
-              notifsToSchedule.push({id: r.id*100 + rd, title:'Amplify', body:r.label, schedule:{at:rdate}, sound:'default'});
-            }
-          }
+    savedReminders.forEach(function(r, rIdx){
+      if(!r.on || r.id < 1000) return;
+      var parts = r.time.split(':');
+      var hr = parseInt(parts[0]); var mn = parseInt(parts[1]);
+      for(var rd = 0; rd < DAYS; rd++){
+        var rday = startDay(hr, mn) + rd;
+        if(rday >= DAYS) return;
+        var rdate = dateAt(rday, hr, mn);
+        if(rdate.getTime() > Date.now() + 60000){
+          notifsToSchedule.push({
+            id: 900 + (rIdx * 10) + rd,
+            title: 'Amplify', body: r.label,
+            schedule: {at: rdate}, sound: 'default'
+          });
         }
       }
+    });
+
+    notifsToSchedule = notifsToSchedule.filter(function(n){
+      return n.schedule.at.getTime() > Date.now() + 60000;
     });
 
     if(notifsToSchedule.length) await LocalNotifications.schedule({notifications: notifsToSchedule});
     save('amp_notifs_scheduled', true);
 
-    // Notification tap -> deep link to correct tab
     LocalNotifications.addListener('localNotificationActionPerformed', function(action){
-      var slot = Math.floor(action.notification.id / 100);
-      var screen = 'home';
-      if(slot===7) screen='goals';
-      else if(slot===1||slot===5||slot===6) screen='home';
-      else if(slot===2) screen='goals';
-      else if(slot===3||slot===4) screen='focus';
+      var id = action.notification.id;
+      var screen = (id >= 90 && id < 100) ? 'focus' : 'home';
       var btn = document.querySelector('.nav-btn[onclick*="'+screen+'"]');
       if(btn) btn.click();
     }).catch(function(){});
 
   } catch(e){ console.log('Local notif error:',e); }
+}
+
+// SERVER-SIDE PUSH REGISTRATION
+// Registers device token + timezone + prefs with Supabase so the Edge Function
+// sends timezone-correct personalized pushes without app needing to be open.
+
+var SUPA_URL  = 'https://qrjrxgktwxklpmvkzhlh.supabase.co';
+var SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8';
+
+async function registerDeviceForPush(){
+  if(!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  try{
+    var PP = window.Capacitor.Plugins.PushNotifications;
+    if(!PP) return;
+    var perm = await PP.requestPermissions();
+    if(perm.receive !== 'granted') return;
+    await PP.register();
+
+    PP.addListener('registration', async function(tokenData){
+      var token    = tokenData.value;
+      var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
+      try{
+        await fetch(SUPA_URL + '/rest/v1/amp_devices', {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'apikey':        SUPA_ANON,
+            'Authorization': 'Bearer ' + SUPA_ANON,
+            'Prefer':        'resolution=merge-duplicates',
+          },
+          body: JSON.stringify({
+            device_token: token,
+            timezone:     timezone,
+            name:         load('amp_name',''),
+            scripture_on: load('amp_scripture', true),
+            ds_mode:      load('amp_ds_on', false),
+            streak_days:  load('amp_streak_days',[]).length,
+            last_seen:    new Date().toISOString(),
+            active:       true,
+          }),
+        });
+        save('amp_push_token', token);
+        console.log('Amplify: registered for server push, tz='+timezone);
+      } catch(e){ console.log('Amplify: token upload failed',e); }
+    });
+
+    PP.addListener('registrationError', function(e){ console.log('APNs reg error',e); });
+
+    PP.addListener('pushNotificationActionPerformed', function(action){
+      var slot = action.notification.data && action.notification.data.slot;
+      var map  = {goal_nudge:'home',morning:'home',quote:'fuel',midday:'goals',
+                  afternoon:'goals',gratitude:'goals',evening:'focus',verse:'fuel'};
+      var screen = map[slot] || 'home';
+      var btn = document.querySelector('.nav-btn[onclick*="'+screen+'"]');
+      if(btn) btn.click();
+    });
+  } catch(e){ console.log('Amplify: push setup error',e); }
+}
+
+async function syncPushPrefs(){
+  var token = load('amp_push_token','');
+  if(!token) return;
+  try{
+    await fetch(SUPA_URL + '/rest/v1/amp_devices', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPA_ANON,
+        'Authorization': 'Bearer ' + SUPA_ANON,
+        'Prefer':        'resolution=merge-duplicates',
+      },
+      body: JSON.stringify({
+        device_token: token,
+        name:         load('amp_name',''),
+        scripture_on: load('amp_scripture', true),
+        ds_mode:      load('amp_ds_on', false),
+        streak_days:  load('amp_streak_days',[]).length,
+        last_seen:    new Date().toISOString(),
+        active:       true,
+      }),
+    });
+  } catch(e){}
 }
 
 var DS_QUOTES = {
@@ -2580,8 +2635,8 @@ function toggleDrillSergeant(){
   save('amp_drill_sergeant', drillSergeantOn);
   renderDrillSergeantUI();
   updateNotifPreviews();
-  // reschedule notifications with new DS setting
   scheduleLocalNotifications(true);
+  syncPushPrefs();
 }
 function renderDrillSergeantUI(){
   var toggle = document.getElementById('ds-toggle');
@@ -2719,6 +2774,7 @@ function initApp(){
   renderScriptureToggle();
   checkReEngagement();
   checkDailyReschedule();
+  registerDeviceForPush();
   checkProgressCard();
   setTimeout(function(){
     appReady=true;
