@@ -199,6 +199,90 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .guide-actions{display:flex;gap:10px;width:100%;}
 .guide-skip{flex:1;background:transparent;border:1px solid #261f14;border-radius:8px;color:rgba(232,224,212,0.28);font-size:13px;padding:12px;cursor:pointer;font-family:-apple-system,sans-serif;}
 .guide-next{flex:2;background:#8B7040;border:none;border-radius:8px;color:#e8e0d4;font-size:14px;font-weight:700;padding:12px;cursor:pointer;font-family:-apple-system,sans-serif;}
+
+/* ── LIVE ROOMS ────────────────────────────────────────────────────── */
+.rooms-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.18);border-radius:20px;padding:7px 14px;cursor:pointer;margin-bottom:16px;width:100%;}
+.rooms-pill-dot{width:7px;height:7px;border-radius:50%;background:#4dcca0;animation:rpulse 1.8s ease-in-out infinite;}
+@keyframes rpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.rooms-pill-txt{font-size:12px;color:#C9A96E;font-weight:600;flex:1;}
+.rooms-pill-arrow{font-size:12px;color:rgba(201,169,110,0.5);}
+.rooms-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:990;align-items:flex-end;justify-content:center;}
+.rooms-sheet.open{display:flex;}
+.rooms-inner{background:#111009;border-radius:20px 20px 0 0;padding:0 0 40px;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;border-top:1px solid #1e1a12;}
+.rooms-handle{width:36px;height:4px;border-radius:2px;background:#2a2218;margin:14px auto 18px;}
+.rooms-section{padding:0 18px;}
+.rooms-section-label{font-size:10px;color:rgba(232,224,212,0.25);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+.room-card{background:#161410;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;border:1px solid #1e1a12;transition:border-color 0.15s;}
+.room-card:active{transform:scale(0.98);}
+.room-card.study{border-color:rgba(78,132,255,0.2);}
+.room-card.workout{border-color:rgba(226,75,74,0.2);}
+.room-card.deep{border-color:rgba(201,169,110,0.2);}
+.room-card.calm{border-color:rgba(29,158,117,0.2);}
+.room-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.room-card-name{font-size:16px;font-weight:700;color:#e8e0d4;font-family:Georgia,serif;}
+.room-card-count{font-size:11px;color:rgba(232,224,212,0.35);display:flex;align-items:center;gap:5px;}
+.room-count-dot{width:5px;height:5px;border-radius:50%;}
+.room-count-dot.study{background:#4e84ff;}
+.room-count-dot.workout{background:#E24B4A;}
+.room-count-dot.deep{background:#C9A96E;}
+.room-count-dot.calm{background:#1D9E75;}
+.room-card-meta{font-size:10px;color:rgba(232,224,212,0.22);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
+.room-card-activity{display:flex;gap:5px;flex-wrap:wrap;}
+.room-activity-chip{font-size:10px;padding:3px 8px;border-radius:20px;background:#1c1814;border:1px solid #2a2218;color:rgba(232,224,212,0.35);}
+.create-room-btn{width:100%;background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.2);border-radius:12px;color:#C9A96E;font-size:14px;font-weight:700;padding:14px;cursor:pointer;font-family:Georgia,serif;margin-top:4px;}
+.join-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:995;align-items:flex-end;justify-content:center;}
+.join-sheet.open{display:flex;}
+.join-inner{background:#111009;border-radius:20px 20px 0 0;padding:24px 20px 44px;width:100%;max-width:430px;border-top:1px solid #1e1a12;}
+.join-title{font-size:20px;font-weight:700;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:4px;}
+.join-sub{font-size:12px;color:rgba(232,224,212,0.32);margin-bottom:18px;}
+.join-lbl{font-size:11px;color:rgba(232,224,212,0.3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;display:block;}
+.join-inp{width:100%;background:#1c1814;border:1px solid #2a2218;border-radius:8px;color:#e8e0d4;font-size:14px;padding:11px 12px;outline:none;font-family:-apple-system,sans-serif;margin-bottom:14px;}
+.dur-row{display:flex;gap:6px;margin-bottom:16px;}
+.dur-btn{flex:1;background:#1c1814;border:1px solid #2a2218;border-radius:8px;color:rgba(232,224,212,0.38);font-size:12px;padding:9px 0;cursor:pointer;font-family:-apple-system,sans-serif;font-weight:600;text-align:center;}
+.dur-btn.sel{background:rgba(139,112,64,0.15);border-color:#8B7040;color:#C9A96E;}
+.vibe-row{display:flex;gap:6px;margin-bottom:18px;}
+.vibe-pick{flex:1;background:#1c1814;border:1px solid #2a2218;border-radius:8px;color:rgba(232,224,212,0.38);font-size:11px;padding:9px 4px;cursor:pointer;font-family:-apple-system,sans-serif;text-align:center;line-height:1.4;}
+.vibe-pick.sel{background:rgba(139,112,64,0.12);border-color:#8B7040;color:#C9A96E;}
+.lock-btn{width:100%;padding:14px;border-radius:10px;border:none;font-size:16px;font-weight:800;cursor:pointer;font-family:Georgia,serif;background:#8B7040;color:#e8e0d4;margin-bottom:10px;}
+.in-room-overlay{display:none;position:fixed;inset:0;background:#0f0e0c;z-index:985;flex-direction:column;}
+.in-room-overlay.open{display:flex;}
+.in-room-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #1e1a12;}
+.in-room-title{font-size:17px;font-weight:700;color:#e8e0d4;font-family:Georgia,serif;}
+.in-room-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.session-card{background:#161410;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #1e1a12;}
+.session-goal{font-size:16px;font-weight:700;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:12px;line-height:1.4;}
+.checkin-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.ci-chip{background:#1c1814;border:1px solid #302618;border-radius:20px;color:rgba(232,224,212,0.45);font-size:12px;font-weight:600;padding:7px 13px;cursor:pointer;font-family:-apple-system,sans-serif;}
+.ci-chip.sel{background:rgba(201,169,110,0.15);border-color:#8B7040;color:#C9A96E;}
+.ci-chip.done{background:rgba(29,158,117,0.15);border-color:#1D9E75;color:#4dcca0;}
+.timer-big{font-size:52px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;font-variant-numeric:tabular-nums;letter-spacing:-2px;text-align:center;padding:8px 0;}
+.music-bar-room{background:#1c1814;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.music-eq{display:flex;gap:2px;align-items:flex-end;height:14px;}
+.music-eq-bar{width:3px;border-radius:1px;background:#4dcca0;}
+.music-eq-bar:nth-child(1){animation:eq1 0.9s ease-in-out infinite;}
+.music-eq-bar:nth-child(2){animation:eq1 0.9s ease-in-out infinite 0.15s;}
+.music-eq-bar:nth-child(3){animation:eq1 0.9s ease-in-out infinite 0.3s;}
+@keyframes eq1{0%,100%{height:4px;}50%{height:14px;}}
+.feed-section{margin-bottom:14px;}
+.feed-label{font-size:10px;color:rgba(232,224,212,0.25);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.feed-item{background:#161410;border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.feed-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.feed-info{flex:1;min-width:0;}
+.feed-name{font-size:12px;font-weight:600;color:#e8e0d4;}
+.feed-goal-txt{font-size:11px;color:rgba(232,224,212,0.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.feed-badge{font-size:10px;padding:3px 8px;border-radius:20px;flex-shrink:0;font-weight:600;}
+.badge-started{background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.2);color:#C9A96E;}
+.badge-progress{background:rgba(78,132,255,0.1);border:1px solid rgba(78,132,255,0.2);color:#7aa6ff;}
+.badge-almost{background:rgba(193,155,80,0.12);border:1px solid rgba(193,155,80,0.25);color:#d4a84a;}
+.badge-done{background:rgba(29,158,117,0.12);border:1px solid rgba(29,158,117,0.25);color:#4dcca0;}
+.react-row{display:flex;gap:6px;margin-top:8px;}
+.react-btn-room{background:#1c1814;border:1px solid #2a2218;border-radius:6px;font-size:14px;padding:5px 10px;cursor:pointer;}
+.done-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+.done-overlay.open{display:flex;}
+.private-code-box{background:#1c1814;border:1px solid #2a2218;border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+.private-code{font-size:32px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;letter-spacing:4px;text-align:center;margin:8px 0;}
+.code-input-row{display:flex;gap:8px;margin-bottom:16px;}
+
 </style>
 </head>
 <body>
@@ -313,6 +397,14 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
     <div id="micro-list"></div>
     <div style="font-size:11px;color:rgba(29,158,117,0.5);margin-top:8px;">Just pick one. That's enough.</div>
   </div>
+  
+  <!-- LIVE ROOMS ENTRY -->
+  <div class="rooms-pill" onclick="openRoomsSheet()">
+    <div class="rooms-pill-dot"></div>
+    <div class="rooms-pill-txt" id="rooms-pill-txt">People are locking in right now. Join them.</div>
+    <div class="rooms-pill-arrow">→</div>
+  </div>
+
   <div id="countdown-list"></div>
   <button class="btn btn-g" style="width:100%;margin-bottom:12px;" onclick="openAddCountdownModal()">+ Add countdown</button>
 </div>
@@ -2860,6 +2952,825 @@ function dismissWidgetPrompt(){
   save('amp_widget_prompt_shown', true);
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// LIVE ROOMS
+// ═══════════════════════════════════════════════════════════════
+
+var roomState = {
+  active: false,
+  roomId: null,
+  roomType: null,
+  roomName: null,
+  vibeKey: null,
+  goal: null,
+  durationMins: 45,
+  timerSecs: 0,
+  timerInterval: null,
+  sessionId: null,
+  isPrivate: false,
+  roomCode: null,
+  musicPlaying: false,
+  audioCtx: null,
+  audioNodes: [],
+  realtimeChannel: null,
+};
+
+var joinState = {
+  roomType: null,
+  roomName: null,
+  colorClass: null,
+  vibeKey: null,
+  durationMins: 45,
+  privateDurationMins: 60,
+  privateVibe: 'lofi',
+};
+
+// ── Profanity filter (basic) ───────────────────────────────────
+var BAD_WORDS = ['fuck','shit','ass','bitch','damn','crap','dick','pussy','cock','nigga','nigger','faggot','retard'];
+function cleanName(name){
+  if(!name) return 'Anonymous';
+  var lower = name.toLowerCase();
+  for(var i=0;i<BAD_WORDS.length;i++){
+    if(lower.indexOf(BAD_WORDS[i])>-1) return 'Anonymous';
+  }
+  return name;
+}
+
+// ── Room counts (loaded from Supabase) ────────────────────────
+function loadRoomCounts(){
+  var types = ['study','workout','deep','calm'];
+  types.forEach(function(t){
+    fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions?select=id,status&room_type=eq.'+t+'&status=eq.active&is_private=eq.false',{
+      headers:{
+        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
+      }
+    }).then(function(r){return r.json();}).then(function(data){
+      var count = Array.isArray(data) ? data.length : 0;
+      var el = document.getElementById('room-count-'+t);
+      if(el) el.textContent = count + ' in here';
+      var pill = document.getElementById('rooms-pill-txt');
+      if(pill){
+        var total = 0;
+        ['study','workout','deep','calm'].forEach(function(rt){
+          var e = document.getElementById('room-count-'+rt);
+          if(e) total += parseInt(e.textContent)||0;
+        });
+        pill.textContent = total > 0
+          ? total+' people are locking in right now. Join them.'
+          : 'Start a session with others. Join a room.';
+      }
+    }).catch(function(){});
+  });
+}
+
+// ── Open / close rooms sheet ──────────────────────────────────
+function openRoomsSheet(){
+  document.getElementById('rooms-sheet').classList.add('open');
+  loadRoomCounts();
+}
+function closeRoomsSheet(){
+  document.getElementById('rooms-sheet').classList.remove('open');
+}
+
+// ── Join sheet ────────────────────────────────────────────────
+function openJoinSheet(type, name, colorClass, vibe){
+  joinState.roomType = type;
+  joinState.roomName = name;
+  joinState.colorClass = colorClass;
+  joinState.vibeKey = vibe;
+  document.getElementById('join-sheet-title').textContent = 'Join '+name;
+  // Pre-fill goal from current tasks
+  var tasks = load('amp_tasks',[])||[];
+  var todayStr = new Date().toDateString();
+  var todayTask = tasks.find(function(t){ return new Date(t.date).toDateString()===todayStr && !t.done; });
+  document.getElementById('join-goal-inp').value = todayTask ? todayTask.text : '';
+  document.getElementById('join-sheet').classList.add('open');
+}
+function closeJoinSheet(){
+  document.getElementById('join-sheet').classList.remove('open');
+}
+function selectDur(el, mins){
+  document.querySelectorAll('.dur-row .dur-btn').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+  joinState.durationMins = mins;
+}
+
+// ── Private room ──────────────────────────────────────────────
+function openCreatePrivate(){
+  document.getElementById('rooms-sheet').classList.remove('open');
+  document.getElementById('create-private-sheet').classList.add('open');
+}
+function selectVibe(el, vibe){
+  document.querySelectorAll('.vibe-pick').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+  joinState.privateVibe = vibe;
+}
+function selectPrivateDur(el, mins){
+  document.querySelectorAll('#private-dur-row .dur-btn').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+  joinState.privateDurationMins = mins;
+}
+function generateRoomCode(){
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code = 'AMP-';
+  for(var i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+async function createPrivateRoom(){
+  var name = document.getElementById('private-room-name').value.trim();
+  var goal = document.getElementById('private-room-goal').value.trim();
+  if(!name){ document.getElementById('private-room-name').focus(); return; }
+  if(!goal){ document.getElementById('private-room-goal').focus(); return; }
+  var code = generateRoomCode();
+  roomState.roomCode = code;
+  roomState.isPrivate = true;
+  joinState.roomType = 'private';
+  joinState.roomName = name;
+  joinState.vibeKey = joinState.privateVibe;
+  joinState.durationMins = joinState.privateDurationMins;
+  // Save to Supabase
+  try{
+    await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Prefer':'return=representation'
+      },
+      body:JSON.stringify({
+        room_type:'private', room_name:name, room_code:code,
+        user_name:cleanName(load('amp_name','') || 'Anonymous'),
+        goal:goal, status:'waiting', is_private:true,
+        vibe:joinState.privateVibe, duration_mins:joinState.privateDurationMins,
+        check_in:'Just started', started_at:new Date().toISOString()
+      })
+    });
+  }catch(e){}
+  document.getElementById('create-private-sheet').classList.remove('open');
+  document.getElementById('created-room-code').textContent = code;
+  document.getElementById('private-created-sheet').classList.add('open');
+}
+function shareRoomCode(){
+  var code = roomState.roomCode || document.getElementById('created-room-code').textContent;
+  var link = 'https://camronnt.github.io/amplify-web?room='+code;
+  var text = 'Join me in my Amplify room! Code: '+code+' or tap the link: '+link;
+  if(navigator.share){
+    navigator.share({title:'Join my Amplify room',text:text,url:link});
+  } else {
+    navigator.clipboard && navigator.clipboard.writeText(text);
+    showToast('Link copied!');
+  }
+}
+function joinCreatedRoom(){
+  document.getElementById('private-created-sheet').classList.remove('open');
+  enterRoom(joinState.roomName, joinState.vibeKey, joinState.durationMins, true);
+}
+async function joinPrivateByCode(){
+  var code = document.getElementById('private-code-input').value.trim().toUpperCase();
+  if(!code){ return; }
+  try{
+    var r = await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions?room_code=eq.'+code+'&status=in.(waiting,active)&select=*&limit=1',{
+      headers:{
+        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
+      }
+    });
+    var data = await r.json();
+    if(!data || !data.length){ showToast('Room not found. Check the code.'); return; }
+    var room = data[0];
+    joinState.roomType = 'private';
+    joinState.roomName = room.room_name;
+    joinState.vibeKey = room.vibe || 'lofi';
+    joinState.durationMins = room.duration_mins || 60;
+    roomState.roomCode = code;
+    roomState.isPrivate = true;
+    document.getElementById('rooms-sheet').classList.remove('open');
+    openJoinSheet('private', room.room_name, 'deep', room.vibe || 'lofi');
+  }catch(e){ showToast('Could not find that room.'); }
+}
+
+// ── Confirm join and enter room ───────────────────────────────
+async function confirmJoin(){
+  var goal = document.getElementById('join-goal-inp').value.trim();
+  if(!goal){ document.getElementById('join-goal-inp').focus(); return; }
+  document.getElementById('join-sheet').classList.remove('open');
+  document.getElementById('rooms-sheet').classList.remove('open');
+  // Register session in Supabase
+  var userName = cleanName(load('amp_name','') || 'Anonymous');
+  try{
+    var r = await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Prefer':'return=representation'
+      },
+      body:JSON.stringify({
+        room_type:joinState.roomType, room_name:joinState.roomName,
+        room_code:roomState.roomCode||null,
+        user_name:userName, goal:goal, status:'active',
+        is_private:roomState.isPrivate||false,
+        vibe:joinState.vibeKey, duration_mins:joinState.durationMins,
+        check_in:'Just started', started_at:new Date().toISOString()
+      })
+    });
+    var data = await r.json();
+    if(data && data[0]) roomState.sessionId = data[0].id;
+  }catch(e){}
+  enterRoom(joinState.roomName, joinState.vibeKey, joinState.durationMins, false, goal);
+}
+
+// ── Enter room ────────────────────────────────────────────────
+function enterRoom(name, vibe, durationMins, isCreator, goal){
+  roomState.active = true;
+  roomState.roomName = name;
+  roomState.vibeKey = vibe;
+  roomState.durationMins = durationMins;
+  roomState.timerSecs = durationMins * 60;
+  document.getElementById('in-room-title').textContent = name;
+  document.getElementById('session-goal-display').textContent = goal || joinState.roomName;
+  document.getElementById('room-timer-display').textContent = formatRoomTime(roomState.timerSecs);
+  var musicLabels = {lofi:'Lofi beats playing',hype:'Hype beats playing',ambient:'Ambient sounds playing',rain:'Rain sounds playing'};
+  document.getElementById('music-label-room').textContent = musicLabels[vibe] || 'Music playing';
+  document.getElementById('in-room-overlay').classList.add('open');
+  // Start timer
+  clearInterval(roomState.timerInterval);
+  roomState.timerInterval = setInterval(function(){
+    roomState.timerSecs--;
+    document.getElementById('room-timer-display').textContent = formatRoomTime(roomState.timerSecs);
+    if(roomState.timerSecs <= 0){
+      clearInterval(roomState.timerInterval);
+      finishSession();
+    }
+  }, 1000);
+  // Start music
+  startRoomMusic(vibe);
+  // Subscribe to Realtime feed
+  subscribeToRoom();
+  // Reset check-in chips
+  document.querySelectorAll('.ci-chip').forEach(function(c){c.classList.remove('sel');});
+  // Update widget
+  save('amp_in_room', true);
+  save('amp_room_name', name);
+  syncWidgetData();
+}
+
+function formatRoomTime(secs){
+  var m = Math.floor(Math.abs(secs)/60);
+  var s = Math.abs(secs)%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+
+// ── Leave room ────────────────────────────────────────────────
+async function leaveRoom(){
+  if(!confirm('Leave this room? Your session will end.')) return;
+  endRoomSession();
+}
+async function endRoomSession(){
+  clearInterval(roomState.timerInterval);
+  stopRoomMusic();
+  if(roomState.sessionId){
+    try{
+      await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions?id=eq.'+roomState.sessionId,{
+        method:'PATCH',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+          'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
+        },
+        body:JSON.stringify({status:'done', ended_at:new Date().toISOString()})
+      });
+    }catch(e){}
+  }
+  if(roomState.realtimeChannel){
+    try{ roomState.realtimeChannel.unsubscribe(); }catch(e){}
+    roomState.realtimeChannel = null;
+  }
+  roomState.active = false;
+  roomState.sessionId = null;
+  document.getElementById('in-room-overlay').classList.remove('open');
+  save('amp_in_room', false);
+  syncWidgetData();
+}
+
+// ── Check in ─────────────────────────────────────────────────
+async function checkIn(el, status){
+  document.querySelectorAll('.ci-chip').forEach(function(c){c.classList.remove('sel');});
+  el.classList.add('sel');
+  showToast('Checked in: '+status);
+  if(roomState.sessionId){
+    try{
+      await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions?id=eq.'+roomState.sessionId,{
+        method:'PATCH',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+          'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
+        },
+        body:JSON.stringify({check_in:status})
+      });
+    }catch(e){}
+  }
+}
+
+// ── Finish session (Done 🔥) ───────────────────────────────────
+async function finishSession(){
+  clearInterval(roomState.timerInterval);
+  stopRoomMusic();
+  if(roomState.sessionId){
+    try{
+      await fetch('https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions?id=eq.'+roomState.sessionId,{
+        method:'PATCH',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+          'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
+        },
+        body:JSON.stringify({check_in:'Done 🔥', status:'done', ended_at:new Date().toISOString()})
+      });
+    }catch(e){}
+  }
+  // Fire confetti
+  fireRoomConfetti();
+  // Show done overlay
+  var mins = roomState.durationMins;
+  document.getElementById('done-message').textContent = 'You locked in for '+mins+' minutes. That\'s what matters.';
+  document.getElementById('in-room-overlay').classList.remove('open');
+  document.getElementById('done-overlay').classList.add('open');
+  save('amp_in_room', false);
+  syncWidgetData();
+}
+
+function closeDoneOverlay(){
+  document.getElementById('done-overlay').classList.remove('open');
+  roomState.active = false;
+  roomState.sessionId = null;
+  if(roomState.realtimeChannel){
+    try{ roomState.realtimeChannel.unsubscribe(); }catch(e){}
+    roomState.realtimeChannel = null;
+  }
+}
+
+// ── Confetti ──────────────────────────────────────────────────
+function fireRoomConfetti(){
+  var canvas = document.createElement('canvas');
+  canvas.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:1000;width:100%;height:100%;';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  var particles = [];
+  var colors = ['#C9A96E','#4dcca0','#7aa6ff','#ff7b7b','#e8e0d4'];
+  for(var i=0;i<80;i++){
+    particles.push({
+      x:Math.random()*canvas.width, y:-10,
+      w:Math.random()*8+4, h:Math.random()*4+2,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      vx:(Math.random()-0.5)*4, vy:Math.random()*4+2,
+      rot:Math.random()*360, vr:(Math.random()-0.5)*8
+    });
+  }
+  var frame = 0;
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(function(p){
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<120) requestAnimationFrame(animate);
+    else document.body.removeChild(canvas);
+  }
+  animate();
+}
+
+// ── Share session card ────────────────────────────────────────
+function shareRoomLink(){
+  var link = 'https://camronnt.github.io/amplify-web?room='+(roomState.roomCode||joinState.roomType||'study');
+  var text = 'Locking in on Amplify — join me in the '+roomState.roomName+'! '+link;
+  if(navigator.share){
+    navigator.share({title:'Join my Amplify room',text:text,url:link});
+  } else {
+    navigator.clipboard && navigator.clipboard.writeText(text);
+    showToast('Link copied!');
+  }
+}
+
+function shareSessionCard(){
+  var text = 'Just finished a '+roomState.durationMins+'-minute session in the '+roomState.roomName+' on Amplify 🔥 Download the app and join me next time.';
+  if(navigator.share){
+    navigator.share({title:'Session complete on Amplify',text:text});
+  } else {
+    navigator.clipboard && navigator.clipboard.writeText(text);
+    showToast('Copied!');
+  }
+  closeDoneOverlay();
+}
+
+function sendReaction(emoji){
+  showToast(emoji+' sent to the room');
+}
+
+// ── Realtime feed ─────────────────────────────────────────────
+function subscribeToRoom(){
+  // Load current room members via REST first
+  loadRoomFeed();
+  // Then poll every 30s as a lightweight realtime alternative
+  // (Full Supabase Realtime JS lib would need a CDN import)
+  roomState.feedPollInterval = setInterval(loadRoomFeed, 30000);
+}
+
+async function loadRoomFeed(){
+  var type = joinState.roomType;
+  var isPrivate = roomState.isPrivate;
+  var code = roomState.roomCode;
+  try{
+    var url = 'https://qrjrxgktwxklpmvkzhlh.supabase.co/rest/v1/amp_room_sessions?status=eq.active&select=user_name,goal,check_in,vibe&order=started_at.asc&limit=10';
+    if(isPrivate && code) url += '&room_code=eq.'+code;
+    else url += '&room_type=eq.'+type+'&is_private=eq.false';
+    var r = await fetch(url,{
+      headers:{
+        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8',
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyanJ4Z2t0d3hrbHBtdmt6aGxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzk0OTUsImV4cCI6MjA5NDcxNTQ5NX0.2b0fY5AW1NXA-_fpJTSO9vuKW-xsBMgdjjuqSYNQRW8'
+      }
+    });
+    var data = await r.json();
+    renderRoomFeed(Array.isArray(data)?data:[]);
+  }catch(e){}
+}
+
+function renderRoomFeed(sessions){
+  var feed = document.getElementById('room-feed');
+  if(!feed) return;
+  var avatarColors = ['rgba(78,132,255,0.15)','rgba(29,158,117,0.15)','rgba(201,169,110,0.15)','rgba(226,75,74,0.15)','rgba(127,119,221,0.15)'];
+  var textColors = ['#7aa6ff','#4dcca0','#C9A96E','#ff7b7b','#9b96e0'];
+  var badgeMap = {
+    'Just started':'<div class="feed-badge badge-started">Just started</div>',
+    'Making progress':'<div class="feed-badge badge-progress">Making progress</div>',
+    'Almost done':'<div class="feed-badge badge-almost">Almost done</div>',
+    'Done 🔥':'<div class="feed-badge badge-done">Done 🔥</div>'
+  };
+  if(!sessions.length){
+    feed.innerHTML = '<div style="font-size:12px;color:rgba(232,224,212,0.25);text-align:center;padding:20px;">You\'re the first one here. Hold it down.</div>';
+    return;
+  }
+  feed.innerHTML = sessions.map(function(s,i){
+    var initials = (s.user_name||'?').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    var ci = i % avatarColors.length;
+    var badge = badgeMap[s.check_in] || '<div class="feed-badge badge-started">'+s.check_in+'</div>';
+    return '<div class="feed-item"><div class="feed-avatar" style="background:'+avatarColors[ci]+';color:'+textColors[ci]+';">'+initials+'</div><div class="feed-info"><div class="feed-name">'+s.user_name+'</div><div class="feed-goal-txt">'+(s.goal||'')+'</div></div>'+badge+'</div>';
+  }).join('');
+}
+
+// ── Music engine (Web Audio API) ──────────────────────────────
+function startRoomMusic(vibe){
+  try{
+    var ctx = new (window.AudioContext||window.webkitAudioContext)();
+    roomState.audioCtx = ctx;
+    roomState.audioNodes = [];
+    roomState.musicPlaying = true;
+    if(vibe==='lofi') buildLofi(ctx);
+    else if(vibe==='hype') buildHype(ctx);
+    else if(vibe==='ambient') buildAmbient(ctx);
+    else if(vibe==='rain') buildRain(ctx);
+  }catch(e){ console.log('Audio error',e); }
+}
+
+function stopRoomMusic(){
+  if(roomState.audioCtx){
+    try{ roomState.audioCtx.close(); }catch(e){}
+    roomState.audioCtx = null;
+  }
+  roomState.audioNodes = [];
+  roomState.musicPlaying = false;
+}
+
+function toggleRoomMusic(){
+  if(roomState.musicPlaying){
+    stopRoomMusic();
+    document.querySelector('[onclick="toggleRoomMusic()"]').textContent = 'Play';
+    document.getElementById('music-bar-room').style.opacity = '0.4';
+  } else {
+    startRoomMusic(joinState.vibeKey);
+    document.querySelector('[onclick="toggleRoomMusic()"]').textContent = 'Pause';
+    document.getElementById('music-bar-room').style.opacity = '1';
+  }
+}
+
+function makeNoise(ctx, type, freq, gain, fadeIn){
+  var buf = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+  var data = buf.getChannelData(0);
+  for(var i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
+  var src = ctx.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  var filt = ctx.createBiquadFilter();
+  filt.type = type; filt.frequency.value = freq;
+  var gainNode = ctx.createGain();
+  gainNode.gain.setValueAtTime(0, ctx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(gain, ctx.currentTime+(fadeIn||1));
+  src.connect(filt); filt.connect(gainNode); gainNode.connect(ctx.destination);
+  src.start();
+  roomState.audioNodes.push(src, gainNode);
+  return {src,filt,gain:gainNode};
+}
+
+function makeTone(ctx, freq, gain, type){
+  var osc = ctx.createOscillator();
+  var gainNode = ctx.createGain();
+  osc.type = type||'sine'; osc.frequency.value = freq;
+  gainNode.gain.setValueAtTime(0,ctx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(gain, ctx.currentTime+2);
+  osc.connect(gainNode); gainNode.connect(ctx.destination);
+  osc.start();
+  roomState.audioNodes.push(osc, gainNode);
+  return {osc, gain:gainNode};
+}
+
+function buildLofi(ctx){
+  makeNoise(ctx,'lowpass',800,0.04,2);   // warm brown noise base
+  makeNoise(ctx,'bandpass',200,0.02,3);  // low rumble
+  // Simple pentatonic melody
+  var notes = [261.6,293.7,329.6,392,440,523.3];
+  function playNote(){
+    if(!roomState.musicPlaying || !roomState.audioCtx) return;
+    var freq = notes[Math.floor(Math.random()*notes.length)];
+    var osc = ctx.createOscillator();
+    var g = ctx.createGain();
+    osc.type='sine'; osc.frequency.value=freq;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.06,ctx.currentTime+0.1);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.5);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime+1.6);
+    setTimeout(playNote, 800+Math.random()*1200);
+  }
+  setTimeout(playNote, 500);
+}
+
+function buildHype(ctx){
+  makeNoise(ctx,'highpass',200,0.05,1);
+  makeNoise(ctx,'bandpass',800,0.03,1);
+  makeTone(ctx,55,0.08,'sawtooth');
+  makeTone(ctx,110,0.04,'square');
+  // Beat pulse
+  function beat(){
+    if(!roomState.musicPlaying || !roomState.audioCtx) return;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.15,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
+    var buf = ctx.createBuffer(1,ctx.sampleRate*0.1,ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    var s = ctx.createBufferSource();
+    s.buffer=buf; s.connect(g); g.connect(ctx.destination); s.start();
+    setTimeout(beat, 500);
+  }
+  setTimeout(beat,200);
+}
+
+function buildAmbient(ctx){
+  makeNoise(ctx,'lowpass',400,0.06,4);
+  makeTone(ctx,80,0.04,'sine');
+  makeTone(ctx,120,0.02,'sine');
+  makeTone(ctx,160,0.015,'sine');
+}
+
+function buildRain(ctx){
+  makeNoise(ctx,'highpass',1000,0.08,2);
+  makeNoise(ctx,'bandpass',3000,0.04,3);
+  makeNoise(ctx,'lowpass',300,0.03,4);
+  // Occasional thunder rumble
+  function thunder(){
+    if(!roomState.musicPlaying || !roomState.audioCtx) return;
+    var g = ctx.createGain();
+    var t = ctx.currentTime;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.06,t+0.3);
+    g.gain.exponentialRampToValueAtTime(0.001,t+3);
+    var buf = ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    var filt = ctx.createBiquadFilter();
+    filt.type='lowpass'; filt.frequency.value=80;
+    var s = ctx.createBufferSource();
+    s.buffer=buf; s.connect(filt); filt.connect(g); g.connect(ctx.destination); s.start();
+    setTimeout(thunder, 15000+Math.random()*25000);
+  }
+  setTimeout(thunder, 8000);
+}
+
+// ── Toast ─────────────────────────────────────────────────────
+var _toastTimer;
+function showToast(msg){
+  var t = document.getElementById('toast-msg');
+  if(!t){
+    t = document.createElement('div');
+    t.id='toast-msg';
+    t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;font-size:13px;font-weight:700;padding:10px 20px;border-radius:8px;z-index:2000;opacity:0;transition:opacity 0.2s;white-space:nowrap;pointer-events:none;font-family:-apple-system,sans-serif;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){t.style.opacity='0';},2200);
+}
+
+// ── Init rooms on app load ────────────────────────────────────
+function initRooms(){
+  loadRoomCounts();
+  // Check for deep link room code
+  var params = new URLSearchParams(window.location.search);
+  var roomCode = params.get('room');
+  if(roomCode && roomCode.startsWith('AMP-')){
+    setTimeout(function(){
+      document.getElementById('private-code-input').value = roomCode;
+      openRoomsSheet();
+    }, 1500);
+  }
+}
+
 </script>
+
+<!-- LIVE ROOMS SHEET -->
+<div class="rooms-sheet" id="rooms-sheet">
+  <div class="rooms-inner">
+    <div class="rooms-handle"></div>
+    <div class="rooms-section">
+      <div style="font-size:22px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:4px;">Live Rooms</div>
+      <div style="font-size:12px;color:rgba(232,224,212,0.3);margin-bottom:18px;">Work alongside strangers. No chit-chat. Just people doing the work.</div>
+
+      <div class="rooms-section-label">Public rooms</div>
+
+      <div class="room-card study" onclick="openJoinSheet('study','📚 Study Room','study','lofi')">
+        <div class="room-card-top">
+          <div class="room-card-name">📚 Study Room</div>
+          <div class="room-card-count"><div class="room-count-dot study"></div><span id="room-count-study">— in here</span></div>
+        </div>
+        <div class="room-card-meta">Lofi beats · Quiet energy</div>
+        <div class="room-card-activity" id="room-activity-study"></div>
+      </div>
+
+      <div class="room-card workout" onclick="openJoinSheet('workout','💪 Workout Room','workout','hype')">
+        <div class="room-card-top">
+          <div class="room-card-name">💪 Workout Room</div>
+          <div class="room-card-count"><div class="room-count-dot workout"></div><span id="room-count-workout">— in here</span></div>
+        </div>
+        <div class="room-card-meta">Hype beats · High energy</div>
+        <div class="room-card-activity" id="room-activity-workout"></div>
+      </div>
+
+      <div class="room-card deep" onclick="openJoinSheet('deep','🧠 Deep Work','deep','ambient')">
+        <div class="room-card-top">
+          <div class="room-card-name">🧠 Deep Work</div>
+          <div class="room-card-count"><div class="room-count-dot deep"></div><span id="room-count-deep">— in here</span></div>
+        </div>
+        <div class="room-card-meta">Ambient · No distractions</div>
+        <div class="room-card-activity" id="room-activity-deep"></div>
+      </div>
+
+      <div class="room-card calm" onclick="openJoinSheet('calm','🌿 Calm Room','calm','rain')">
+        <div class="room-card-top">
+          <div class="room-card-name">🌿 Calm Room</div>
+          <div class="room-card-count"><div class="room-count-dot calm"></div><span id="room-count-calm">— in here</span></div>
+        </div>
+        <div class="room-card-meta">Rain sounds · Wind down</div>
+        <div class="room-card-activity" id="room-activity-calm"></div>
+      </div>
+
+      <div style="margin-top:18px;margin-bottom:10px;">
+        <div class="rooms-section-label">Private rooms</div>
+        <button class="create-room-btn" onclick="openCreatePrivate()">+ Create Private Room</button>
+        <div style="margin-top:10px;">
+          <div class="code-input-row">
+            <input class="join-inp" id="private-code-input" placeholder="Enter room code (e.g. AMP-7K3X)" maxlength="8" style="margin-bottom:0;flex:1;text-transform:uppercase;">
+            <button class="lock-btn" style="width:auto;padding:11px 16px;font-size:13px;margin-bottom:0;" onclick="joinPrivateByCode()">Join</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOIN SHEET -->
+<div class="join-sheet" id="join-sheet">
+  <div class="join-inner">
+    <div style="width:36px;height:4px;border-radius:2px;background:#2a2218;margin:0 auto 20px;"></div>
+    <div class="join-title" id="join-sheet-title">Join Study Room</div>
+    <div class="join-sub">Tell the room what you're working on.</div>
+    <label class="join-lbl">What's your goal for this session?</label>
+    <input class="join-inp" id="join-goal-inp" placeholder="e.g. Finish chapter 4 of my textbook" maxlength="60">
+    <label class="join-lbl">How long do you need?</label>
+    <div class="dur-row">
+      <div class="dur-btn" onclick="selectDur(this,25)">25m</div>
+      <div class="dur-btn sel" onclick="selectDur(this,45)">45m</div>
+      <div class="dur-btn" onclick="selectDur(this,60)">1hr</div>
+      <div class="dur-btn" onclick="selectDur(this,120)">2hr</div>
+      <div class="dur-btn" onclick="selectDur(this,180)">3hr</div>
+    </div>
+    <button class="lock-btn" id="lock-in-btn" onclick="confirmJoin()">Lock in →</button>
+    <button class="btn btn-g" style="width:100%;font-size:12px;opacity:0.5;" onclick="closeJoinSheet()">Cancel</button>
+  </div>
+</div>
+
+<!-- CREATE PRIVATE ROOM SHEET -->
+<div class="join-sheet" id="create-private-sheet">
+  <div class="join-inner">
+    <div style="width:36px;height:4px;border-radius:2px;background:#2a2218;margin:0 auto 20px;"></div>
+    <div class="join-title">Create Private Room</div>
+    <div class="join-sub">Invite your people. Only they can join.</div>
+    <label class="join-lbl">Room name</label>
+    <input class="join-inp" id="private-room-name" placeholder='e.g. "Sunday Grind" or "Me & Bri 💪"' maxlength="30">
+    <label class="join-lbl">Your goal for this session</label>
+    <input class="join-inp" id="private-room-goal" placeholder="What are you working on?" maxlength="60">
+    <label class="join-lbl">Vibe / Music</label>
+    <div class="vibe-row">
+      <div class="vibe-pick sel" onclick="selectVibe(this,'lofi')" data-vibe="lofi">🎵<br>Lofi</div>
+      <div class="vibe-pick" onclick="selectVibe(this,'hype')" data-vibe="hype">⚡<br>Hype</div>
+      <div class="vibe-pick" onclick="selectVibe(this,'ambient')" data-vibe="ambient">🌫<br>Ambient</div>
+      <div class="vibe-pick" onclick="selectVibe(this,'rain')" data-vibe="rain">🌧<br>Rain</div>
+    </div>
+    <label class="join-lbl">Duration</label>
+    <div class="dur-row" id="private-dur-row">
+      <div class="dur-btn" onclick="selectPrivateDur(this,25)">25m</div>
+      <div class="dur-btn sel" onclick="selectPrivateDur(this,60)">1hr</div>
+      <div class="dur-btn" onclick="selectPrivateDur(this,120)">2hr</div>
+      <div class="dur-btn" onclick="selectPrivateDur(this,180)">3hr</div>
+    </div>
+    <button class="lock-btn" onclick="createPrivateRoom()">Create Room →</button>
+    <button class="btn btn-g" style="width:100%;font-size:12px;opacity:0.5;" onclick="document.getElementById('create-private-sheet').classList.remove('open')">Cancel</button>
+  </div>
+</div>
+
+<!-- PRIVATE ROOM CREATED SHEET -->
+<div class="join-sheet" id="private-created-sheet">
+  <div class="join-inner">
+    <div style="width:36px;height:4px;border-radius:2px;background:#2a2218;margin:0 auto 20px;"></div>
+    <div class="join-title">Room created 🔥</div>
+    <div class="join-sub">Share this code or link with your people.</div>
+    <div class="private-code-box">
+      <div style="font-size:10px;color:rgba(232,224,212,0.3);text-transform:uppercase;letter-spacing:0.1em;">Room code</div>
+      <div class="private-code" id="created-room-code">AMP-0000</div>
+    </div>
+    <button class="lock-btn" style="background:#1D9E75;margin-bottom:8px;" onclick="shareRoomCode()">Share code + link</button>
+    <button class="lock-btn" onclick="joinCreatedRoom()">Enter my room →</button>
+    <button class="btn btn-g" style="width:100%;font-size:12px;opacity:0.5;margin-top:8px;" onclick="document.getElementById('private-created-sheet').classList.remove('open')">Later</button>
+  </div>
+</div>
+
+<!-- IN-ROOM OVERLAY -->
+<div class="in-room-overlay" id="in-room-overlay">
+  <div class="in-room-header">
+    <button style="background:none;border:none;color:rgba(232,224,212,0.4);font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;" onclick="leaveRoom()">← Leave</button>
+    <div class="in-room-title" id="in-room-title">Study Room</div>
+    <button style="background:none;border:none;color:rgba(232,224,212,0.4);font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;" onclick="shareRoomLink()">Share</button>
+  </div>
+  <div class="in-room-body">
+    <div class="music-bar-room" id="music-bar-room">
+      <div class="music-eq"><div class="music-eq-bar"></div><div class="music-eq-bar"></div><div class="music-eq-bar"></div></div>
+      <div style="font-size:12px;color:rgba(232,224,212,0.4);" id="music-label-room">Lofi beats playing</div>
+      <button style="background:none;border:none;color:rgba(232,224,212,0.25);font-size:11px;cursor:pointer;margin-left:auto;" onclick="toggleRoomMusic()">Pause</button>
+    </div>
+    <div class="session-card">
+      <div class="session-goal" id="session-goal-display">Finishing chapter 4</div>
+      <div style="font-size:11px;color:rgba(232,224,212,0.3);margin-bottom:10px;">How's it going?</div>
+      <div class="checkin-row">
+        <div class="ci-chip" onclick="checkIn(this,'Just started')">Just started</div>
+        <div class="ci-chip" onclick="checkIn(this,'Making progress')">Making progress</div>
+        <div class="ci-chip" onclick="checkIn(this,'Almost done')">Almost done</div>
+        <div class="ci-chip done" onclick="finishSession()">Done 🔥</div>
+      </div>
+      <div class="timer-big" id="room-timer-display">45:00</div>
+      <div style="font-size:10px;color:rgba(232,224,212,0.2);text-transform:uppercase;letter-spacing:0.08em;text-align:center;">remaining</div>
+    </div>
+    <div class="feed-section">
+      <div class="feed-label">In this room right now</div>
+      <div id="room-feed"></div>
+    </div>
+    <div class="react-row">
+      <button class="react-btn-room" onclick="sendReaction('🔥')">🔥</button>
+      <button class="react-btn-room" onclick="sendReaction('💪')">💪</button>
+      <button class="react-btn-room" onclick="sendReaction('⚡')">⚡</button>
+      <button class="react-btn-room" onclick="sendReaction('💜')">💜</button>
+    </div>
+  </div>
+</div>
+
+<!-- DONE OVERLAY -->
+<div class="done-overlay" id="done-overlay">
+  <div style="font-size:64px;margin-bottom:16px;">🔥</div>
+  <div style="font-size:28px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:8px;">Session complete.</div>
+  <div style="font-size:14px;color:rgba(232,224,212,0.4);margin-bottom:32px;" id="done-message">You showed up. That\'s what matters.</div>
+  <button class="lock-btn" style="width:100%;max-width:300px;margin-bottom:10px;" onclick="shareSessionCard()">Share your session 🔥</button>
+  <button class="btn btn-g" style="width:100%;max-width:300px;opacity:0.6;font-size:13px;" onclick="closeDoneOverlay()">Close</button>
+</div>
+
 </body>
 </html>
