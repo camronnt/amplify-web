@@ -773,6 +773,33 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 </div>
 
 <!-- MORNING RITUAL -->
+
+<!-- Widget Discovery Modal -->
+<div id="widget-prompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:998;align-items:flex-end;justify-content:center;">
+  <div style="background:#161410;border-radius:20px 20px 0 0;padding:28px 24px 44px;width:100%;max-width:430px;border-top:1px solid #261f14;">
+    <div style="width:36px;height:4px;border-radius:2px;background:#2a2218;margin:0 auto 24px;"></div>
+    <div style="font-size:40px;margin-bottom:12px;">📱</div>
+    <div style="font-size:22px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:8px;line-height:1.3;">Amplify is now on your home screen.</div>
+    <div style="font-size:14px;color:rgba(232,224,212,0.4);line-height:1.6;margin-bottom:20px;">See your streak and daily message without opening the app. Add the Amplify widget in 3 taps.</div>
+    <div style="background:#1c1814;border-radius:12px;padding:16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#8B7040;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#e8e0d4;flex-shrink:0;">1</div>
+        <div style="font-size:13px;color:rgba(232,224,212,0.7);">Long press your home screen until icons wiggle</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#8B7040;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#e8e0d4;flex-shrink:0;">2</div>
+        <div style="font-size:13px;color:rgba(232,224,212,0.7);">Tap the <strong style="color:#e8e0d4;">+</strong> button in the top left</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#8B7040;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#e8e0d4;flex-shrink:0;">3</div>
+        <div style="font-size:13px;color:rgba(232,224,212,0.7);">Search <strong style="color:#e8e0d4;">Amplify</strong> and add your widget</div>
+      </div>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-bottom:10px;" onclick="dismissWidgetPrompt()">Got it — I'll add it now</button>
+    <button class="btn btn-g" style="width:100%;opacity:0.5;font-size:12px;" onclick="dismissWidgetPrompt()">Maybe later</button>
+  </div>
+</div>
+
 <div id="morning-ritual" style="display:none;position:fixed;inset:0;background:#0a0806;z-index:450;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;">
   <div style="font-size:13px;color:rgba(232,224,212,0.28);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:32px;" id="ritual-greeting">Good morning</div>
   <div style="font-size:22px;color:rgba(232,224,212,0.85);line-height:1.7;font-style:italic;font-family:Georgia,serif;margin-bottom:8px;" id="ritual-quote"></div>
@@ -1780,7 +1807,7 @@ function renderTasks(){
     var sd=load('amp_streak_days',[]);
     if(sd.indexOf(today)===-1){
       sd.push(today);
-      save('amp_streak_days',sd); syncWidgetData();
+      save('amp_streak_days',sd);
       // check streak milestones
       var newStreak=sd.length;
       if(newStreak===7||newStreak===14||newStreak===30||newStreak===60||newStreak===100){
@@ -2771,7 +2798,6 @@ function initApp(){
   checkReEngagement();
   checkDailyReschedule();
   registerDeviceForPush();
-  syncWidgetData();
   checkProgressCard();
   setTimeout(function(){
     appReady=true;
@@ -2821,34 +2847,17 @@ window.addEventListener('load',function(){
   }
 });
 
-// WIDGET BRIDGE
-async function syncWidgetData(){
+function showWidgetPrompt(){
+  if(load('amp_widget_prompt_shown', false)) return;
   if(!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
-  try{
-    var Prefs = window.Capacitor.Plugins.Preferences;
-    if(!Prefs) return;
-    var streakDays = (load('amp_streak_days',[])||[]).length;
-    var tasks = load('amp_tasks',[])||[];
-    var todayStr = new Date().toDateString();
-    var todayTasks = tasks.filter(function(t){ return new Date(t.date).toDateString()===todayStr; });
-    var currentGoal = todayTasks.length>0 ? todayTasks[0].text : (load('amp_current_goal','')||'');
-    var messages = [
-      "Make some noise for yourself.",
-      "Show up. Do the work. Repeat.",
-      "One goal. One day. Make it count.",
-      "You don't find motivation. You build it.",
-      "Progress over perfection, every time.",
-      "The work you avoid is the work that matters.",
-      "Do it now. Thank yourself later."
-    ];
-    var todayNum = Math.floor(Date.now()/86400000);
-    var dailyMsg = messages[todayNum % messages.length];
-    await Prefs.set({key:'amp_streak_days', value:String(streakDays)});
-    await Prefs.set({key:'amp_widget_goal', value:currentGoal||''});
-    await Prefs.set({key:'amp_widget_message', value:dailyMsg});
-    await Prefs.set({key:'amp_in_room', value:'false'});
-    console.log('Amplify: widget data synced');
-  } catch(e){ console.log('Widget sync error:',e); }
+  setTimeout(function(){
+    document.getElementById('widget-prompt').style.display='flex';
+  }, 3000); // show 3 seconds after app opens
+}
+
+function dismissWidgetPrompt(){
+  document.getElementById('widget-prompt').style.display='none';
+  save('amp_widget_prompt_shown', true);
 }
 
 </script>
