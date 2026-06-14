@@ -2771,6 +2771,7 @@ function initApp(){
   checkReEngagement();
   checkDailyReschedule();
   registerDeviceForPush();
+  syncWidgetData();
   checkProgressCard();
   setTimeout(function(){
     appReady=true;
@@ -2819,6 +2820,37 @@ window.addEventListener('load',function(){
     initApp();
   }
 });
+
+// WIDGET BRIDGE
+async function syncWidgetData(){
+  if(!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  try{
+    var Prefs = window.Capacitor.Plugins.Preferences;
+    if(!Prefs) return;
+    var streakDays = (load('amp_streak_days',[])||[]).length;
+    var tasks = load('amp_tasks',[])||[];
+    var todayStr = new Date().toDateString();
+    var todayTasks = tasks.filter(function(t){ return new Date(t.date).toDateString()===todayStr; });
+    var currentGoal = todayTasks.length>0 ? todayTasks[0].text : (load('amp_current_goal','')||'');
+    var messages = [
+      "Make some noise for yourself.",
+      "Show up. Do the work. Repeat.",
+      "One goal. One day. Make it count.",
+      "You don't find motivation. You build it.",
+      "Progress over perfection, every time.",
+      "The work you avoid is the work that matters.",
+      "Do it now. Thank yourself later."
+    ];
+    var todayNum = Math.floor(Date.now()/86400000);
+    var dailyMsg = messages[todayNum % messages.length];
+    await Prefs.set({key:'amp_streak_days', value:String(streakDays)});
+    await Prefs.set({key:'amp_widget_goal', value:currentGoal||''});
+    await Prefs.set({key:'amp_widget_message', value:dailyMsg});
+    await Prefs.set({key:'amp_in_room', value:'false'});
+    console.log('Amplify: widget data synced');
+  } catch(e){ console.log('Widget sync error:',e); }
+}
+
 </script>
 </body>
 </html>
