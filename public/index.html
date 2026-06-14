@@ -246,7 +246,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .lock-btn{width:100%;padding:14px;border-radius:10px;border:none;font-size:16px;font-weight:800;cursor:pointer;font-family:Georgia,serif;background:#8B7040;color:#e8e0d4;margin-bottom:10px;}
 .in-room-overlay{display:none;position:fixed;inset:0;background:#0f0e0c;z-index:985;flex-direction:column;}
 .in-room-overlay.open{display:flex;}
-.in-room-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #1e1a12;}
+.in-room-header{display:flex;align-items:center;justify-content:space-between;padding:52px 18px 14px;border-bottom:1px solid #1e1a12;}
 .in-room-title{font-size:17px;font-weight:700;color:#e8e0d4;font-family:Georgia,serif;}
 .in-room-body{flex:1;overflow-y:auto;padding:16px 18px;}
 .session-card{background:#161410;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #1e1a12;}
@@ -3212,7 +3212,9 @@ function enterRoom(name, vibe, durationMins, isCreator, goal){
   // Subscribe to Realtime feed
   subscribeToRoom();
   // Reset check-in chips
-  document.querySelectorAll('.ci-chip').forEach(function(c){c.classList.remove('sel');});
+  checkInLocked = false;
+  clearTimeout(checkInUnlockTimer);
+  document.querySelectorAll('.ci-chip').forEach(function(c){c.classList.remove('sel');c.style.opacity='1';});
   // Update widget
   save('amp_in_room', true);
   save('amp_room_name', name);
@@ -3258,7 +3260,35 @@ async function endRoomSession(){
 }
 
 // ── Check in ─────────────────────────────────────────────────
+function addFifteenMins(){
+  roomState.timerSecs += 15 * 60;
+  roomState.durationMins += 15;
+  document.getElementById('room-timer-display').textContent = formatRoomTime(roomState.timerSecs);
+  showToast('+15 minutes added');
+}
+
+var checkInLocked = false;
+var checkInUnlockTimer = null;
+
 async function checkIn(el, status){
+  if(checkInLocked){ showToast('Check in again in a few minutes'); return; }
+  checkInLocked = true;
+  // Unlock after 5 minutes (not 15 — feels more natural on mobile)
+  clearTimeout(checkInUnlockTimer);
+  checkInUnlockTimer = setTimeout(function(){
+    checkInLocked = false;
+    // Subtle visual cue that chips are available again
+    document.querySelectorAll('.ci-chip').forEach(function(c){
+      if(!c.classList.contains('done')) c.style.opacity='1';
+    });
+  }, 5 * 60 * 1000);
+  // Dim non-selected chips
+  document.querySelectorAll('.ci-chip').forEach(function(c){
+    c.classList.remove('sel');
+    if(!c.classList.contains('done')) c.style.opacity='0.4';
+  });
+  el.classList.add('sel');
+  el.style.opacity='1';
   document.querySelectorAll('.ci-chip').forEach(function(c){c.classList.remove('sel');});
   el.classList.add('sel');
   showToast('Checked in: '+status);
@@ -3454,17 +3484,7 @@ function stopRoomMusic(){
   roomState.musicPlaying = false;
 }
 
-function toggleRoomMusic(){
-  if(roomState.musicPlaying){
-    stopRoomMusic();
-    document.querySelector('[onclick="toggleRoomMusic()"]').textContent = 'Play';
-    document.getElementById('music-bar-room').style.opacity = '0.4';
-  } else {
-    startRoomMusic(joinState.vibeKey);
-    document.querySelector('[onclick="toggleRoomMusic()"]').textContent = 'Pause';
-    document.getElementById('music-bar-room').style.opacity = '1';
-  }
-}
+// music toggle removed - music always plays
 
 function makeNoise(ctx, type, freq, gain, fadeIn){
   var buf = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
@@ -3584,6 +3604,22 @@ function showToast(msg){
 }
 
 // ── Init rooms on app load ────────────────────────────────────
+
+function addFifteenMins(){
+  roomState.timerSecs += 15 * 60;
+  roomState.durationMins += 15;
+  document.getElementById('room-timer-display').textContent = formatRoomTime(roomState.timerSecs);
+  showToast('+15 minutes added');
+}
+
+// Resume music when app comes back to foreground
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible' && roomState.active && !roomState.musicPlaying){
+    startRoomMusic(joinState.vibeKey || roomState.vibeKey);
+    document.getElementById('music-bar-room') && (document.getElementById('music-bar-room').style.opacity = '1');
+  }
+});
+
 function initRooms(){
   loadRoomCounts();
   // Check for deep link room code
@@ -3600,11 +3636,14 @@ function initRooms(){
 </script>
 
 <!-- LIVE ROOMS SHEET -->
-<div class="rooms-sheet" id="rooms-sheet">
+<div class="rooms-sheet" id="rooms-sheet" onclick="if(event.target===this)closeRoomsSheet()">
   <div class="rooms-inner">
     <div class="rooms-handle"></div>
     <div class="rooms-section">
-      <div style="font-size:22px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:4px;">Live Rooms</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="font-size:22px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;">Live Rooms</div>
+        <button onclick="closeRoomsSheet()" style="background:rgba(232,224,212,0.06);border:1px solid rgba(232,224,212,0.1);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:rgba(232,224,212,0.4);">✕</button>
+      </div>
       <div style="font-size:12px;color:rgba(232,224,212,0.3);margin-bottom:18px;">Work alongside strangers. No chit-chat. Just people doing the work.</div>
 
       <div class="rooms-section-label">Public rooms</div>
@@ -3660,7 +3699,7 @@ function initRooms(){
 </div>
 
 <!-- JOIN SHEET -->
-<div class="join-sheet" id="join-sheet">
+<div class="join-sheet" id="join-sheet" onclick="if(event.target===this)closeJoinSheet()">
   <div class="join-inner">
     <div style="width:36px;height:4px;border-radius:2px;background:#2a2218;margin:0 auto 20px;"></div>
     <div class="join-title" id="join-sheet-title">Join Study Room</div>
@@ -3727,8 +3766,8 @@ function initRooms(){
 
 <!-- IN-ROOM OVERLAY -->
 <div class="in-room-overlay" id="in-room-overlay">
-  <div class="in-room-header">
-    <button style="background:none;border:none;color:rgba(232,224,212,0.4);font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;" onclick="leaveRoom()">← Leave</button>
+  <div class="in-room-header" style="padding-top:max(14px,env(safe-area-inset-top));">
+    <button style="background:rgba(170,55,55,0.12);border:1px solid rgba(170,55,55,0.25);border-radius:8px;color:#c96060;font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;font-family:-apple-system,sans-serif;" onclick="leaveRoom()">← Leave</button>
     <div class="in-room-title" id="in-room-title">Study Room</div>
     <button style="background:none;border:none;color:rgba(232,224,212,0.4);font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;" onclick="shareRoomLink()">Share</button>
   </div>
@@ -3736,16 +3775,15 @@ function initRooms(){
     <div class="music-bar-room" id="music-bar-room">
       <div class="music-eq"><div class="music-eq-bar"></div><div class="music-eq-bar"></div><div class="music-eq-bar"></div></div>
       <div style="font-size:12px;color:rgba(232,224,212,0.4);" id="music-label-room">Lofi beats playing</div>
-      <button style="background:none;border:none;color:rgba(232,224,212,0.25);font-size:11px;cursor:pointer;margin-left:auto;" onclick="toggleRoomMusic()">Pause</button>
     </div>
     <div class="session-card">
       <div class="session-goal" id="session-goal-display">Finishing chapter 4</div>
       <div style="font-size:11px;color:rgba(232,224,212,0.3);margin-bottom:10px;">How's it going?</div>
       <div class="checkin-row">
-        <div class="ci-chip" onclick="checkIn(this,'Just started')">Just started</div>
-        <div class="ci-chip" onclick="checkIn(this,'Making progress')">Making progress</div>
-        <div class="ci-chip" onclick="checkIn(this,'Almost done')">Almost done</div>
-        <div class="ci-chip done" onclick="finishSession()">Done 🔥</div>
+        <div class="ci-chip" id="chip-started" onclick="checkIn(this,'Just started')">Just started</div>
+        <div class="ci-chip" id="chip-progress" onclick="checkIn(this,'Making progress')">Making progress</div>
+        <div class="ci-chip" id="chip-almost" onclick="checkIn(this,'Almost done')">Almost done</div>
+        <div class="ci-chip done" id="chip-done" onclick="finishSession()">Done 🔥</div>
       </div>
       <div class="timer-big" id="room-timer-display">45:00</div>
       <div style="font-size:10px;color:rgba(232,224,212,0.2);text-transform:uppercase;letter-spacing:0.08em;text-align:center;">remaining</div>
