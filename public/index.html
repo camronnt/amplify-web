@@ -3127,6 +3127,7 @@ function shareRoomCode(){
 function joinCreatedRoom(){
   document.getElementById('private-created-sheet').classList.remove('open');
   enterRoom(joinState.roomName, joinState.vibeKey, joinState.durationMins, true);
+  setTimeout(function(){ startRoomMusic(joinState.vibeKey); }, 100);
 }
 async function joinPrivateByCode(){
   var code = document.getElementById('private-code-input').value.trim().toUpperCase();
@@ -3182,6 +3183,8 @@ async function confirmJoin(){
     if(data && data[0]) roomState.sessionId = data[0].id;
   }catch(e){}
   enterRoom(joinState.roomName, joinState.vibeKey, joinState.durationMins, false, goal);
+  // Start audio immediately — we're inside a user gesture (button tap)
+  setTimeout(function(){ startRoomMusic(joinState.vibeKey); }, 100);
 }
 
 // ── Enter room ────────────────────────────────────────────────
@@ -3189,6 +3192,7 @@ function enterRoom(name, vibe, durationMins, isCreator, goal){
   roomState.active = true;
   roomState.roomName = name;
   roomState.vibeKey = vibe;
+  joinState.vibeKey = vibe;
   roomState.durationMins = durationMins;
   roomState.timerSecs = durationMins * 60;
   document.getElementById('in-room-title').textContent = name;
@@ -3197,6 +3201,7 @@ function enterRoom(name, vibe, durationMins, isCreator, goal){
   var musicLabels = {lofi:'Lofi beats playing',hype:'Hype beats playing',ambient:'Ambient sounds playing',rain:'Rain sounds playing'};
   document.getElementById('music-label-room').textContent = musicLabels[vibe] || 'Music playing';
   document.getElementById('in-room-overlay').classList.add('open');
+  // iOS requires user gesture for audio — start on first touch
   // Start timer
   clearInterval(roomState.timerInterval);
   roomState.timerInterval = setInterval(function(){
@@ -3207,8 +3212,7 @@ function enterRoom(name, vibe, durationMins, isCreator, goal){
       finishSession();
     }
   }, 1000);
-  // Start music
-  startRoomMusic(vibe);
+  // Music started by caller (confirmJoin/joinCreatedRoom) inside user gesture
   // Subscribe to Realtime feed
   subscribeToRoom();
   // Reset check-in chips
@@ -3271,21 +3275,10 @@ var checkInLocked = false;
 var checkInUnlockTimer = null;
 
 async function checkIn(el, status){
-  if(checkInLocked){ showToast('Check in again in a few minutes'); return; }
-  checkInLocked = true;
-  // Unlock after 5 minutes (not 15 — feels more natural on mobile)
-  clearTimeout(checkInUnlockTimer);
-  checkInUnlockTimer = setTimeout(function(){
-    checkInLocked = false;
-    // Subtle visual cue that chips are available again
-    document.querySelectorAll('.ci-chip').forEach(function(c){
-      if(!c.classList.contains('done')) c.style.opacity='1';
-    });
-  }, 5 * 60 * 1000);
-  // Dim non-selected chips
-  document.querySelectorAll('.ci-chip').forEach(function(c){
+  // Mutually exclusive selection — one chip at a time
+  document.querySelectorAll('.ci-chip:not(.done)').forEach(function(c){
     c.classList.remove('sel');
-    if(!c.classList.contains('done')) c.style.opacity='0.4';
+    c.style.opacity='0.5';
   });
   el.classList.add('sel');
   el.style.opacity='1';
