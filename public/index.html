@@ -283,6 +283,17 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .private-code{font-size:32px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;letter-spacing:4px;text-align:center;margin:8px 0;}
 .code-input-row{display:flex;gap:8px;margin-bottom:16px;}
 
+
+#room-landing{display:none;position:fixed;inset:0;background:#0f0e0c;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;}
+#room-landing.show{display:flex;}
+.landing-logo{font-size:48px;margin-bottom:16px;}
+.landing-title{font-size:26px;font-weight:800;color:#e8e0d4;font-family:Georgia,serif;margin-bottom:8px;line-height:1.3;}
+.landing-sub{font-size:14px;color:rgba(232,224,212,0.4);margin-bottom:32px;line-height:1.6;}
+.landing-code{background:#1c1814;border:1px solid #8B7040;border-radius:10px;padding:14px 24px;margin-bottom:24px;}
+.landing-code-label{font-size:10px;color:rgba(232,224,212,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+.landing-code-value{font-size:28px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;letter-spacing:4px;}
+.landing-btn-primary{display:block;width:100%;max-width:300px;background:#C9A96E;color:#0f0e0c;font-size:16px;font-weight:800;padding:16px;border-radius:12px;text-decoration:none;margin-bottom:12px;font-family:Georgia,serif;}
+.landing-btn-secondary{display:block;width:100%;max-width:300px;background:rgba(232,224,212,0.06);border:1px solid rgba(232,224,212,0.1);color:rgba(232,224,212,0.5);font-size:13px;font-weight:600;padding:12px;border-radius:12px;text-decoration:none;font-family:-apple-system,sans-serif;}
 </style>
 </head>
 <body>
@@ -3613,7 +3624,35 @@ document.addEventListener('visibilitychange', function(){
   }
 });
 
+
+function checkRoomShareLink(){
+  var params = new URLSearchParams(window.location.search);
+  var roomCode = params.get('room');
+  if(!roomCode) return;
+  if(window.Capacitor && window.Capacitor.isNativePlatform()){
+    if(roomCode.startsWith('AMP-')){
+      setTimeout(function(){
+        var inp = document.getElementById('private-code-input');
+        if(inp){ inp.value=roomCode; openRoomsSheet(); }
+      }, 1500);
+    }
+    return;
+  }
+  var landing = document.getElementById('room-landing');
+  if(!landing) return;
+  if(roomCode.startsWith('AMP-')){
+    document.getElementById('landing-code-box').style.display='block';
+    document.getElementById('landing-code-display').textContent=roomCode;
+  }
+  landing.classList.add('show');
+  setTimeout(function(){ window.location='amplify://?room='+roomCode; },300);
+}
+function dismissLanding(){
+  var el=document.getElementById('room-landing');
+  if(el) el.classList.remove('show');
+}
 function initRooms(){
+  checkRoomShareLink();
   loadRoomCounts();
   // Check for deep link room code
   var params = new URLSearchParams(window.location.search);
@@ -3803,5 +3842,17 @@ function initRooms(){
   <button class="btn btn-g" style="width:100%;max-width:300px;opacity:0.6;font-size:13px;" onclick="closeDoneOverlay()">Close</button>
 </div>
 
+
+<div id="room-landing">
+  <div class="landing-logo">🔥</div>
+  <div class="landing-title">Someone invited you to their Amplify room.</div>
+  <div class="landing-sub">Amplify is where people lock in and do the work together. Download the app free to join.</div>
+  <div class="landing-code" id="landing-code-box" style="display:none;">
+    <div class="landing-code-label">Room code</div>
+    <div class="landing-code-value" id="landing-code-display">AMP-0000</div>
+  </div>
+  <a class="landing-btn-primary" href="https://apps.apple.com/app/amplify-make-noise/id6772685979">Download Amplify - Free</a>
+  <a class="landing-btn-secondary" href="#" onclick="dismissLanding();return false;">Already have the app? Open it</a>
+</div>
 </body>
 </html>
