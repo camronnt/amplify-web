@@ -3211,7 +3211,7 @@ function enterRoom(name, vibe, durationMins, isCreator, goal){
   document.getElementById('in-room-title').textContent = name;
   document.getElementById('session-goal-display').textContent = goal || joinState.roomName;
   document.getElementById('room-timer-display').textContent = formatRoomTime(roomState.timerSecs);
-  var musicLabels = {lofi:'Lofi beats playing',hype:'Hype beats playing',ambient:'Ambient sounds playing',rain:'Rain sounds playing'};
+  var musicLabels = {lofi:'Lofi beats playing',hype:'Energy meditation playing',ambient:'432Hz drones playing',rain:'Bell meditation playing'};
   document.getElementById('music-label-room').textContent = musicLabels[vibe] || 'Music playing';
   document.getElementById('in-room-overlay').classList.add('open');
   // iOS requires user gesture for audio — start on first touch
@@ -3522,160 +3522,148 @@ function makeTone(ctx, freq, gain, type){
 }
 
 function buildLofi(ctx){
-  // Warm brown noise base — very low gain, heavily filtered
+  // STUDY ROOM — Warm lofi: brown noise + slow chord pads
+  // Brown noise base
   var buf = ctx.createBuffer(2, ctx.sampleRate*4, ctx.sampleRate);
   for(var ch=0;ch<2;ch++){
-    var d = buf.getChannelData(ch);
-    var last = 0;
-    for(var i=0;i<d.length;i++){
-      last = (last + 0.02*(Math.random()*2-1)) / 1.02;
-      d[i] = last * 3.5;
-    }
+    var d=buf.getChannelData(ch); var last=0;
+    for(var i=0;i<d.length;i++){ last=(last+0.02*(Math.random()*2-1))/1.02; d[i]=last*3; }
   }
-  var noise = ctx.createBufferSource();
-  noise.buffer = buf; noise.loop = true;
-  var lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=300; lp.Q.value=0.5;
-  var ng = ctx.createGain(); ng.gain.setValueAtTime(0,ctx.currentTime); ng.gain.linearRampToValueAtTime(0.08,ctx.currentTime+3);
+  var noise=ctx.createBufferSource(); noise.buffer=buf; noise.loop=true;
+  var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=250;
+  var ng=ctx.createGain(); ng.gain.setValueAtTime(0,ctx.currentTime); ng.gain.linearRampToValueAtTime(0.07,ctx.currentTime+3);
   noise.connect(lp); lp.connect(ng); ng.connect(ctx.destination); noise.start();
   roomState.audioNodes.push(noise,ng);
-  // Warm chord pad — stacked sine waves
-  var chords = [[130.8,164.8,196,246.9],[146.8,185,220,277.2],[123.5,155.6,185,233.1]];
-  var chordIdx = 0;
+  // Slow chord pads — C major pentatonic
+  var chords=[[130.8,164.8,196],[146.8,185,220],[123.5,155.6,185],[110,138.6,164.8]];
+  var ci=0;
   function playChord(){
     if(!roomState.musicPlaying||!roomState.audioCtx) return;
-    var chord = chords[chordIdx%chords.length]; chordIdx++;
-    chord.forEach(function(freq,i){
-      var o = ctx.createOscillator();
-      var g = ctx.createGain();
-      var lp2 = ctx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=600;
+    var chord=chords[ci%chords.length]; ci++;
+    chord.forEach(function(freq,j){
+      var o=ctx.createOscillator(); var g=ctx.createGain();
+      var lp2=ctx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=500;
       o.type='sine'; o.frequency.value=freq;
-      var t = ctx.currentTime;
+      var t=ctx.currentTime;
       g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(0.025/(i+1),t+0.8);
-      g.gain.setValueAtTime(0.025/(i+1),t+3.5);
-      g.gain.linearRampToValueAtTime(0,t+5);
+      g.gain.linearRampToValueAtTime(0.022/(j+1),t+1);
+      g.gain.setValueAtTime(0.022/(j+1),t+4);
+      g.gain.linearRampToValueAtTime(0,t+6);
       o.connect(lp2); lp2.connect(g); g.connect(ctx.destination);
-      o.start(t); o.stop(t+5.5);
+      o.start(t); o.stop(t+6.5);
     });
-    setTimeout(playChord, 5000+Math.random()*2000);
+    setTimeout(playChord, 5500+Math.random()*1500);
   }
-  setTimeout(playChord, 1000);
+  setTimeout(playChord,800);
 }
 
 function buildHype(ctx){
-  // Clean punchy beat — no harsh sawtooth
-  // Deep sub bass pulse
-  function kick(){
+  // WORKOUT ROOM — Energizing meditation: upbeat binaural + rhythmic pulse
+  // Base carrier tone — 200Hz
+  var carrier=ctx.createOscillator(); var cg=ctx.createGain();
+  carrier.type='sine'; carrier.frequency.value=200;
+  cg.gain.setValueAtTime(0,ctx.currentTime); cg.gain.linearRampToValueAtTime(0.08,ctx.currentTime+2);
+  carrier.connect(cg); cg.connect(ctx.destination); carrier.start();
+  roomState.audioNodes.push(carrier,cg);
+  // Binaural beat — slightly detuned for 10Hz alpha/beta
+  var carrier2=ctx.createOscillator(); var cg2=ctx.createGain();
+  carrier2.type='sine'; carrier2.frequency.value=210;
+  cg2.gain.setValueAtTime(0,ctx.currentTime); cg2.gain.linearRampToValueAtTime(0.08,ctx.currentTime+2);
+  carrier2.connect(cg2); cg2.connect(ctx.destination); carrier2.start();
+  roomState.audioNodes.push(carrier2,cg2);
+  // Energizing pulse — clean sine wave at 4Hz rhythm
+  var pulse=ctx.createOscillator(); var pg=ctx.createGain();
+  pulse.type='sine'; pulse.frequency.value=80;
+  var lfo=ctx.createOscillator(); var lfog=ctx.createGain();
+  lfo.frequency.value=1.5; lfog.gain.value=0.06;
+  lfo.connect(lfog); lfog.connect(pg.gain);
+  pg.gain.setValueAtTime(0,ctx.currentTime); pg.gain.linearRampToValueAtTime(0.1,ctx.currentTime+2);
+  pulse.connect(pg); pg.connect(ctx.destination);
+  pulse.start(); lfo.start();
+  roomState.audioNodes.push(pulse,pg,lfo,lfog);
+  // Rising motivational tones
+  var motiveTones=[220,277.2,329.6,440];
+  var mi=0;
+  function playMotive(){
     if(!roomState.musicPlaying||!roomState.audioCtx) return;
-    var o = ctx.createOscillator();
-    var g = ctx.createGain();
-    o.type='sine';
-    var t = ctx.currentTime;
-    o.frequency.setValueAtTime(150,t);
-    o.frequency.exponentialRampToValueAtTime(40,t+0.15);
-    g.gain.setValueAtTime(0.6,t);
-    g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+    var o=ctx.createOscillator(); var g=ctx.createGain();
+    o.type='sine'; o.frequency.value=motiveTones[mi%motiveTones.length]; mi++;
+    var t=ctx.currentTime;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.04,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.8);
     o.connect(g); g.connect(ctx.destination);
-    o.start(t); o.stop(t+0.35);
-    setTimeout(kick, 500);
+    o.start(t); o.stop(t+1);
+    setTimeout(playMotive, 800+Math.random()*400);
   }
-  // Hi-hat
-  function hihat(){
-    if(!roomState.musicPlaying||!roomState.audioCtx) return;
-    var buf = ctx.createBuffer(1,ctx.sampleRate*0.05,ctx.sampleRate);
-    var d = buf.getChannelData(0);
-    for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-    var hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=8000;
-    var g = ctx.createGain(); g.gain.setValueAtTime(0.08,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);
-    var s = ctx.createBufferSource(); s.buffer=buf;
-    s.connect(hp); hp.connect(g); g.connect(ctx.destination); s.start();
-    setTimeout(hihat, 250);
-  }
-  // Warm bass tone
-  var bass = ctx.createOscillator();
-  var bassG = ctx.createGain();
-  var bassLp = ctx.createBiquadFilter(); bassLp.type='lowpass'; bassLp.frequency.value=200;
-  bass.type='sine'; bass.frequency.value=55;
-  bassG.gain.setValueAtTime(0,ctx.currentTime); bassG.gain.linearRampToValueAtTime(0.12,ctx.currentTime+1);
-  bass.connect(bassLp); bassLp.connect(bassG); bassG.connect(ctx.destination); bass.start();
-  roomState.audioNodes.push(bass,bassG);
-  setTimeout(kick,100); setTimeout(hihat,50);
+  setTimeout(playMotive,1000);
 }
 
 function buildAmbient(ctx){
-  // Pure clean sine drones — no noise at all
-  var drones = [
-    {freq:55, gain:0.06, detune:0},
-    {freq:82.4, gain:0.04, detune:2},
-    {freq:110, gain:0.03, detune:-1},
-    {freq:165, gain:0.02, detune:1},
-  ];
-  drones.forEach(function(d,i){
-    var o = ctx.createOscillator();
-    var g = ctx.createGain();
-    var lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=400;
-    o.type='sine'; o.frequency.value=d.freq; o.detune.value=d.detune;
+  // DEEP WORK ROOM — Deep 432Hz meditation drones
+  // 432Hz is considered the "healing frequency" — very clean and focused
+  var freqs=[432,288,216,144]; // 432Hz and perfect harmonics
+  freqs.forEach(function(freq,i){
+    var o=ctx.createOscillator(); var g=ctx.createGain();
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=800;
+    o.type='sine'; o.frequency.value=freq;
     g.gain.setValueAtTime(0,ctx.currentTime);
-    g.gain.linearRampToValueAtTime(d.gain, ctx.currentTime+4+i);
+    g.gain.linearRampToValueAtTime(0.05/(i+1), ctx.currentTime+5+i*2);
     o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start();
     roomState.audioNodes.push(o,g);
-    // Slow volume swell
+    // Slow breathing swell
     function swell(){
       if(!roomState.musicPlaying||!roomState.audioCtx) return;
-      var t = ctx.currentTime;
-      var v = d.gain * (0.6 + Math.random()*0.4);
-      g.gain.linearRampToValueAtTime(v, t+4+Math.random()*4);
-      setTimeout(swell, 5000+Math.random()*5000);
+      var t=ctx.currentTime; var v=0.05/(i+1);
+      g.gain.linearRampToValueAtTime(v*1.3,t+4);
+      g.gain.linearRampToValueAtTime(v*0.7,t+8);
+      setTimeout(swell,8000+i*1000);
     }
-    setTimeout(swell, 5000);
+    setTimeout(swell,6000);
   });
 }
 
-function buildRain(ctx){
-  // Realistic rain — layered filtered noise at different frequencies
-  // Light rain texture
-  var buf1 = ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate);
-  var d1 = buf1.getChannelData(0);
-  for(var i=0;i<d1.length;i++) d1[i]=Math.random()*2-1;
-  var rain1 = ctx.createBufferSource(); rain1.buffer=buf1; rain1.loop=true;
-  var bp1 = ctx.createBiquadFilter(); bp1.type='bandpass'; bp1.frequency.value=3000; bp1.Q.value=0.8;
-  var g1 = ctx.createGain(); g1.gain.setValueAtTime(0,ctx.currentTime); g1.gain.linearRampToValueAtTime(0.12,ctx.currentTime+3);
-  rain1.connect(bp1); bp1.connect(g1); g1.connect(ctx.destination); rain1.start();
-  // Medium rain texture  
-  var buf2 = ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);
-  var d2 = buf2.getChannelData(0);
-  for(var i=0;i<d2.length;i++) d2[i]=Math.random()*2-1;
-  var rain2 = ctx.createBufferSource(); rain2.buffer=buf2; rain2.loop=true;
-  var bp2 = ctx.createBiquadFilter(); bp2.type='bandpass'; bp2.frequency.value=1200; bp2.Q.value=1.2;
-  var g2 = ctx.createGain(); g2.gain.setValueAtTime(0,ctx.currentTime); g2.gain.linearRampToValueAtTime(0.08,ctx.currentTime+4);
-  rain2.connect(bp2); bp2.connect(g2); g2.connect(ctx.destination); rain2.start();
-  // Deep rumble
-  var buf3 = ctx.createBuffer(1,ctx.sampleRate*4,ctx.sampleRate);
-  var d3 = buf3.getChannelData(0);
-  var last=0;
-  for(var i=0;i<d3.length;i++){ last=(last+0.02*(Math.random()*2-1))/1.02; d3[i]=last*4; }
-  var rain3 = ctx.createBufferSource(); rain3.buffer=buf3; rain3.loop=true;
-  var lp3 = ctx.createBiquadFilter(); lp3.type='lowpass'; lp3.frequency.value=120;
-  var g3 = ctx.createGain(); g3.gain.setValueAtTime(0,ctx.currentTime); g3.gain.linearRampToValueAtTime(0.06,ctx.currentTime+5);
-  rain3.connect(lp3); lp3.connect(g3); g3.connect(ctx.destination); rain3.start();
-  roomState.audioNodes.push(rain1,rain2,rain3,g1,g2,g3);
-  // Gentle drips
-  function drip(){
+function buildCalm(ctx){
+  // CALM ROOM — Tibetan bell tones + soft meditation pads
+  // Singing bowl frequencies
+  var bowlFreqs=[528,396,417,639,741];
+  function ringBowl(){
     if(!roomState.musicPlaying||!roomState.audioCtx) return;
-    var o = ctx.createOscillator();
-    var g = ctx.createGain();
-    var freq = 800+Math.random()*400;
+    var freq=bowlFreqs[Math.floor(Math.random()*bowlFreqs.length)];
+    var o=ctx.createOscillator(); var g=ctx.createGain();
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1000;
     o.type='sine'; o.frequency.value=freq;
-    var t = ctx.currentTime;
+    var t=ctx.currentTime;
     g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(0.015,t+0.01);
-    g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
-    o.connect(g); g.connect(ctx.destination);
-    o.start(t); o.stop(t+0.35);
-    setTimeout(drip, 400+Math.random()*1200);
+    g.gain.linearRampToValueAtTime(0.06,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,t+4);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+4.5);
+    // Subtle overtone
+    var o2=ctx.createOscillator(); var g2=ctx.createGain();
+    o2.type='sine'; o2.frequency.value=freq*2.756; // natural overtone
+    g2.gain.setValueAtTime(0,t);
+    g2.gain.linearRampToValueAtTime(0.015,t+0.02);
+    g2.gain.exponentialRampToValueAtTime(0.001,t+3);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.start(t); o2.stop(t+3.5);
+    setTimeout(ringBowl, 3000+Math.random()*4000);
   }
-  setTimeout(drip,2000);
+  setTimeout(ringBowl,500);
+  // Soft pad underneath
+  var padFreqs=[264,330,396]; // C major at 432Hz tuning
+  padFreqs.forEach(function(freq,i){
+    var o=ctx.createOscillator(); var g=ctx.createGain();
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=600;
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.018/(i+1),ctx.currentTime+4);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start();
+    roomState.audioNodes.push(o,g);
+  });
 }
+
+function buildRain(ctx){ buildCalm(ctx); } // Rain replaced with Calm
 
 // ── Toast ─────────────────────────────────────────────────────
 var _toastTimer;
@@ -3782,7 +3770,7 @@ function initRooms(){
           <div class="room-card-name">💪 Workout Room</div>
           <div class="room-card-count"><div class="room-count-dot workout"></div><span id="room-count-workout">— in here</span></div>
         </div>
-        <div class="room-card-meta">Hype beats · High energy</div>
+        <div class="room-card-meta">Meditation beats · High energy</div>
         <div class="room-card-activity" id="room-activity-workout"></div>
       </div>
 
@@ -3800,7 +3788,7 @@ function initRooms(){
           <div class="room-card-name">🌿 Calm Room</div>
           <div class="room-card-count"><div class="room-count-dot calm"></div><span id="room-count-calm">— in here</span></div>
         </div>
-        <div class="room-card-meta">Rain sounds · Wind down</div>
+        <div class="room-card-meta">Bell meditation · Wind down</div>
         <div class="room-card-activity" id="room-activity-calm"></div>
       </div>
 
