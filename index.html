@@ -284,6 +284,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .code-input-row{display:flex;gap:8px;margin-bottom:16px;}
 
 
+/* Smart landing page for room share links */
 #room-landing{display:none;position:fixed;inset:0;background:#0f0e0c;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;}
 #room-landing.show{display:flex;}
 .landing-logo{font-size:48px;margin-bottom:16px;}
@@ -294,6 +295,7 @@ input::placeholder,textarea::placeholder{color:rgba(232,224,212,0.22);}
 .landing-code-value{font-size:28px;font-weight:800;color:#C9A96E;font-family:Georgia,serif;letter-spacing:4px;}
 .landing-btn-primary{display:block;width:100%;max-width:300px;background:#C9A96E;color:#0f0e0c;font-size:16px;font-weight:800;padding:16px;border-radius:12px;text-decoration:none;margin-bottom:12px;font-family:Georgia,serif;}
 .landing-btn-secondary{display:block;width:100%;max-width:300px;background:rgba(232,224,212,0.06);border:1px solid rgba(232,224,212,0.1);color:rgba(232,224,212,0.5);font-size:13px;font-weight:600;padding:12px;border-radius:12px;text-decoration:none;font-family:-apple-system,sans-serif;}
+
 </style>
 </head>
 <body>
@@ -3520,76 +3522,159 @@ function makeTone(ctx, freq, gain, type){
 }
 
 function buildLofi(ctx){
-  makeNoise(ctx,'lowpass',800,0.04,2);   // warm brown noise base
-  makeNoise(ctx,'bandpass',200,0.02,3);  // low rumble
-  // Simple pentatonic melody
-  var notes = [261.6,293.7,329.6,392,440,523.3];
-  function playNote(){
-    if(!roomState.musicPlaying || !roomState.audioCtx) return;
-    var freq = notes[Math.floor(Math.random()*notes.length)];
-    var osc = ctx.createOscillator();
-    var g = ctx.createGain();
-    osc.type='sine'; osc.frequency.value=freq;
-    g.gain.setValueAtTime(0,ctx.currentTime);
-    g.gain.linearRampToValueAtTime(0.06,ctx.currentTime+0.1);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.5);
-    osc.connect(g); g.connect(ctx.destination);
-    osc.start(); osc.stop(ctx.currentTime+1.6);
-    setTimeout(playNote, 800+Math.random()*1200);
+  // Warm brown noise base — very low gain, heavily filtered
+  var buf = ctx.createBuffer(2, ctx.sampleRate*4, ctx.sampleRate);
+  for(var ch=0;ch<2;ch++){
+    var d = buf.getChannelData(ch);
+    var last = 0;
+    for(var i=0;i<d.length;i++){
+      last = (last + 0.02*(Math.random()*2-1)) / 1.02;
+      d[i] = last * 3.5;
+    }
   }
-  setTimeout(playNote, 500);
+  var noise = ctx.createBufferSource();
+  noise.buffer = buf; noise.loop = true;
+  var lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=300; lp.Q.value=0.5;
+  var ng = ctx.createGain(); ng.gain.setValueAtTime(0,ctx.currentTime); ng.gain.linearRampToValueAtTime(0.08,ctx.currentTime+3);
+  noise.connect(lp); lp.connect(ng); ng.connect(ctx.destination); noise.start();
+  roomState.audioNodes.push(noise,ng);
+  // Warm chord pad — stacked sine waves
+  var chords = [[130.8,164.8,196,246.9],[146.8,185,220,277.2],[123.5,155.6,185,233.1]];
+  var chordIdx = 0;
+  function playChord(){
+    if(!roomState.musicPlaying||!roomState.audioCtx) return;
+    var chord = chords[chordIdx%chords.length]; chordIdx++;
+    chord.forEach(function(freq,i){
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      var lp2 = ctx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=600;
+      o.type='sine'; o.frequency.value=freq;
+      var t = ctx.currentTime;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.025/(i+1),t+0.8);
+      g.gain.setValueAtTime(0.025/(i+1),t+3.5);
+      g.gain.linearRampToValueAtTime(0,t+5);
+      o.connect(lp2); lp2.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t+5.5);
+    });
+    setTimeout(playChord, 5000+Math.random()*2000);
+  }
+  setTimeout(playChord, 1000);
 }
 
 function buildHype(ctx){
-  makeNoise(ctx,'highpass',200,0.05,1);
-  makeNoise(ctx,'bandpass',800,0.03,1);
-  makeTone(ctx,55,0.08,'sawtooth');
-  makeTone(ctx,110,0.04,'square');
-  // Beat pulse
-  function beat(){
-    if(!roomState.musicPlaying || !roomState.audioCtx) return;
+  // Clean punchy beat — no harsh sawtooth
+  // Deep sub bass pulse
+  function kick(){
+    if(!roomState.musicPlaying||!roomState.audioCtx) return;
+    var o = ctx.createOscillator();
     var g = ctx.createGain();
-    g.gain.setValueAtTime(0.15,ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
-    var buf = ctx.createBuffer(1,ctx.sampleRate*0.1,ctx.sampleRate);
+    o.type='sine';
+    var t = ctx.currentTime;
+    o.frequency.setValueAtTime(150,t);
+    o.frequency.exponentialRampToValueAtTime(40,t+0.15);
+    g.gain.setValueAtTime(0.6,t);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+0.35);
+    setTimeout(kick, 500);
+  }
+  // Hi-hat
+  function hihat(){
+    if(!roomState.musicPlaying||!roomState.audioCtx) return;
+    var buf = ctx.createBuffer(1,ctx.sampleRate*0.05,ctx.sampleRate);
     var d = buf.getChannelData(0);
     for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-    var s = ctx.createBufferSource();
-    s.buffer=buf; s.connect(g); g.connect(ctx.destination); s.start();
-    setTimeout(beat, 500);
+    var hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=8000;
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.08,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);
+    var s = ctx.createBufferSource(); s.buffer=buf;
+    s.connect(hp); hp.connect(g); g.connect(ctx.destination); s.start();
+    setTimeout(hihat, 250);
   }
-  setTimeout(beat,200);
+  // Warm bass tone
+  var bass = ctx.createOscillator();
+  var bassG = ctx.createGain();
+  var bassLp = ctx.createBiquadFilter(); bassLp.type='lowpass'; bassLp.frequency.value=200;
+  bass.type='sine'; bass.frequency.value=55;
+  bassG.gain.setValueAtTime(0,ctx.currentTime); bassG.gain.linearRampToValueAtTime(0.12,ctx.currentTime+1);
+  bass.connect(bassLp); bassLp.connect(bassG); bassG.connect(ctx.destination); bass.start();
+  roomState.audioNodes.push(bass,bassG);
+  setTimeout(kick,100); setTimeout(hihat,50);
 }
 
 function buildAmbient(ctx){
-  makeNoise(ctx,'lowpass',400,0.06,4);
-  makeTone(ctx,80,0.04,'sine');
-  makeTone(ctx,120,0.02,'sine');
-  makeTone(ctx,160,0.015,'sine');
+  // Pure clean sine drones — no noise at all
+  var drones = [
+    {freq:55, gain:0.06, detune:0},
+    {freq:82.4, gain:0.04, detune:2},
+    {freq:110, gain:0.03, detune:-1},
+    {freq:165, gain:0.02, detune:1},
+  ];
+  drones.forEach(function(d,i){
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    var lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=400;
+    o.type='sine'; o.frequency.value=d.freq; o.detune.value=d.detune;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(d.gain, ctx.currentTime+4+i);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start();
+    roomState.audioNodes.push(o,g);
+    // Slow volume swell
+    function swell(){
+      if(!roomState.musicPlaying||!roomState.audioCtx) return;
+      var t = ctx.currentTime;
+      var v = d.gain * (0.6 + Math.random()*0.4);
+      g.gain.linearRampToValueAtTime(v, t+4+Math.random()*4);
+      setTimeout(swell, 5000+Math.random()*5000);
+    }
+    setTimeout(swell, 5000);
+  });
 }
 
 function buildRain(ctx){
-  makeNoise(ctx,'highpass',1000,0.08,2);
-  makeNoise(ctx,'bandpass',3000,0.04,3);
-  makeNoise(ctx,'lowpass',300,0.03,4);
-  // Occasional thunder rumble
-  function thunder(){
-    if(!roomState.musicPlaying || !roomState.audioCtx) return;
+  // Realistic rain — layered filtered noise at different frequencies
+  // Light rain texture
+  var buf1 = ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate);
+  var d1 = buf1.getChannelData(0);
+  for(var i=0;i<d1.length;i++) d1[i]=Math.random()*2-1;
+  var rain1 = ctx.createBufferSource(); rain1.buffer=buf1; rain1.loop=true;
+  var bp1 = ctx.createBiquadFilter(); bp1.type='bandpass'; bp1.frequency.value=3000; bp1.Q.value=0.8;
+  var g1 = ctx.createGain(); g1.gain.setValueAtTime(0,ctx.currentTime); g1.gain.linearRampToValueAtTime(0.12,ctx.currentTime+3);
+  rain1.connect(bp1); bp1.connect(g1); g1.connect(ctx.destination); rain1.start();
+  // Medium rain texture  
+  var buf2 = ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);
+  var d2 = buf2.getChannelData(0);
+  for(var i=0;i<d2.length;i++) d2[i]=Math.random()*2-1;
+  var rain2 = ctx.createBufferSource(); rain2.buffer=buf2; rain2.loop=true;
+  var bp2 = ctx.createBiquadFilter(); bp2.type='bandpass'; bp2.frequency.value=1200; bp2.Q.value=1.2;
+  var g2 = ctx.createGain(); g2.gain.setValueAtTime(0,ctx.currentTime); g2.gain.linearRampToValueAtTime(0.08,ctx.currentTime+4);
+  rain2.connect(bp2); bp2.connect(g2); g2.connect(ctx.destination); rain2.start();
+  // Deep rumble
+  var buf3 = ctx.createBuffer(1,ctx.sampleRate*4,ctx.sampleRate);
+  var d3 = buf3.getChannelData(0);
+  var last=0;
+  for(var i=0;i<d3.length;i++){ last=(last+0.02*(Math.random()*2-1))/1.02; d3[i]=last*4; }
+  var rain3 = ctx.createBufferSource(); rain3.buffer=buf3; rain3.loop=true;
+  var lp3 = ctx.createBiquadFilter(); lp3.type='lowpass'; lp3.frequency.value=120;
+  var g3 = ctx.createGain(); g3.gain.setValueAtTime(0,ctx.currentTime); g3.gain.linearRampToValueAtTime(0.06,ctx.currentTime+5);
+  rain3.connect(lp3); lp3.connect(g3); g3.connect(ctx.destination); rain3.start();
+  roomState.audioNodes.push(rain1,rain2,rain3,g1,g2,g3);
+  // Gentle drips
+  function drip(){
+    if(!roomState.musicPlaying||!roomState.audioCtx) return;
+    var o = ctx.createOscillator();
     var g = ctx.createGain();
+    var freq = 800+Math.random()*400;
+    o.type='sine'; o.frequency.value=freq;
     var t = ctx.currentTime;
     g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(0.06,t+0.3);
-    g.gain.exponentialRampToValueAtTime(0.001,t+3);
-    var buf = ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate);
-    var d = buf.getChannelData(0);
-    for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-    var filt = ctx.createBiquadFilter();
-    filt.type='lowpass'; filt.frequency.value=80;
-    var s = ctx.createBufferSource();
-    s.buffer=buf; s.connect(filt); filt.connect(g); g.connect(ctx.destination); s.start();
-    setTimeout(thunder, 15000+Math.random()*25000);
+    g.gain.linearRampToValueAtTime(0.015,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+0.35);
+    setTimeout(drip, 400+Math.random()*1200);
   }
-  setTimeout(thunder, 8000);
+  setTimeout(drip,2000);
 }
 
 // ── Toast ─────────────────────────────────────────────────────
@@ -3605,6 +3690,36 @@ function showToast(msg){
   t.textContent=msg; t.style.opacity='1';
   clearTimeout(_toastTimer);
   _toastTimer=setTimeout(function(){t.style.opacity='0';},2200);
+}
+
+
+// SMART LANDING PAGE
+function checkRoomShareLink(){
+  var params = new URLSearchParams(window.location.search);
+  var roomCode = params.get('room');
+  if(!roomCode) return;
+  if(window.Capacitor && window.Capacitor.isNativePlatform()){
+    if(roomCode.startsWith('AMP-')){
+      setTimeout(function(){
+        document.getElementById('private-code-input').value = roomCode;
+        openRoomsSheet();
+      }, 1500);
+    }
+    return;
+  }
+  var landing = document.getElementById('room-landing');
+  if(!landing) return;
+  if(roomCode.startsWith('AMP-')){
+    document.getElementById('landing-code-box').style.display='block';
+    document.getElementById('landing-code-display').textContent = roomCode;
+  }
+  landing.classList.add('show');
+  setTimeout(function(){ window.location = 'amplify://?room=' + roomCode; }, 300);
+}
+
+function dismissLanding(){
+  var el = document.getElementById('room-landing');
+  if(el) el.classList.remove('show');
 }
 
 // ── Init rooms on app load ────────────────────────────────────
@@ -3624,33 +3739,6 @@ document.addEventListener('visibilitychange', function(){
   }
 });
 
-
-function checkRoomShareLink(){
-  var params = new URLSearchParams(window.location.search);
-  var roomCode = params.get('room');
-  if(!roomCode) return;
-  if(window.Capacitor && window.Capacitor.isNativePlatform()){
-    if(roomCode.startsWith('AMP-')){
-      setTimeout(function(){
-        var inp = document.getElementById('private-code-input');
-        if(inp){ inp.value=roomCode; openRoomsSheet(); }
-      }, 1500);
-    }
-    return;
-  }
-  var landing = document.getElementById('room-landing');
-  if(!landing) return;
-  if(roomCode.startsWith('AMP-')){
-    document.getElementById('landing-code-box').style.display='block';
-    document.getElementById('landing-code-display').textContent=roomCode;
-  }
-  landing.classList.add('show');
-  setTimeout(function(){ window.location='amplify://?room='+roomCode; },300);
-}
-function dismissLanding(){
-  var el=document.getElementById('room-landing');
-  if(el) el.classList.remove('show');
-}
 function initRooms(){
   checkRoomShareLink();
   loadRoomCounts();
@@ -3843,16 +3931,18 @@ function initRooms(){
 </div>
 
 
+<!-- ROOM SHARE LANDING PAGE -->
 <div id="room-landing">
   <div class="landing-logo">🔥</div>
   <div class="landing-title">Someone invited you to their Amplify room.</div>
-  <div class="landing-sub">Amplify is where people lock in and do the work together. Download the app free to join.</div>
+  <div class="landing-sub">Amplify is where people lock in and do the work — together. Download the app to join.</div>
   <div class="landing-code" id="landing-code-box" style="display:none;">
     <div class="landing-code-label">Room code</div>
     <div class="landing-code-value" id="landing-code-display">AMP-0000</div>
   </div>
-  <a class="landing-btn-primary" href="https://apps.apple.com/app/amplify-make-noise/id6772685979">Download Amplify - Free</a>
-  <a class="landing-btn-secondary" href="#" onclick="dismissLanding();return false;">Already have the app? Open it</a>
+  <a class="landing-btn-primary" href="https://apps.apple.com/app/amplify-make-noise/id6772685979" id="landing-download-btn">Download Amplify — Free</a>
+  <a class="landing-btn-secondary" href="#" onclick="dismissLanding();return false;">Already have the app? Open it →</a>
 </div>
+
 </body>
 </html>
