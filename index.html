@@ -1913,6 +1913,8 @@ function renderTasks(){
     if(sd.indexOf(today)===-1){
       sd.push(today);
       save('amp_streak_days',sd);
+      // Reschedule streak notification with fresh count
+      scheduleLocalNotifications(true);
       // check streak milestones
       var newStreak=sd.length;
       if(newStreak===7||newStreak===14||newStreak===30||newStreak===60||newStreak===100){
